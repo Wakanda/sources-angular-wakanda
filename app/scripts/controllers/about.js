@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('angularWakandaFrontApp')
-        .controller('MainCtrl', function($scope) {
+        .controller('AboutCtrl', function($scope) {
             $scope.awesomeThings = [
                 'HTML5 Boilerplate',
                 'AngularJS',
