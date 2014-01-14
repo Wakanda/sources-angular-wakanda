@@ -1,4 +1,8 @@
 <div id="view-about">
     <h3>About</h3>
     <p>This is the about page.</p>
+    <p>
+        Try a CORS (Cross-origin) XHR request towards our running wakanda server on port 8081 (same IP),<br>
+        the url is simply : <input type="text" ng-model="url" ng-init='url = "http://127.0.0.1:8081/rest/$catalog/Products/"' style='width:150px;'> <a ng-click="xhrToWakanda()" style="text-decoration: underline; cursor: pointer; color: blue;">call</a> (watch in the console).
+    </p>
 </div>
