@@ -21,6 +21,10 @@ angular.module('angularWakandaFrontApp', [
         templateUrl: 'views/connect1.html',
         controller: 'Connect1Ctrl'
       })
+      .when('/retrieve-infos', {
+        templateUrl: 'views/retrieve-infos.html',
+        controller: 'RetrieveInfosCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });

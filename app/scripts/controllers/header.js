@@ -1,14 +1,15 @@
 'use strict';
 
 angular.module('angularWakandaFrontApp')
-        .controller('HeaderCtrl', ['$scope','$location',function($scope, $location) {
+    .controller('HeaderCtrl', ['$scope', '$location', function($scope, $location) {
             $scope.links = [
-                {href : '/', text : 'Home'},
-                {href : '/about', text : 'About'},
-                {href : '/connect1', text : 'Connect1'}
+                {href: '/', text: 'Home'},
+                {href: '/about', text: 'About'},
+                {href: '/connect1', text: 'Connect1'},
+                {href: '/retrieve-infos', text: 'Retrieve infos'}
             ];
-            $scope.isActive = function (viewLocation) {
+            $scope.isActive = function(viewLocation) {
                 var active = (viewLocation === $location.path());
                 return active;
-           };
+            };
         }]);
