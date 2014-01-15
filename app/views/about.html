@@ -1,8 +1,11 @@
 <div id="view-about">
     <h3>About</h3>
-    <p>This is the about page.</p>
-    <p>
-        Try a CORS (Cross-origin) XHR request towards our running wakanda server on port 8081 (same IP),<br>
-        the url is simply : <input type="text" ng-model="url" ng-init="url = 'http://127.0.0.1:9000/rest/$catalog/Products/'" style='width:150px;'> <a ng-click="xhrToWakanda()" style="text-decoration: underline; cursor: pointer; color: blue;">call</a> (watch in the console).
-    </p>
+    <p>Since the Wakanda Server doesn't support <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing" title="Cross-origin resource sharing">CORS</a> requests, it is impossible make direct requests from the node server (port 9000) to our Wakanda server (port 8081) because of the same-origin policy.</p>
+    <p>So, I setup a proxy between the two servers in order to be able to call <code>/rest</code> requests on port 8081 from port 900.</p>
+    <p>Give it a try :</p>
+    <ul>
+        <li><input type="text" ng-model="url1" class="test-url"> <button ng-click="xhrToWakanda(url1)">Test</button> (will raise an error)</li>
+        <li><input type="text" ng-model="url2" class="test-url"> <button ng-click="xhrToWakanda(url2)">Test</button> (will work)</li>
+    </ul>
+    <pre class="{{error ? 'error' : ''}}">{{result}}</pre>
 </div>

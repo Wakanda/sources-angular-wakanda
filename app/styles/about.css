@@ -1,0 +1,6 @@
+#view-about .test-url{
+    width: 300px;
+}
+#view-about pre.error{
+    color : #a94442;
+}
