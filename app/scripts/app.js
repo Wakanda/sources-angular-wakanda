@@ -4,7 +4,8 @@ angular.module('angularWakandaFrontApp', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
-  'ngRoute'
+  'ngRoute',
+  'wakandaConnect1Module'
 ])
   .config(function ($routeProvider) {
     $routeProvider
@@ -15,6 +16,10 @@ angular.module('angularWakandaFrontApp', [
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
+      })
+      .when('/connect1', {
+        templateUrl: 'views/connect1.html',
+        controller: 'Connect1Ctrl'
       })
       .otherwise({
         redirectTo: '/'
