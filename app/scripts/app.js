@@ -5,9 +5,10 @@ angular.module('angularWakandaFrontApp', [
     'ngResource',
     'ngSanitize',
     'ngRoute',
+    'wakConnectorModule',
     'wakandaConnect1Module'
 ])
-  .config(function ($routeProvider) {
+  .config(['$routeProvider', function ($routeProvider) {
         $routeProvider
                 .when('/', {
                     templateUrl: 'views/main.html',
@@ -28,4 +29,4 @@ angular.module('angularWakandaFrontApp', [
                 .otherwise({
                     redirectTo: '/'
                 });
-  });
+  }]);
