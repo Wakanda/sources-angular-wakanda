@@ -13,7 +13,7 @@ angular.module('angularWakandaFrontApp', [
         var wakConnectorService = myInjector.get("wakConnectorService");
         var routeResolver = {
             app : function(wakConnectorService){
-                return wakConnectorService.wait(1000);
+                return wakConnectorService.initDs();
             }
         };
         $routeProvider
