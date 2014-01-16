@@ -9,6 +9,9 @@ angular.module('angularWakandaFrontApp', [
     'wakandaConnect1Module'
 ])
   .config(['$routeProvider', function ($routeProvider) {
+        //there maybe other ways or even services (ones that handles resolve for all routes),
+        //for the moment, this should fit in your bootstrap (or be adaptable), whatever way you did it
+        //see more on README.md
         var myInjector = angular.injector(['ng','wakConnectorModule']);
         var wakConnectorService = myInjector.get("wakConnectorService");
         var routeResolver = {

@@ -1,3 +1,8 @@
 <div id="view-retrieve-infos">
     <h3>Retrieve Infos</h3>
+    <p>Example using <code>ds.Products.toArray</code> with the <code>onSuccess</code> callback.</p>
+    <h4>Products {{productsArray.length}}</h4>
+    <ul>
+        <li ng-repeat="product in productsArray"><label>Name :</label> <strong>{{product.name}}</strong> - object : {{product}}</li>
+    </ul>
 </div>
