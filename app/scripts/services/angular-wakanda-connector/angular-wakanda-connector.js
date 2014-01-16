@@ -3,31 +3,35 @@
 
     var wakConnectorModule = angular.module('wakConnectorModule',[]);
     
-    wakConnectorModule.provider('wakConnectorService',function(){
+    wakConnectorModule.factory('wakConnectorService',['$q',function($q){
         
-        this.$get = ['$q',function($q){
-            
-            var wait = function(duration, forceFail){
-                var deferred = $q.defer();
-                if(forceFail){
-                    setTimeout(function(){
-                        deferred.reject("deferred reject after "+duration+"ms");
-                    },duration);
-                }
-                else{
-                    setTimeout(function(){
-                        deferred.resolve("deferred resolved after "+duration+"ms");
-                    },duration);
-                }
-                return deferred.promise;
-            };
-            
-            return {
-                wait    : wait
-            };
-            
-        }];
+        var time = null;
         
-    });
+        var wait = function(duration, forceFail){
+            console.log('called wait');
+            var deferred = $q.defer();
+            if(forceFail){
+                setTimeout(function(){
+                    time = (new Date()).getTime();
+                    deferred.reject("deferred reject after "+duration+"ms at "+time);
+                },duration);
+            }
+            else{
+                setTimeout(function(){
+                    time = (new Date()).getTime();
+                    deferred.resolve("deferred resolved after "+duration+"ms at "+time);
+                },duration);
+            }
+            return deferred.promise;
+        };
+
+        return {
+            wait    : wait,
+            getTime : function(){
+                return time;
+            }
+        };
+
+    }]);
 
 })();
