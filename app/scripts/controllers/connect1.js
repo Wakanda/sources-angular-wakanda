@@ -1,5 +1,8 @@
 'use strict';
 
+//yes, this is a global (it is meant to be, so that you could play with it in the console)
+var connectDs;
+
 angular.module('angularWakandaFrontApp')
     .controller('Connect1Ctrl', ['$scope', 'wakandaConnect1Service', function($scope, wakandaConnect1Service) {
         //init scope variables
@@ -8,11 +11,11 @@ angular.module('angularWakandaFrontApp')
         
         //declare public scope methods
         $scope.getDs = function(){
-            var closuredDs = wakandaConnect1Service.getDs({
+            connectDs = wakandaConnect1Service.getDs({
                 catalog : $scope.catalog,
                 forceReload : $scope.forceReload
             });
-            console.log('closuredDs',closuredDs);
+            console.log('connectDs',connectDs);
         };
         $scope.getDsWithCallbacks = function(){
             var closuredDs = wakandaConnect1Service.getDs({
@@ -25,6 +28,6 @@ angular.module('angularWakandaFrontApp')
                     console.error('getDsWithCallbacks - got an error',e);
                 }
             });
-            console.log('closuredDs',closuredDs);
+            console.log('connectDs',connectDs);
         };
     }]);
