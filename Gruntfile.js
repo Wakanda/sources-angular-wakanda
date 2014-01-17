@@ -34,6 +34,8 @@ module.exports = function(grunt) {
         middlewares.push(connect.directory(directory));
         return middlewares;
     };
+    
+    var wakandaApp = require('./wakandaApp.json');
 
     // Define the configuration for all the tasks
     grunt.initConfig({
@@ -42,10 +44,7 @@ module.exports = function(grunt) {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
             dist: 'dist',
-            wakandaApp : {
-                host : '127.0.0.1',
-                port : 8081
-            }
+            wakandaApp : wakandaApp
         },
         // Watches files for changes and runs tasks based on the changed files
         watch: {
@@ -150,6 +149,15 @@ module.exports = function(grunt) {
                             '.tmp',
                             '<%= yeoman.dist %>/*',
                             '!<%= yeoman.dist %>/.git*'
+                        ]
+                    }]
+            },
+            wakWebFolder: {
+                files: [{
+                        dot: true,
+                        src: [
+                            '<%= yeoman.wakandaApp.wakWebFolder %>/*',
+                            '!<%= yeoman.wakandaApp.wakWebFolder %>/.git*'
                         ]
                     }]
             },
@@ -285,6 +293,25 @@ module.exports = function(grunt) {
                         src: ['generated/*']
                     }]
             },
+            wakWebFolder: {
+                files: [{
+                        expand: true,
+                        dot: true,
+                        cwd: '<%= yeoman.dist %>',
+                        dest: '<%= yeoman.wakandaApp.wakWebFolder %>',
+                        src: [
+                            '*.{ico,png,txt}',
+                            '.htaccess',
+                            '*.html',
+                            'views/{,*/}*.html',
+                            'scripts/{,*/}*.js',
+                            'styles/{,*/}*.css',
+                            'bower_components/**/*',
+                            'images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+                            'fonts/*'
+                        ]
+                    }]
+            },
             styles: {
                 expand: true,
                 cwd: '<%= yeoman.app %>/styles',
@@ -387,6 +414,11 @@ module.exports = function(grunt) {
         'rev',
         'usemin',
         'htmlmin'
+    ]);
+    
+    grunt.registerTask('wakCopyBuild',[
+        'clean:wakWebFolder',
+        'copy:wakWebFolder'
     ]);
 
     grunt.registerTask('default', [
