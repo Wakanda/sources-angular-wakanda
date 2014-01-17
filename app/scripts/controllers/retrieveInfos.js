@@ -7,14 +7,12 @@ angular.module('angularWakandaFrontApp')
         ds = wakConnectorService.getDs();
 
         //all() version
-        $scope.products;
         products = $scope.products = ds.Products.all({
             onSuccess:function(){ $scope.$apply();}
         });
         console.log('$scope.products',$scope.products);
         
         //toArray() version
-        $scope.productsArray;
         ds.Products.toArray(null,{
             onSuccess:function(result){
                 productsArray = $scope.productsArray = result.result;
