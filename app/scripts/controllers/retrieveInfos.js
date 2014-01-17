@@ -3,7 +3,7 @@
 var products,productsArray,ds;
 
 angular.module('angularWakandaFrontApp')
-    .controller('RetrieveInfosCtrl', ['$scope','wakConnectorService', '$q',function($scope,wakConnectorService, $q) {
+    .controller('RetrieveInfosCtrl', ['$scope','wakConnectorService', function($scope,wakConnectorService) {
         ds = wakConnectorService.getDs();
 
         //all() version

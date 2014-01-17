@@ -6,7 +6,8 @@ angular.module('angularWakandaFrontApp')
                 {href: '/', text: 'Home'},
                 {href: '/about', text: 'About'},
                 {href: '/connect1', text: 'Connect1'},
-                {href: '/retrieve-infos', text: 'Retrieve infos'}
+                {href: '/retrieve-infos', text: 'Retrieve infos'},
+                {href: '/example1', text: 'Example1'}
             ];
             $scope.isActive = function(viewLocation) {
                 var active = (viewLocation === $location.path());

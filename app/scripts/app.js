@@ -22,26 +22,27 @@ angular.module('angularWakandaFrontApp', [
         $routeProvider
                 .when('/', {
                     templateUrl: 'views/main.html',
-                    controller: 'MainCtrl',
-                    resolve: routeResolver
+                    controller: 'MainCtrl'
                 })
                 .when('/about', {
                     templateUrl: 'views/about.html',
-                    controller: 'AboutCtrl',
-                    resolve: routeResolver
+                    controller: 'AboutCtrl'
                 })
                 .when('/connect1', {
                     templateUrl: 'views/connect1.html',
-                    controller: 'Connect1Ctrl',
-                    resolve: routeResolver
+                    controller: 'Connect1Ctrl'
                 })
                 .when('/retrieve-infos', {
                     templateUrl: 'views/retrieve-infos.html',
                     controller: 'RetrieveInfosCtrl',
                     resolve: routeResolver
                 })
-                .otherwise({
-                    redirectTo: '/',
+                .when('/example1', {
+                    templateUrl: 'views/example1.html',
+                    controller: 'Example1Ctrl',
                     resolve: routeResolver
+                })
+                .otherwise({
+                    redirectTo: '/'
                 });
   }]);
