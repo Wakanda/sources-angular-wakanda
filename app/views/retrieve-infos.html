@@ -1,8 +1,23 @@
 <div id="view-retrieve-infos" ng-cloak>
     <h3>Retrieve Infos</h3>
     <p>Example using <code>ds.Products.toArray</code> with the <code>onSuccess</code> callback.</p>
-    <h4>Products <small>({{productsArray.length}} items)</small></h4>
     <ul>
-        <li ng-repeat="product in productsArray"><label>Name :</label> <strong>{{product.name}}</strong> - object : {{product}}</li>
+        <li ng-click="extendView(false)">simple view</li>
+        <li ng-click="extendView(true)">expanded view</li>
+    </ul>
+    <h4>Products <small>({{productsArray.length}} items)</small></h4>
+    <ul ng-show="extended">
+        <li ng-repeat="product in productsArray">object : {{product}}
+            <ul>
+                <li><label>Name :</label> <strong>{{product.name}}</strong></li>
+                <li><label>ID :</label> <strong>{{product.ID}}</strong></li>
+                <li><label>__STAMP :</label> <strong>{{product.__STAMP}}</strong></li>
+                <li><label>__KEY :</label> <strong>{{product.__KEY}}</strong></li>
+                <li><label>$$hashKey :</label> <strong>{{product.$$hashKey}}</strong></li>
+            </ul>
+        </li>
+    </ul>
+    <ul ng-show="!extended">
+        <li ng-repeat="product in productsArray"><label>Name :</label> <strong>{{product.name}}</strong></li>
     </ul>
 </div>

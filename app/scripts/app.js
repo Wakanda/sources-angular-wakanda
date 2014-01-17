@@ -42,6 +42,11 @@ angular.module('angularWakandaFrontApp', [
                     controller: 'Example1Ctrl',
                     resolve: routeResolver
                 })
+                .when('/example2', {
+                    templateUrl: 'views/example2.html',
+                    controller: 'Example2Ctrl',
+                    resolve: routeResolver
+                })
                 .otherwise({
                     redirectTo: '/'
                 });
