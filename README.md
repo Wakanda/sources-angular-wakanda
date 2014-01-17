@@ -16,9 +16,14 @@ Once you have all above, to init :
 
 Last step : duplicate wakandaApp.default.json to wakandaApp.json and set your own settings
 
-To test :
+Grunt tasks :
 
-* `grunt serve` (will launch your app in livereload mode)
+* To test (will launch a test server) : `grunt serve` (will launch your app in livereload mode)
+* To test in build mode (will build AND launch a server) : `grunt serve:dist`
+* To build only : `grunt build` (your build is in `dist` flder)
+* To copy your build to your Wakanda Project folder :
+    * first run `grunt build`
+    * then run `grunt wakCopyBuild` probably with `--force` (warning, before copying, it cleans up the WebFolder so be sure of what you set in wakandaApp.json)
 
 ---
 
