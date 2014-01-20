@@ -1,6 +1,6 @@
 'use strict';
 
-var ds, products, queryResult, toArrayResult;
+var ds, products, toArrayResult;
 
 angular.module('angularWakandaFrontApp')
         .controller('Example3Ctrl', ['$scope','wakConnectorService',function($scope,wakConnectorService) {
@@ -21,17 +21,13 @@ angular.module('angularWakandaFrontApp')
                     query = 'name = *';
                 }
             
-                ds.Products.query(query,{
+                ds.Products.toArray(null,{
+                    filterQuery: query,
                     onSuccess:function(result){
-                        queryResult = result;
-                        result.result.toArray(null,{
-                            onSuccess : function(result){
-                                $scope.$apply(function(){
-                                    toArrayResult = result;
-                                    products = $scope.products = result.result;
-                                    console.log('products',products);
-                                });
-                            }
+                        $scope.$apply(function(){
+                            toArrayResult = result;
+                            products = $scope.products = result.result;
+                            console.log('products',products);
                         });
                     }
                 });
