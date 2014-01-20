@@ -1220,8 +1220,67 @@ WAF.DataClass.query = function(queryString, options, userData)
 	options = resOp.options;
 	
 	var dataClass = this;
-	var entityCollection = new WAF.EntityCollection(dataClass, queryString, options, userData)
-	return entityCollection;
+	/*
+	if (options.asArray)
+	{
+	    var request = new WAF.core.restConnect.restRequest(true);
+	    
+	    request.resource = dataClass.getName();
+		
+	   	request.filter = priv.queryString;
+	    
+	    request.top = top;
+		request.skip = skip;
+		request.attributesRequested = null;
+		request.attributesExpanded = null;
+		request.autoExpand = priv.autoExpand;
+		request.autoSubExpand = priv.autoSubExpand;
+		request.filterAttributes = priv.filterAttributes;
+		request.params = priv.params;
+		
+		request.orderby = options.orderby;
+		
+		request.retainPositions = options.retainPositions || null;
+		
+		request.progressInfo = options.progressInfo;
+			
+		request.orderby = options.orderby;
+		request.autoExpand = attributeList;
+		request.asArray = true;
+		
+		if (options.filterQuery)
+		{
+			request.filter = options.filterQuery;
+			request.params = options.params;
+		}
+	
+		request.handler = function(){
+		        
+		    if (request.http_request.readyState != 4) {
+		        return;
+		    }
+		    
+		    var rawResult = WAF.getRequestResult(request);
+		    
+		    var event = { dataClass: dataClass, result:rawResult, XHR: request.http_request };
+			
+			var withError = rawResult.__ERROR != null;
+			
+			WAF.callHandler(withError, rawResult.__ERROR, event, options, userData);	
+		          
+		};
+	
+		var errorFlag = request.go();
+		
+
+		return null;
+	}
+	else
+	{
+	*/
+		var entityCollection = new WAF.EntityCollection(dataClass, queryString, options, userData);
+		return entityCollection;
+	//}
 }
 
 
@@ -3089,6 +3148,8 @@ WAF.Entity = function(dataClass, rawData, options)
 	this.touch = WAF.Entity.touch;
 	this.getDataClass = WAF.Entity.getDataClass;
 	this.getKey = WAF.Entity.getKey;
+	this.setStamp = WAF.Entity.setStamp;
+	this.setKey = WAF.Entity.setKey;
 	this.getStamp = WAF.Entity.getStamp;
 	this.callMethod = WAF.Entity.callMethod;
 	this.isNew = WAF.Entity.isNew;
@@ -3194,6 +3255,16 @@ WAF.Entity.getKey = function()
 WAF.Entity.getStamp = function()
 {
 	return this._private.stamp;
+}
+
+WAF.Entity.setKey = function(key)
+{
+	this._private.key = key;
+}
+
+WAF.Entity.setStamp = function(stamp)
+{
+	this._private.stamp = stamp;
 }
 
 
