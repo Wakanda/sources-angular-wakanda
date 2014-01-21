@@ -14,7 +14,7 @@ angular.module('angularWakandaFrontApp', [
         //see more on README.md
         var routeResolver = {
             app : ['wakConnectorService',function(wakConnectorService){
-                return wakConnectorService.initDs();
+                return wakConnectorService.init();
             }]
         };
         $routeProvider

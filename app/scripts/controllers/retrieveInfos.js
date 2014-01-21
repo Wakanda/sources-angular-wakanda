@@ -4,7 +4,7 @@ var products,productsArray,ds;
 
 angular.module('angularWakandaFrontApp')
     .controller('RetrieveInfosCtrl', ['$scope','wakConnectorService', function($scope,wakConnectorService) {
-        ds = wakConnectorService.getDs();
+        ds = wakConnectorService.getDatastore();
 
         $scope.extended = false;
         

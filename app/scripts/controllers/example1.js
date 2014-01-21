@@ -4,7 +4,7 @@ var ds, products, queryResult;
 
 angular.module('angularWakandaFrontApp')
         .controller('Example1Ctrl', ['$scope','wakConnectorService',function($scope,wakConnectorService) {
-            ds = wakConnectorService.getDs();
+            ds = wakConnectorService.getDatastore();
             
             $scope.query = 'name = "*"';
             

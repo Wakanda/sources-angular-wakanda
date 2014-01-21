@@ -7,8 +7,8 @@
         
         var ds = null;
         
-        var initDs = function(catalog){
-            console.log('>wakConnectorService initDs');
+        var init = function(catalog){
+            console.log('>wakConnectorService init');
             var deferred = $q.defer();
             if(typeof catalog !== "string" || catalog === '*' || catalog === ''){
                 catalog = null;
@@ -17,12 +17,12 @@
                 new WAF.DataStore({
                     onSuccess: function(event){
                         ds = event.dataStore;
-                        console.log('>wakConnectorService initDs > success',event);
+                        console.log('>wakConnectorService init > success',event);
                         deferred.resolve(ds);
                     },
                     onError: function(event){
                         ds = null;
-                        console.error('>wakConnectorService initDs > error',event);
+                        console.error('>wakConnectorService init > error',event);
                         deferred.reject(event);
                     },
                     catalog: catalog
@@ -34,18 +34,18 @@
             return deferred.promise;
         };
         
-        var getDs = function(){
+        var getDatastore = function(){
             if(ds !== null){
                 return ds;
             }
             else{
-                throw new Error("The Datastore isn't initialized please execute .initDs(catalog) before you run your app.");
+                throw new Error("The Datastore isn't initialized please execute .init(catalog) before you run your app.");
             }
         };
 
         return {
-            initDs  : initDs,
-            getDs   : getDs
+            init  : init,
+            getDatastore   : getDatastore
         };
 
     }]);
