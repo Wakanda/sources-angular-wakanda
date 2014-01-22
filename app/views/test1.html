@@ -1,0 +1,57 @@
+<div id="view-test1" ng-cloak>
+    <h3>Test 1</h3>
+    <p>First implementation of <code>.$find()</code></p>
+    <ul>
+        <li ng-click="extendView(false)">simple view</li>
+        <li ng-click="extendView(true)">expanded view</li>
+    </ul>
+    <h4>Which table query ?</h4>
+    <ul>
+        <li ng-click="show('Products')">Products</li>
+        <li ng-click="show('Employee')">Employee</li>
+        <li ng-click="show('Company')">Company</li>
+    </ul>
+    <div ng-show="display === 'Products'">
+        <p><label>Request on products :</label> <input type="text" ng-model="productsQuery"></p>
+        <h4>Products <small>({{products.length}} items)</small></h4>
+        <ul ng-show="extended">
+            <li ng-repeat="product in products">object : {{product}}
+                <ul>
+                    <li><label>Name :</label> <strong>{{product.name}}</strong></li>
+                    <li><label>ID :</label> <strong>{{product.ID}}</strong></li>
+                    <li><label>__STAMP :</label> <strong>{{product.__STAMP}}</strong></li>
+                    <li><label>__KEY :</label> <strong>{{product.__KEY}}</strong></li>
+                    <li><label>$$hashKey :</label> <strong>{{product.$$hashKey}}</strong></li>
+                </ul>
+            </li>
+        </ul>
+        <ul ng-show="!extended">
+            <li ng-repeat="product in products"><label>Name :</label> <strong>{{product.name}}</strong></li>
+        </ul>
+    </div>
+    <div ng-show="display === 'Employee'">
+        <p><label>Request on employee :</label> <input type="text" ng-model="employeeQuery" size="80"></p>
+        <h4>Employee <small>({{employees.length}} items)</small></h4>
+        <ul ng-show="extended">
+            <li ng-repeat="employee in employees | limitTo:150">object : {{employee}}
+                <ul>
+                    <li><label>lastName :</label> <strong>{{employee.lastName}}</strong></li>
+                    <li><label>firstName :</label> <strong>{{employee.firstName}}</strong></li>
+                    <li><label>salary :</label> <strong>{{employee.salary}}</strong></li>
+                    <li><label>ID :</label> <strong>{{employee.ID}}</strong></li>
+                    <li><label>__STAMP :</label> <strong>{{employee.__STAMP}}</strong></li>
+                    <li><label>__KEY :</label> <strong>{{employee.__KEY}}</strong></li>
+                    <li><label>$$hashKey :</label> <strong>{{employee.$$hashKey}}</strong></li>
+                </ul>
+            </li>
+        </ul>
+        <ul ng-show="!extended">
+            <li ng-repeat="employee in employees | limitTo:150">
+                <strong>{{employee.firstName}} {{employee.lastName}}</strong> employed by <strong>{{employee.employer.name}}</strong>
+            </li>
+        </ul>
+    </div>
+    <div ng-show="display === 'Company'">
+        <p>Not yet implemented ...</p>
+    </div>
+</div>
