@@ -47,7 +47,7 @@
         </ul>
         <ul ng-show="!extended">
             <li ng-repeat="employee in employees | limitTo:150">
-                <strong>{{employee.firstName}} {{employee.lastName}}</strong> employed by <strong>{{employee.employer.name}}</strong>
+                <strong>{{employee.firstName}} {{employee.lastName}}</strong> ({{employee.salary | currency}}) employed by <strong>{{employee.employer.name}}</strong>
             </li>
         </ul>
     </div>
@@ -85,7 +85,7 @@
         </ul>
         <ul ng-show="!extended">
             <li ng-repeat="employee in employeesFiltered | filter:search:strict | orderBy:employeesFilteredPredicate:employeesFilteredReverse | limitTo:150">
-                <strong>{{employee.firstName}} {{employee.lastName}}</strong> employed by <strong>{{employee.employer.name}}</strong>
+                <strong>{{employee.firstName}} {{employee.lastName}}</strong> ({{employee.salary | currency}}) employed by <strong>{{employee.employer.name}}</strong>
             </li>
         </ul>
     </div>
