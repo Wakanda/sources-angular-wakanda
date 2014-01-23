@@ -9,6 +9,7 @@
 
             var init = function(catalog) {
                 console.log('>wakConnectorService init');
+                wakToAngular.prepareWAF();
                 var deferred = $q.defer();
                 if (typeof catalog !== "string" || catalog === '*' || catalog === '') {
                     catalog = null;
@@ -56,8 +57,6 @@
             };           
             
             /**
-             * @scope WAF.DataClass
-             * @todo for the moment, set on each DataClass, maybe set on the DataClass.prototype ?
              * 
              * @param {Object} options
              * @returns {$q.promise}
@@ -109,18 +108,22 @@
             };
 
             var wakToAngular = {
+                prepareWAF : function(){
+                    WAF.DataClass.prototype.$find = $$find;
+                },
                 transformDatastore: function(dataStore) {
                     var dataClass;
+                    console.group('wakToAngular.transformDatastore()',dataStore);
                     for (dataClass in dataStore) {
                         if (dataStore.hasOwnProperty(dataClass) && dataClass !== "_private") {
-                            console.log(dataClass, dataStore[dataClass]);
                             wakToAngular.transformDataClass(dataStore[dataClass]);
                         }
                     }
+                    console.groupEnd();
                 },
                 transformDataClass: function(dataClass) {
-                    console.log('transformDataClass', dataClass);
-                    dataClass.$find = $$find;
+                    console.group('wakToAngular.transformDataClass(%s)',dataClass._private.className,dataClass);
+                    console.groupEnd();
                 },
                 transformEntityArray: function(entityArray) {
 
