@@ -21,6 +21,7 @@
     "after": false,
     "afterEach": false,
     "angular": false,
+    "WAF" : false
     "before": false,
     "beforeEach": false,
     "browser": false,

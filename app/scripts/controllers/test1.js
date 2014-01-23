@@ -17,6 +17,35 @@ angular.module('angularWakandaFrontApp')
                 $scope.display = tableName;
             };
             
+            $scope.orderByOptions = [
+                {"label" : "none", "value" : "none"},
+                {"label" : "firstName asc", "value" : "firstName:asc"},
+                {"label" : "firstName desc", "value" : "firstName:desc"},
+                {"label" : "lastName asc", "value" : "lastName:asc"},
+                {"label" : "lastName desc", "value" : "lastName:desc"}
+            ];
+            
+            $scope.orderBy = $scope.orderByOptions[0];//init the select to none
+            
+            var setOrderByFilterOnEmployeesFilteredFromCombo = function(comboValue){
+                var tmp;
+                if(comboValue.value === "none"){
+                    $scope.employeesFilteredPredicate = "";
+                }
+                else{
+                    tmp = comboValue.value.split(':');
+                    $scope.employeesFilteredPredicate = tmp[0];
+                    $scope.employeesFilteredReverse = tmp[1] === "asc" ? false : true;
+                }
+            };
+            
+            $scope.$watch('orderBy',function(comboValue){
+                console.log('watch',comboValue);
+                setOrderByFilterOnEmployeesFilteredFromCombo(comboValue);
+            });
+            
+            //bellow : server requests
+            
             /** products */
             
             $scope.productsQuery = 'name = "*"';
@@ -57,7 +86,7 @@ angular.module('angularWakandaFrontApp')
                     orderBy : 'firstName asc'
                 }).then(function(event){
                     console.log(event);
-                    products = $scope.employees = event.result;
+                    products = $scope.employees = $scope.employeesFiltered = event.result;
                 });
                 
             });

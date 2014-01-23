@@ -9,7 +9,7 @@
     <ul>
         <li ng-click="show('Products')">Products</li>
         <li ng-click="show('Employee')">Employee</li>
-        <li ng-click="show('Company')">Company</li>
+        <li ng-click="show('EmployeeFilter')">Employee with angular filter</li>
     </ul>
     <div ng-show="display === 'Products'">
         <p><label>Request on products :</label> <input type="text" ng-model="productsQuery"></p>
@@ -30,7 +30,7 @@
         </ul>
     </div>
     <div ng-show="display === 'Employee'">
-        <p><label>Request on employee :</label> <input type="text" ng-model="employeeQuery" size="80"></p>
+        <p><label>Request on employee :</label> <input type="text" ng-model="employeeQuery" size="70"></p>
         <h4>Employee <small>({{employees.length}} items)</small></h4>
         <ul ng-show="extended">
             <li ng-repeat="employee in employees | limitTo:150">object : {{employee}}
@@ -51,7 +51,42 @@
             </li>
         </ul>
     </div>
-    <div ng-show="display === 'Company'">
-        <p>Not yet implemented ...</p>
+    <div ng-show="display === 'EmployeeFilter'">
+        <p><label>Request on employee (<strong>REST request to the server</strong>) :</label> <input type="text" ng-model="employeeQuery" size="70"></p>
+        <p><strong>filter</strong> and <strong>orderBy</strong> on the result set retrieved (with angular filters - <strong>no http requests</strong>) :</p>
+        <ul>
+            <li>
+                filter : 
+                <ul>
+                    <li><label>firstName</label> <input type="text" ng-model="search.firstName"></li>
+                    <li><label>lastName</label> <input type="text" ng-model="search.lastName"></li>
+                    <li><label>employer.name</label> <input type="text" ng-model="search.employer.name"></li>
+                </ul>
+            </li>
+            <li>
+                orderBy : select as label for value in array
+                <select ng-model="orderBy" ng-options="orderByOption.label for orderByOption in orderByOptions">
+                </select>
+            </li>
+        </ul>
+        <h4>Employee <small>({{(employeesFiltered | filter:search:strict).length}} items)</small></h4>
+        <ul ng-show="extended">
+            <li ng-repeat="employee in employeesFiltered | filter:search:strict | orderBy:employeesFilteredPredicate:employeesFilteredReverse | limitTo:150">object : {{employee}}
+                <ul>
+                    <li><label>lastName :</label> <strong>{{employee.lastName}}</strong></li>
+                    <li><label>firstName :</label> <strong>{{employee.firstName}}</strong></li>
+                    <li><label>salary :</label> <strong>{{employee.salary}}</strong></li>
+                    <li><label>ID :</label> <strong>{{employee.ID}}</strong></li>
+                    <li><label>__STAMP :</label> <strong>{{employee.__STAMP}}</strong></li>
+                    <li><label>__KEY :</label> <strong>{{employee.__KEY}}</strong></li>
+                    <li><label>$$hashKey :</label> <strong>{{employee.$$hashKey}}</strong></li>
+                </ul>
+            </li>
+        </ul>
+        <ul ng-show="!extended">
+            <li ng-repeat="employee in employeesFiltered | filter:search:strict | orderBy:employeesFilteredPredicate:employeesFilteredReverse | limitTo:150">
+                <strong>{{employee.firstName}} {{employee.lastName}}</strong> employed by <strong>{{employee.employer.name}}</strong>
+            </li>
+        </ul>
     </div>
 </div>
