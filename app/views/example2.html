@@ -13,8 +13,8 @@
     </ul>
     <p><label>Request on product :</label> <input type="text" ng-model="query"></p>
     <ul>
-        <li ng-click="extendView(false)">simple view</li>
-        <li ng-click="extendView(true)">expanded view</li>
+        <li ng-click="extendView(false)" ng-class="{ active: !extended }">simple view</li>
+        <li ng-click="extendView(true)" ng-class="{ active: extended }">expanded view</li>
     </ul>
     <h4>Products <small>({{products.length}} items)</small></h4>
     <ul ng-show="extended">
