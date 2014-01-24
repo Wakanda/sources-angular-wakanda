@@ -1,6 +1,6 @@
 'use strict';
 
-var ds, products, toArrayResult, rs;
+var ds, products, toArrayResult, rs, employees;
 
 angular.module('angularWakandaFrontApp')
         .controller('Test1Ctrl', ['$scope','$rootScope','wakConnectorService',function($scope,$rootScope,wakConnectorService) {
@@ -68,7 +68,8 @@ angular.module('angularWakandaFrontApp')
             
             /** employee */
             
-            $scope.employeeQuery = 'firstName = "*" and employer.name = "*"';
+//            $scope.employeeQuery = 'firstName = "*" and employer.name = "*"';
+            $scope.employeeQuery = 'firstName = "*"';
             
             $scope.employees = [];
             
@@ -79,14 +80,15 @@ angular.module('angularWakandaFrontApp')
             
                 ds.Employee.$find({
                     select : 'firstName, lastName, salary, employer',
+//                    select : 'firstName, lastName, salary',
                     filter : query,
 //                    limit: 10,
 //                    offset : 5,
-//                    pageSize : 20,//no pageSize on toArray
+                    pageSize : 70,//no pageSize on toArray
                     orderBy : 'firstName asc'
                 }).then(function(event){
                     console.log(event);
-                    products = $scope.employees = $scope.employeesFiltered = event.result;
+                    employees = $scope.employees = $scope.employeesFiltered = event.result;
                 });
                 
             });
