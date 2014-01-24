@@ -1,92 +1,92 @@
 <div id="view-test1" ng-cloak>
-    <h3>Test 1</h3>
-    <p>First implementation of <code>.$find()</code></p>
-    <ul>
-        <li ng-click="extendView(false)" ng-class="{ active: !extended }">simple view</li>
-        <li ng-click="extendView(true)" ng-class="{ active: extended }">expanded view</li>
-    </ul>
-    <h4>Which table query ?</h4>
-    <ul>
-        <li ng-click="show('Products')" ng-class="{ active: display === 'Products' }">Products</li>
-        <li ng-click="show('Employee')" ng-class="{ active: display === 'Employee' }">Employee</li>
-        <li ng-click="show('EmployeeFilter')" ng-class="{ active: display === 'EmployeeFilter' }">Employee with angular filter</li>
-    </ul>
-    <div ng-show="display === 'Products'">
-        <p><label>Request on products :</label> <input type="text" ng-model="productsQuery"></p>
-        <h4>Products <small>({{products.length}} items)</small></h4>
-        <ul ng-show="extended">
-            <li ng-repeat="product in products">object : {{product}}
-                <ul>
-                    <li><label>Name :</label> <strong>{{product.name}}</strong></li>
-                    <li><label>ID :</label> <strong>{{product.ID}}</strong></li>
-                    <li><label>__STAMP :</label> <strong>{{product.__STAMP}}</strong></li>
-                    <li><label>__KEY :</label> <strong>{{product.__KEY}}</strong></li>
-                    <li><label>$$hashKey :</label> <strong>{{product.$$hashKey}}</strong></li>
-                </ul>
-            </li>
-        </ul>
-        <ul ng-show="!extended">
-            <li ng-repeat="product in products"><label>Name :</label> <strong>{{product.name}}</strong></li>
-        </ul>
-    </div>
-    <div ng-show="display === 'Employee'">
-        <p><label>Request on employee :</label> <input type="text" ng-model="employeeQuery" size="70"></p>
-        <h4>Employee <small>({{employees.length}} items)</small></h4>
-        <ul ng-show="extended">
-            <li ng-repeat="employee in employees | limitTo:150">object : {{employee}}
-                <ul>
-                    <li><label>lastName :</label> <strong>{{employee.lastName}}</strong></li>
-                    <li><label>firstName :</label> <strong>{{employee.firstName}}</strong></li>
-                    <li><label>salary :</label> <strong>{{employee.salary}}</strong></li>
-                    <li><label>ID :</label> <strong>{{employee.ID}}</strong></li>
-                    <li><label>__STAMP :</label> <strong>{{employee.__STAMP}}</strong></li>
-                    <li><label>__KEY :</label> <strong>{{employee.__KEY}}</strong></li>
-                    <li><label>$$hashKey :</label> <strong>{{employee.$$hashKey}}</strong></li>
-                </ul>
-            </li>
-        </ul>
-        <ul ng-show="!extended">
-            <li ng-repeat="employee in employees | limitTo:150">
-                <strong>{{employee.firstName}} {{employee.lastName}}</strong> ({{employee.salary | currency}}) employed by <strong>{{employee.employer.name}}</strong>
-            </li>
-        </ul>
-    </div>
-    <div ng-show="display === 'EmployeeFilter'">
-        <p><label>Request on employee (<strong>REST request to the server</strong>) :</label> <input type="text" ng-model="employeeQuery" size="70"></p>
-        <p><strong>filter</strong> and <strong>orderBy</strong> on the result set retrieved (with angular filters - <strong>no http requests</strong>) :</p>
+  <h3>Test 1</h3>
+  <p>First implementation of <code>.$find()</code></p>
+  <ul>
+    <li ng-click="extendView(false)" ng-class="{ active: !extended }">simple view</li>
+    <li ng-click="extendView(true)" ng-class="{ active: extended }">expanded view</li>
+  </ul>
+  <h4>Which table query ?</h4>
+  <ul>
+    <li ng-click="show('Products')" ng-class="{ active: display === 'Products' }">Products</li>
+    <li ng-click="show('Employee')" ng-class="{ active: display === 'Employee' }">Employee</li>
+    <li ng-click="show('EmployeeFilter')" ng-class="{ active: display === 'EmployeeFilter' }">Employee with angular filter</li>
+  </ul>
+  <div ng-show="display === 'Products'">
+    <p><label>Request on products :</label> <input type="text" ng-model="productsQuery"></p>
+    <h4>Products <small>({{products.length}} items)</small></h4>
+    <ul ng-show="extended">
+      <li ng-repeat="product in products">object : {{product}}
         <ul>
-            <li>
-                filter : 
-                <ul>
-                    <li><label>firstName</label> <input type="text" ng-model="search.firstName"></li>
-                    <li><label>lastName</label> <input type="text" ng-model="search.lastName"></li>
-                    <li><label>employer.name</label> needs a custom filter (for nested objects)</li>
-                </ul>
-            </li>
-            <li>
-                orderBy : select as label for value in array
-                <select ng-model="orderBy" ng-options="orderByOption.label for orderByOption in orderByOptions">
-                </select>
-            </li>
+          <li><label>Name :</label> <strong>{{product.name}}</strong></li>
+          <li><label>ID :</label> <strong>{{product.ID}}</strong></li>
+          <li><label>__STAMP :</label> <strong>{{product.__STAMP}}</strong></li>
+          <li><label>__KEY :</label> <strong>{{product.__KEY}}</strong></li>
+          <li><label>$$hashKey :</label> <strong>{{product.$$hashKey}}</strong></li>
         </ul>
-        <h4>Employee <small>({{(employeesFiltered | filter:search:strict).length}} items)</small></h4>
-        <ul ng-show="extended">
-            <li ng-repeat="employee in employeesFiltered | filter:search:strict | orderBy:employeesFilteredPredicate:employeesFilteredReverse | limitTo:150">object : {{employee}}
-                <ul>
-                    <li><label>lastName :</label> <strong>{{employee.lastName}}</strong></li>
-                    <li><label>firstName :</label> <strong>{{employee.firstName}}</strong></li>
-                    <li><label>salary :</label> <strong>{{employee.salary}}</strong></li>
-                    <li><label>ID :</label> <strong>{{employee.ID}}</strong></li>
-                    <li><label>__STAMP :</label> <strong>{{employee.__STAMP}}</strong></li>
-                    <li><label>__KEY :</label> <strong>{{employee.__KEY}}</strong></li>
-                    <li><label>$$hashKey :</label> <strong>{{employee.$$hashKey}}</strong></li>
-                </ul>
-            </li>
+      </li>
+    </ul>
+    <ul ng-show="!extended">
+      <li ng-repeat="product in products"><label>Name :</label> <strong>{{product.name}}</strong></li>
+    </ul>
+  </div>
+  <div ng-show="display === 'Employee'">
+    <p><label>Request on employee :</label> <input type="text" ng-model="employeeQuery" size="70"></p>
+    <h4>Employee <small>({{employees.length}} items)</small></h4>
+    <ul ng-show="extended">
+      <li ng-repeat="employee in employees| limitTo:150">object : {{employee}}
+        <ul>
+          <li><label>lastName :</label> <strong>{{employee.lastName}}</strong></li>
+          <li><label>firstName :</label> <strong>{{employee.firstName}}</strong></li>
+          <li><label>salary :</label> <strong>{{employee.salary}}</strong></li>
+          <li><label>ID :</label> <strong>{{employee.ID}}</strong></li>
+          <li><label>__STAMP :</label> <strong>{{employee.__STAMP}}</strong></li>
+          <li><label>__KEY :</label> <strong>{{employee.__KEY}}</strong></li>
+          <li><label>$$hashKey :</label> <strong>{{employee.$$hashKey}}</strong></li>
         </ul>
-        <ul ng-show="!extended">
-            <li ng-repeat="employee in employeesFiltered | filter:search:strict | orderBy:employeesFilteredPredicate:employeesFilteredReverse | limitTo:150">
-                <strong>{{employee.firstName}} {{employee.lastName}}</strong> ({{employee.salary | currency}}) employed by <strong>{{employee.employer.name}}</strong>
-            </li>
+      </li>
+    </ul>
+    <ul ng-show="!extended">
+      <li ng-repeat="employee in employees| limitTo:150">
+        <strong>{{employee.firstName}} {{employee.lastName}}</strong> ({{employee.salary| currency}}) employed by <strong>{{employee.employer.name}}</strong>
+      </li>
+    </ul>
+  </div>
+  <div ng-show="display === 'EmployeeFilter'">
+    <p><label>Request on employee (<strong>REST request to the server</strong>) :</label> <input type="text" ng-model="employeeQuery" size="70"></p>
+    <p><strong>filter</strong> and <strong>orderBy</strong> on the result set retrieved (with angular filters - <strong>no http requests</strong>) :</p>
+    <ul>
+      <li>
+        filter : 
+        <ul>
+          <li><label>firstName</label> <input type="text" ng-model="search.firstName"></li>
+          <li><label>lastName</label> <input type="text" ng-model="search.lastName"></li>
+          <li><label>employer.name</label> needs a custom filter (for nested objects)</li>
         </ul>
-    </div>
+      </li>
+      <li>
+        orderBy : select as label for value in array
+        <select ng-model="orderBy" ng-options="orderByOption.label for orderByOption in orderByOptions">
+        </select>
+      </li>
+    </ul>
+    <h4>Employee <small>({{(employeesFiltered| filter:search:strict).length}} items)</small></h4>
+    <ul ng-show="extended">
+      <li ng-repeat="employee in employeesFiltered| filter:search:strict | orderBy:employeesFilteredPredicate:employeesFilteredReverse | limitTo:150">object : {{employee}}
+        <ul>
+          <li><label>lastName :</label> <strong>{{employee.lastName}}</strong></li>
+          <li><label>firstName :</label> <strong>{{employee.firstName}}</strong></li>
+          <li><label>salary :</label> <strong>{{employee.salary}}</strong></li>
+          <li><label>ID :</label> <strong>{{employee.ID}}</strong></li>
+          <li><label>__STAMP :</label> <strong>{{employee.__STAMP}}</strong></li>
+          <li><label>__KEY :</label> <strong>{{employee.__KEY}}</strong></li>
+          <li><label>$$hashKey :</label> <strong>{{employee.$$hashKey}}</strong></li>
+        </ul>
+      </li>
+    </ul>
+    <ul ng-show="!extended">
+      <li ng-repeat="employee in employeesFiltered| filter:search:strict | orderBy:employeesFilteredPredicate:employeesFilteredReverse | limitTo:150">
+        <strong>{{employee.firstName}} {{employee.lastName}}</strong> ({{employee.salary| currency}}) employed by <strong>{{employee.employer.name}}</strong>
+      </li>
+    </ul>
+  </div>
 </div>

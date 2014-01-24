@@ -1,24 +1,24 @@
 <div id="view-example3" ng-cloak>
-    <h3>Example3</h3>
-    <p><code>.toArray()</code> with <code>filterQuery</code></p>
-    <p><label>Request on product :</label> <input type="text" ng-model="query"></p>
-    <ul>
-        <li ng-click="extendView(false)" ng-class="{ active: !extended }">simple view</li>
-        <li ng-click="extendView(true)" ng-class="{ active: extended }">expanded view</li>
-    </ul>
-    <h4>Products <small>({{products.length}} items)</small></h4>
-    <ul ng-show="extended">
-        <li ng-repeat="product in products">object : {{product}}
-            <ul>
-                <li><label>Name :</label> <strong>{{product.name}}</strong></li>
-                <li><label>ID :</label> <strong>{{product.ID}}</strong></li>
-                <li><label>__STAMP :</label> <strong>{{product.__STAMP}}</strong></li>
-                <li><label>__KEY :</label> <strong>{{product.__KEY}}</strong></li>
-                <li><label>$$hashKey :</label> <strong>{{product.$$hashKey}}</strong></li>
-            </ul>
-        </li>
-    </ul>
-    <ul ng-show="!extended">
-        <li ng-repeat="product in products"><label>Name :</label> <strong>{{product.name}}</strong></li>
-    </ul>
+  <h3>Example3</h3>
+  <p><code>.toArray()</code> with <code>filterQuery</code></p>
+  <p><label>Request on product :</label> <input type="text" ng-model="query"></p>
+  <ul>
+    <li ng-click="extendView(false)" ng-class="{ active: !extended }">simple view</li>
+    <li ng-click="extendView(true)" ng-class="{ active: extended }">expanded view</li>
+  </ul>
+  <h4>Products <small>({{products.length}} items)</small></h4>
+  <ul ng-show="extended">
+    <li ng-repeat="product in products">object : {{product}}
+      <ul>
+        <li><label>Name :</label> <strong>{{product.name}}</strong></li>
+        <li><label>ID :</label> <strong>{{product.ID}}</strong></li>
+        <li><label>__STAMP :</label> <strong>{{product.__STAMP}}</strong></li>
+        <li><label>__KEY :</label> <strong>{{product.__KEY}}</strong></li>
+        <li><label>$$hashKey :</label> <strong>{{product.$$hashKey}}</strong></li>
+      </ul>
+    </li>
+  </ul>
+  <ul ng-show="!extended">
+    <li ng-repeat="product in products"><label>Name :</label> <strong>{{product.name}}</strong></li>
+  </ul>
 </div>

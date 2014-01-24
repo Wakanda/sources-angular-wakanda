@@ -1,34 +1,34 @@
 <div id="view-example2" ng-cloak>
-    <h3>Example2</h3>
-    <p>In this example, first a <code>.query()</code> is made (asynchronously), on its success a <code>.toArray()</code> asynchronous request is made</p>
-    <h4>Upsides</h4>
-    <ul>
-        <li>No alteration of <code>WAF.Entity</code></li>
-        <li>Real WAF.Entity are not as simple to manage template side as a simple json list</li>
-    </ul>
-    <h4>Downsides</h4>
-    <ul>
-        <li>Two http requests per query (is it possible to call <code>.toArray()</code> with a query - or something like that ?)</li>
-        <li>Not using real WAF.Entity (though, access to ID, KEY and other properties is still OK as you can see)</li>
-    </ul>
-    <p><label>Request on product :</label> <input type="text" ng-model="query"></p>
-    <ul>
-        <li ng-click="extendView(false)" ng-class="{ active: !extended }">simple view</li>
-        <li ng-click="extendView(true)" ng-class="{ active: extended }">expanded view</li>
-    </ul>
-    <h4>Products <small>({{products.length}} items)</small></h4>
-    <ul ng-show="extended">
-        <li ng-repeat="product in products">object : {{product}}
-            <ul>
-                <li><label>Name :</label> <strong>{{product.name}}</strong></li>
-                <li><label>ID :</label> <strong>{{product.ID}}</strong></li>
-                <li><label>__STAMP :</label> <strong>{{product.__STAMP}}</strong></li>
-                <li><label>__KEY :</label> <strong>{{product.__KEY}}</strong></li>
-                <li><label>$$hashKey :</label> <strong>{{product.$$hashKey}}</strong></li>
-            </ul>
-        </li>
-    </ul>
-    <ul ng-show="!extended">
-        <li ng-repeat="product in products"><label>Name :</label> <strong>{{product.name}}</strong></li>
-    </ul>
+  <h3>Example2</h3>
+  <p>In this example, first a <code>.query()</code> is made (asynchronously), on its success a <code>.toArray()</code> asynchronous request is made</p>
+  <h4>Upsides</h4>
+  <ul>
+    <li>No alteration of <code>WAF.Entity</code></li>
+    <li>Real WAF.Entity are not as simple to manage template side as a simple json list</li>
+  </ul>
+  <h4>Downsides</h4>
+  <ul>
+    <li>Two http requests per query (is it possible to call <code>.toArray()</code> with a query - or something like that ?)</li>
+    <li>Not using real WAF.Entity (though, access to ID, KEY and other properties is still OK as you can see)</li>
+  </ul>
+  <p><label>Request on product :</label> <input type="text" ng-model="query"></p>
+  <ul>
+    <li ng-click="extendView(false)" ng-class="{ active: !extended }">simple view</li>
+    <li ng-click="extendView(true)" ng-class="{ active: extended }">expanded view</li>
+  </ul>
+  <h4>Products <small>({{products.length}} items)</small></h4>
+  <ul ng-show="extended">
+    <li ng-repeat="product in products">object : {{product}}
+      <ul>
+        <li><label>Name :</label> <strong>{{product.name}}</strong></li>
+        <li><label>ID :</label> <strong>{{product.ID}}</strong></li>
+        <li><label>__STAMP :</label> <strong>{{product.__STAMP}}</strong></li>
+        <li><label>__KEY :</label> <strong>{{product.__KEY}}</strong></li>
+        <li><label>$$hashKey :</label> <strong>{{product.$$hashKey}}</strong></li>
+      </ul>
+    </li>
+  </ul>
+  <ul ng-show="!extended">
+    <li ng-repeat="product in products"><label>Name :</label> <strong>{{product.name}}</strong></li>
+  </ul>
 </div>
