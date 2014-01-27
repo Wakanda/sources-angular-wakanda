@@ -13,7 +13,7 @@ angular.module('angularWakandaFrontApp')
             };
 
             //all() version
-            products = $scope.products = ds.Products.all({
+            products = $scope.products = ds.Product.all({
               onSuccess: function() {
                 $scope.$apply();
               }
@@ -21,7 +21,7 @@ angular.module('angularWakandaFrontApp')
             console.log('$scope.products', $scope.products);
 
             //toArray() version
-            ds.Products.toArray(null, {
+            ds.Product.toArray(null, {
               onSuccess: function(result) {
                 productsArray = $scope.productsArray = result.result;
                 $scope.$apply();

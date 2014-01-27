@@ -57,7 +57,7 @@ angular.module('angularWakandaFrontApp')
                     query = 'name = *';
                 }
             
-                ds.Products.$find({
+                ds.Product.$find({
                     filter : query
                 }).then(function(event){
                     console.log(event);

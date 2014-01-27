@@ -21,7 +21,7 @@ angular.module('angularWakandaFrontApp')
                 query = 'name = *';
               }
 
-              ds.Products.query(query, {
+              ds.Product.query(query, {
                 onSuccess: function(result) {
                   queryResult = result;
                   result.result.toArray(null, {

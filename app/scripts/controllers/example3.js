@@ -21,7 +21,7 @@ angular.module('angularWakandaFrontApp')
                 query = 'name = *';
               }
 
-              ds.Products.toArray(null, {
+              ds.Product.toArray(null, {
                 filterQuery: query,
                 onSuccess: function(result) {
                   $scope.$apply(function() {

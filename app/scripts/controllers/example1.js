@@ -15,7 +15,7 @@ angular.module('angularWakandaFrontApp')
                 query = 'name = *';
               }
 
-              ds.Products.query(query, {
+              ds.Product.query(query, {
                 onSuccess: function(result) {
                   $scope.$apply(function() {
                     queryResult = result;
