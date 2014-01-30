@@ -134,8 +134,8 @@
           result = parsedXHRResponse.__ENTITIES;
           result.map(function(pojo){
             pojo.$_entity = new WAF.Entity(event.result.getDataClass(),pojo);//@warn what about deep nested entities ? (related ones)
-            wakToAngular.addFrameworkMethodsToPOJO(pojo);
-            wakToAngular.addUserDefinedEntityMethodsToPOJO(pojo);
+            wakToAngular.addFrameworkMethodsToPojo(pojo);
+            wakToAngular.addUserDefinedEntityMethodsToPojo(pojo);
             return pojo;
           });
           result._collection = event.result;
@@ -151,19 +151,20 @@
         transformEntityArray: function(entityArray) {
 
         },
-        addFrameworkMethodsToPOJO: function(pojo) {
+        addFrameworkMethodsToPojo: function(pojo) {
           pojo.$save = $WakEntityMethods.$$save;
           pojo.$remove = $WakEntityMethods.$$remove;
-          pojo.$syncToLocalEntity = $WakEntityMethods.$$syncToLocalEntity;
+          pojo.$syncPojoToEntity = $WakEntityMethods.$$syncPojoToEntity;
+          pojo.$syncEntityToPojo = $WakEntityMethods.$$syncEntityToPojo;
         },
-        addUserDefinedEntityMethodsToPOJO: function(pojo) {
+        addUserDefinedEntityMethodsToPojo: function(pojo) {
           var key;
           //add the public entity methods @todo wrap them up into promise
           if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.methods) {
             for(key in pojo.$_entity._private.methods){
               if(pojo.$_entity._private.methods.hasOwnProperty(key)){
                 pojo[key] = function(){
-                  console.log('overloaded your entity method in addUserDefinedEntityMethodsToPOJO (todo wrap it up into promise)');
+                  console.log('overloaded your entity method in addUserDefinedEntityMethodsToPojo (todo wrap it up into promise)');
                 };
               }
             }
@@ -182,12 +183,32 @@
        */
       var $WakEntityMethods = {
         $$save : function(){
-          console.log("$save() not yet implemented");
+          console.group('$save');
+          var deferred, wakOptions = {}, that = this;
+          this.$syncPojoToEntity();
+          //prepare the promise
+          deferred = $q.defer();
+          wakOptions.onSuccess = function(event) {
+            rootScopeSafeApply(function() {
+              console.log('save.onSuccess', 'event', event);
+              that.$syncEntityToPojo();//once the entity is save resync the result of the server with the pojo
+              deferred.resolve(event);
+            });
+          };
+          wakOptions.onError = function(error) {
+            rootScopeSafeApply(function() {
+              console.error('save.onError','error', error);
+              deferred.reject(error);
+            });
+          };
+          this.$_entity.save(wakOptions);
+          return deferred.promise;
+          console.groupEnd();
         },
         $$remove : function(){
           console.log("$remove() not yet implemented");
         },
-        $$syncToLocalEntity : function(){
+        $$syncPojoToEntity : function(){
           var pojo = this, key;
           if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
             for(key in pojo.$_entity._private.values){
@@ -197,7 +218,19 @@
               }
             }
           }
-          console.log("$syncWithLocalEntity (should it be public ?)");
+          console.log("$syncPojoToEntity (should it be public ?)");
+        },
+        $$syncEntityToPojo : function(){
+          var pojo = this, key;
+          if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
+            for(key in pojo.$_entity._private.values){
+              //only update modified values which are not related entities
+              if(pojo.$_entity[key].getValue() !== pojo[key] && !(pojo.$_entity[key] instanceof WAF.EntityAttributeRelated)){
+                pojo[key] = pojo.$_entity[key].getValue();
+              }
+            }
+          }
+          console.log("$syncEntityToPojo (should it be public ?)");
         }
       };
 
@@ -215,8 +248,8 @@
           }
         }
         data.$_entity = entity;
-        wakToAngular.addFrameworkMethodsToPOJO(data);
-        wakToAngular.addUserDefinedEntityMethodsToPOJO(data);
+        wakToAngular.addFrameworkMethodsToPojo(data);
+        wakToAngular.addUserDefinedEntityMethodsToPojo(data);
         return data;
       };
 
