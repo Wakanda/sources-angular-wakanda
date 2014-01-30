@@ -7,7 +7,7 @@ angular.module('angularWakandaFrontApp')
             ds = wakConnectorService.getDatastore();
             rs = $rootScope;
             $scope.extended = false;
-            $scope.display = 'Products';
+            $scope.display = 'Product';
 
             $scope.extendView = function(extend){
                 $scope.extended = extend;

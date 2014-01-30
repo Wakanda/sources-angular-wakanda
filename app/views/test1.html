@@ -7,11 +7,11 @@
   </ul>
   <h4>Which table query ?</h4>
   <ul>
-    <li ng-click="show('Products')" ng-class="{ active: display === 'Products' }">Products</li>
+    <li ng-click="show('Product')" ng-class="{ active: display === 'Product' }">Product</li>
     <li ng-click="show('Employee')" ng-class="{ active: display === 'Employee' }">Employee</li>
     <li ng-click="show('EmployeeFilter')" ng-class="{ active: display === 'EmployeeFilter' }">Employee with angular filter</li>
   </ul>
-  <div ng-show="display === 'Products'">
+  <div ng-show="display === 'Product'">
     <p><label>Request on products :</label> <input type="text" ng-model="productsQuery"></p>
     <h4>Products <small>({{products.length}} items)</small></h4>
     <ul ng-show="extended">

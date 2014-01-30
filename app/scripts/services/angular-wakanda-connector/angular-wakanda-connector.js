@@ -113,6 +113,9 @@
           if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.methods) {
             for(key in pojo.$_entity._private.methods){
               if(pojo.$_entity._private.methods.hasOwnProperty(key)){
+                pojo[key+"Sync"] = function(){
+                  return pojo.$_entity[key].apply(pojo.$_entity,arguments);
+                };
                 pojo[key] = function(){
                   console.log('overloaded your entity method in addUserDefinedEntityMethodsToPojo (todo wrap it up into promise)');
                 };
@@ -121,8 +124,15 @@
           }
           return pojo;
         },
-        wakandaUserMethodToPromisableMethods : function(method){
-          
+        wakandaUserMethodToPromisableMethods : function(wakandaObject,method){
+          return function(){
+            var thatArguments = arguments,
+                that = this,
+                deferred;
+            //prepare the promise
+            deferred = $q.defer();
+            
+          };
         }
       };
 
