@@ -133,17 +133,15 @@
           parsedXHRResponse = JSON.parse(event.XHR.response);
           result = parsedXHRResponse.__ENTITIES;
           result.map(function(pojo){
-            console.log(pojo, event.result);
+            pojo.$_entity = new WAF.Entity(event.result.getDataClass(),pojo);//@warn what about deep nested entities ? (related ones)
+            wakToAngular.addFrameworkMethodsToPOJO(pojo);
+            wakToAngular.addUserDefinedEntityMethodsToPOJO(pojo);
+            return pojo;
           });
           result._collection = event.result;
-          
-//          result = result.map(function(pojo) {
-//             var entity = result._collection.getByKey(pojo.__ID);
-//             pojo._entity = entity;
-//          });
-          //add methods on result
-
+          event.rawResult = event.result;
           event.result = result;
+          console.log('after transformQueryEvent','event',event);
           return event;
         },
         transformDataClass: function(dataClass) {
@@ -156,6 +154,24 @@
         addFrameworkMethodsToPOJO: function(pojo) {
           pojo.$save = $WakEntityMethods.$$save;
           pojo.$remove = $WakEntityMethods.$$remove;
+          pojo.$syncToLocalEntity = $WakEntityMethods.$$syncToLocalEntity;
+        },
+        addUserDefinedEntityMethodsToPOJO: function(pojo) {
+          var key;
+          //add the public entity methods @todo wrap them up into promise
+          if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.methods) {
+            for(key in pojo.$_entity._private.methods){
+              if(pojo.$_entity._private.methods.hasOwnProperty(key)){
+                pojo[key] = function(){
+                  console.log('overloaded your entity method in addUserDefinedEntityMethodsToPOJO (todo wrap it up into promise)');
+                };
+              }
+            }
+          }
+          return pojo;
+        },
+        wakandaUserMethodToPromisableMethods : function(method){
+          
         }
       };
 
@@ -170,6 +186,18 @@
         },
         $$remove : function(){
           console.log("$remove() not yet implemented");
+        },
+        $$syncToLocalEntity : function(){
+          var pojo = this, key;
+          if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
+            for(key in pojo.$_entity._private.values){
+              //only update modified values which are not related entities
+              if(pojo.$_entity[key].getValue() !== pojo[key] && !(pojo.$_entity[key] instanceof WAF.EntityAttributeRelated)){
+                pojo.$_entity[key].setValue(pojo[key]);
+              }
+            }
+          }
+          console.log("$syncWithLocalEntity (should it be public ?)");
         }
       };
 
@@ -188,6 +216,7 @@
         }
         data.$_entity = entity;
         wakToAngular.addFrameworkMethodsToPOJO(data);
+        wakToAngular.addUserDefinedEntityMethodsToPOJO(data);
         return data;
       };
 

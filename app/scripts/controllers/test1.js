@@ -1,6 +1,6 @@
 'use strict';
 
-var ds, products, toArrayResult, rs, employees;
+var ds, products, toArrayResult, rs, employees, employeesEvent;
 
 angular.module('angularWakandaFrontApp')
         .controller('Test1Ctrl', ['$scope','$rootScope','wakConnectorService',function($scope,$rootScope,wakConnectorService) {
@@ -89,6 +89,7 @@ angular.module('angularWakandaFrontApp')
                 }).then(function(event){
                     console.log(event);
                     employees = $scope.employees = $scope.employeesFiltered = event.result;
+                    employeesEvent = event;
                 });
                 
             });
