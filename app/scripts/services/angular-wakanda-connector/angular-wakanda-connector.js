@@ -60,56 +60,6 @@
         }
       };
 
-      /** private necessary objects */
-
-//      var WakEntityCollection = function(wakEntityCollection, entityCollectionMethods) {
-//        wakEntityCollection = (wakEntityCollection && wakEntityCollection.length > 0 ? wakEntityCollection : false) || Object.create( Array.prototype );
-//        wakEntityCollection = (Array.apply( wakEntityCollection, wakEntityCollection ) || wakEntityCollection);
-//        WakEntityCollection.injectClassMethods( wakEntityCollection, entityCollectionMethods );
-//        return wakEntityCollection;
-//      };
-//      
-//      WakEntityCollection.injectClassMethods = function( wakEntityCollection, entityCollectionMethods ){
-//        var method, originalPush;
-//        //overload push
-//        originalPush = Array.prototype.push;
-//        WakEntityCollection.prototype.push = function(){
-//          console.log('pushing',arguments);
-//          originalPush.apply(this, arguments);
-//        };
-//        // Loop over all the prototype methods and add them to the new wakEntityCollection
-//        for (method in WakEntityCollection.prototype){
-//          // Make sure this is a local method.
-//          if (WakEntityCollection.prototype.hasOwnProperty( method )){
-//            // Add the method to the collection.
-//            wakEntityCollection[ method ] = WakEntityCollection.prototype[ method ];
-//          }
-//        }
-//        //then add the EntityCollectionMethods
-//        for (method in entityCollectionMethods){
-//          // Make sure this is a local method.
-//          if (entityCollectionMethods.hasOwnProperty( method )){
-//            // Add the method to the collection.
-//            wakEntityCollection[ method ] = entityCollectionMethods[ method ];
-//          }
-//        }
-//      };
-//      
-//      WakEntityCollection.prototype.$fetch = function(){
-//        console.log('Not yet implemented $fetch method');
-//      };
-//      
-//      g = WakEntityCollection;
-//
-//      var wakEntityMethods = {
-//        $save : function(){
-//          console.log('Not yet implemented $save method');
-//        },
-//        $remove : function(){
-//          console.log('Not yet implemented $remove method');
-//        }
-//      };
-
       /** event transformation part */
 
       var wakToAngular = {
@@ -213,7 +163,7 @@
           if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
             for(key in pojo.$_entity._private.values){
               //only update modified values which are not related entities
-              if(pojo.$_entity[key].getValue() !== pojo[key] && !(pojo.$_entity[key] instanceof WAF.EntityAttributeRelated)){
+              if(pojo.$_entity[key].getValue() !== pojo[key] && (pojo.$_entity[key] instanceof WAF.EntityAttributeSimple)){
                 pojo.$_entity[key].setValue(pojo[key]);
               }
             }
@@ -225,7 +175,7 @@
           if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
             for(key in pojo.$_entity._private.values){
               //only update modified values which are not related entities
-              if(pojo.$_entity[key].getValue() !== pojo[key] && !(pojo.$_entity[key] instanceof WAF.EntityAttributeRelated)){
+              if(pojo.$_entity[key].getValue() !== pojo[key] && (pojo.$_entity[key] instanceof WAF.EntityAttributeSimple)){
                 pojo[key] = pojo.$_entity[key].getValue();
               }
             }
