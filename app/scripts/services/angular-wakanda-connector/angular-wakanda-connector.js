@@ -89,7 +89,6 @@
             return pojo;
           });
           result._collection = event.result;
-          event.rawResult = event.result;
           event.result = result;
           console.log('after transformQueryEvent','event',event);
           return event;
@@ -116,23 +115,47 @@
                 pojo[key+"Sync"] = function(){
                   return pojo.$_entity[key].apply(pojo.$_entity,arguments);
                 };
-                pojo[key] = function(){
-                  console.log('overloaded your entity method in addUserDefinedEntityMethodsToPojo (todo wrap it up into promise)');
-                };
+                wakToAngular.wakandaUserMethodToPromisableMethods(pojo, key, pojo.$_entity._private.methods[key]);
               }
             }
           }
           return pojo;
         },
-        wakandaUserMethodToPromisableMethods : function(wakandaObject,method){
-          return function(){
-            var thatArguments = arguments,
-                that = this,
+        wakandaUserMethodToPromisableMethods : function(pojo, methodName, method){
+          
+          pojo[methodName] = function(){
+            var thatArguments = [],
+                wakOptions = {},
                 deferred;
+            //duplicate arguments (simple assignation is not sure enough, his is to be sure to have a real array)
+            if(arguments.length > 0){
+              for(var i = 0; i<arguments.length; i++){
+                thatArguments.push(arguments[i]);
+              }
+            }
+            //frist sync the pojo to the entity
+            pojo.$syncPojoToEntity();
             //prepare the promise
-            deferred = $q.defer();
-            
+            deferred = $q.defer();        
+            wakOptions.onSuccess = function(event) {
+              rootScopeSafeApply(function() {
+                console.log('userMethods.onSuccess', 'event', event);
+                pojo.$syncEntityToPojo();//once the entity is save resync the result of the server with the pojo
+                deferred.resolve(event);
+              });
+            };
+            wakOptions.onError = function(error) {
+              rootScopeSafeApply(function() {
+                console.error('userMethods.onError','error', error);
+                deferred.reject(error);
+              });
+            };
+            //add the asynchronous options block
+            thatArguments.unshift(wakOptions);
+            method.apply(pojo.$_entity,thatArguments);
+            return deferred.promise;
           };
+          
         }
       };
 
