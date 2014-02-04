@@ -115,13 +115,13 @@
                 pojo[key+"Sync"] = function(){
                   return pojo.$_entity[key].apply(pojo.$_entity,arguments);
                 };
-                wakToAngular.wakandaUserMethodToPromisableMethods(pojo, key, pojo.$_entity._private.methods[key]);
+                wakToAngular.wakandaUserDefinedEntityMethodToPromisableMethods(pojo, key, pojo.$_entity._private.methods[key]);
               }
             }
           }
           return pojo;
         },
-        wakandaUserMethodToPromisableMethods : function(pojo, methodName, method){
+        wakandaUserDefinedEntityMethodToPromisableMethods : function(pojo, methodName, method){
           
           pojo[methodName] = function(){
             var thatArguments = [],
@@ -223,17 +223,17 @@
        * @argument {Object} Simple JS object matching the dataclass representation
        * @returns {Object} POJO with $_entity pointer to WAF.Entity
        */
-      var $$create = function(data){
+      var $$create = function(pojo){
         var entity = this.newEntity();
-        for (var key in data){
-          if(data.hasOwnProperty(key)){
-            entity[key].setValue(data[key]);
+        for (var key in pojo){
+          if(pojo.hasOwnProperty(key)){
+            entity[key].setValue(pojo[key]);
           }
         }
-        data.$_entity = entity;
-        wakToAngular.addFrameworkMethodsToPojo(data);
-        wakToAngular.addUserDefinedEntityMethodsToPojo(data);
-        return data;
+        pojo.$_entity = entity;
+        wakToAngular.addFrameworkMethodsToPojo(pojo);
+        wakToAngular.addUserDefinedEntityMethodsToPojo(pojo);
+        return pojo;
       };
 
       /**
