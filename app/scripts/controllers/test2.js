@@ -26,4 +26,10 @@ angular.module('angularWakandaFrontApp')
       }
     };
     
+    $scope.displayEntityMethodResult = function(product){
+      product.myEntityMethod("hello","world","from "+product.name).then(function(e){
+        window.alert(e.result);
+      });
+    };
+    
   }]);

@@ -4,7 +4,7 @@
   <h4>products form Product</h4>
   <ul>
     <li ng-repeat="product in products" ng-dblclick="toggleEditMode(product)">
-      <span ng-show="!product.editMode">{{product.name}}</span>
+      <span ng-show="!product.editMode"><span ng-click="displayEntityMethodResult(product)">=> </span>{{product.name}}</span>
       <input type="text" ng-model="product.name" ng-show="product.editMode" ng-keyup="editOnEnter($event.keyCode,product)">
     </li>
   </ul>
