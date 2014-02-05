@@ -89,6 +89,8 @@
             return pojo;
           });
           result._collection = event.result;
+          result.$fetch = $$fetch;
+          result.$add = $$add;
           event.result = result;
           console.log('after transformQueryEvent','event',event);
           return event;
@@ -234,6 +236,17 @@
         wakToAngular.addFrameworkMethodsToPojo(pojo);
         wakToAngular.addUserDefinedEntityMethodsToPojo(pojo);
         return pojo;
+      };
+      
+      /**
+       * Applied to arrays of pojos representing collections
+       */
+      var $$fetch = function(){
+        console.log('$fetch method not yet implemented');
+      };
+      
+      var $$add = function(){
+        console.log('$add method not yet implemented');
       };
 
       /**
