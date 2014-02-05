@@ -65,6 +65,7 @@
       var wakToAngular = {
         prepareWAF: function() {
           WAF.DataClass.prototype.$find = $$find;
+          WAF.DataClass.prototype.$findOne = $$findOne;
           WAF.DataClass.prototype.$create = $$create;
         },
         transformDatastore: function(dataStore) {
@@ -77,7 +78,7 @@
           }
           console.groupEnd();
         },
-        transformQueryEvent: function(event) {
+        transformQueryEvent: function(event, onlyOne) {
           var result,
               parsedXHRResponse;
           parsedXHRResponse = JSON.parse(event.XHR.response);
@@ -88,9 +89,19 @@
             wakToAngular.addUserDefinedEntityMethodsToPojo(pojo);
             return pojo;
           });
-          result._collection = event.result;
-          result.$fetch = $$fetch;
-          result.$add = $$add;
+          if(onlyOne !== true){
+            result._collection = event.result;
+            result.$fetch = $$fetch;
+            result.$add = $$add;
+          }
+          else{
+            if(result.length === 1){
+              result = result[0];
+            }
+            else{
+              result = null;
+            }
+          }
           event.result = result;
           console.log('after transformQueryEvent','event',event);
           return event;
@@ -255,7 +266,7 @@
        * @returns {$q.promise}
        */
       var $$find = function(options) {
-        var deferred, wakOptions = {}, query = null;
+        var deferred, wakOptions = {}, query = null, onlyOne;
         //input check
         if (!options || typeof options !== "object") {
           throw new Error("Please pass an object as options");
@@ -281,10 +292,11 @@
         }
         //prepare the promise
         deferred = $q.defer();
+        onlyOne = options.onlyOne;
         wakOptions.onSuccess = function(event) {
           rootScopeSafeApply(function() {
             console.log('onSuccess', 'originalEvent', event);
-            wakToAngular.transformQueryEvent(event);
+            wakToAngular.transformQueryEvent(event, onlyOne);
             console.log('onSuccess', 'processedEvent', event);
             deferred.resolve(event);
           });
@@ -299,6 +311,13 @@
         options = null;
         this.query(query, wakOptions);
         return deferred.promise;
+      };
+      
+      var $$findOne = function(id){
+        return this.$find({
+          filter:'ID = '+id,
+          onlyOne : true
+        });
       };
 
       /** returned object */
