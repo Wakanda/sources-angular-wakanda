@@ -1,20 +1,4 @@
 <div id="view-example1" ng-cloak>
   <h3>Example1</h3>
-  <p>In this example, an asynchronous <code>ds.Products.query(...)</code> request is made. The result of this query is flattened into an array (via <code>.forEach</code>), to be able to iterate through arrays with ng-repeat.</p>
-  <p>Disclaimer : this can surely made better, but this example is here to test query + ng-repeat over the result of this query.</p>
-  <h4>Upsides</h4>
-  <ul>
-    <li>Only one http request (the REST one) per query</li>
-    <li>Access to real WAF.Entity</li>
-  </ul>
-  <h4>Downsides</h4>
-  <ul>
-    <li>A method <code>.flatten</code> added to the <code>WAF.EntityCollection</code> (for the moment dirty way + probably the wrong way to do that)</li>
-    <li>Real WAF.Entity are not as simple to manage template side as a simple json list</li>
-  </ul>
-  <p><label>Request on product :</label> <input type="text" ng-model="query"></p>
-  <h4>Products <small>({{products.length}} items)</small></h4>
-  <ul>
-    <li ng-repeat="product in products">{{product.entity.name.value}}</li>
-  </ul>
+  <p>This example was removed (using a deprecated method created at the very early days of the connector)</p>
 </div>
