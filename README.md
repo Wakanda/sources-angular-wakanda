@@ -1,5 +1,7 @@
 #angular-wakanda-front
 
+If you want to directly use the angular-wakanda-connector : [get it here](src/master/app /scripts/services/angular-wakanda-connector).
+
 Scaffolded with yeoman angular generator in order to follow the yeoman+grunt+bower workflow.
 
 Needed :
