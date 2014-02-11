@@ -5,4 +5,8 @@
   <ul>
     <li ng-repeat="product in products">{{product.name}}</li>
   </ul>
+  <h4>employees from Product</h4>
+  <ul>
+    <li ng-repeat="employee in employees">{{employee.firstName}} {{employee.lastName}} / {{employee.employer.name}}</li>
+  </ul>
 </div>

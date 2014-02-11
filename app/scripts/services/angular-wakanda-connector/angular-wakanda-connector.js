@@ -106,6 +106,21 @@
           console.log('after transformQueryEvent','event',event);
           return event;
         },
+        transformFetchEvent: function(event, mode){
+          var result;
+          console.log('EVENT',event);
+          result = event.entities;
+          result.forEach(function(entity,index){
+            var pojo = {};
+            pojo.$_entity = entity;
+            wakToAngular.addFrameworkMethodsToPojo(pojo);
+            wakToAngular.addUserDefinedEntityMethodsToPojo(pojo);
+            pojo.$syncEntityToPojo();
+            result[index] = pojo;
+          });
+          console.log('transformFetchEvent','result',result);
+          event.result = result;
+        },
         transformDataClass: function(dataClass) {
           console.group('wakToAngular.transformDataClass(%s)', dataClass._private.className, dataClass);
           console.groupEnd();
@@ -216,10 +231,12 @@
           }
           console.log("$syncPojoToEntity (should it be public ?)");
         },
+        //@todo toutes variable n'atant pas object remonte
         $$syncEntityToPojo : function(){
           var pojo = this, key;
           if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
             for(key in pojo.$_entity._private.values){
+              console.log(key,pojo.$_entity._private.values[key]);
               //only update modified values which are not related entities
               if(pojo.$_entity[key].getValue() !== pojo[key] && (pojo.$_entity[key] instanceof WAF.EntityAttributeSimple)){
                 pojo[key] = pojo.$_entity[key].getValue();
@@ -252,8 +269,28 @@
       /**
        * Applied to arrays of pojos representing collections
        */
-      var $$fetch = function(){
-        console.log('$fetch method not yet implemented');
+      var $$fetch = function(skip, top, mode){
+        var deferred, wakOptions = {}, that = this;
+        mode = (typeof mode === "undefined" || "replace") ? "replace" : mode;
+        //prepare the promise
+        deferred = $q.defer();
+        wakOptions.onSuccess = function(event) {
+          rootScopeSafeApply(function() {
+            console.log('onSuccess', 'originalEvent', event);
+            wakToAngular.transformFetchEvent(event);
+            console.log('onSuccess', 'processedEvent', event);
+            deferred.resolve(event);
+          });
+        };
+        wakOptions.onError = function(event) {
+          rootScopeSafeApply(function() {
+            console.error('onError', event);
+            deferred.reject(event);
+          });
+        };
+        //make the call
+        this._collection.getEntities(skip,top,wakOptions);
+        return deferred.promise;
       };
       
       var $$add = function(){
