@@ -55,6 +55,24 @@ module.exports = function(grunt) {
                     livereload: true
                 }
             },
+//            "angular-wakanda-service-reload": {
+//                files: [
+//                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/angular-wakanda-connector.debug.min.js',
+//                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/angular-wakanda-connector.debug.min.js.map',
+//                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/angular-wakanda-connector.js',
+//                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/WAF/*.js'
+//                ],
+//                options: {
+//                    livereload: true
+//                }
+//            },
+//            "angular-wakanda-service-build": {
+//                files: [
+//                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/angular-wakanda-connector.js',
+//                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/WAF/*.js'
+//                ],
+//                tasks: ['wakConnector-build-debug']
+//            },
             jsTest: {
                 files: ['test/spec/{,*/}*.js'],
                 tasks: ['newer:jshint:test', 'karma']
@@ -420,6 +438,38 @@ module.exports = function(grunt) {
         'clean:wakWebFolder',
         'copy:wakWebFolder'
     ]);
+    
+//    grunt.registerTask('wakConnector-build', function(){
+//      var done = this.async();
+//      grunt.util.spawn({
+//        grunt: true,
+//        args: ['build'],
+//        opts: {
+//            cwd: 'app/scripts/services/angular-wakanda-connector'
+//        }
+//      }, function(err, result, code){
+//        if(err){
+//          grunt.log.error('An error occured building angular-wakanda-connector.min.js',err.message);
+//        }
+//        done();
+//      });
+//    });
+//    
+//    grunt.registerTask('wakConnector-build-debug', function(){
+//      var done = this.async();
+//      grunt.util.spawn({
+//        grunt: true,
+//        args: ['build-debug'],
+//        opts: {
+//            cwd: 'app/scripts/services/angular-wakanda-connector'
+//        }
+//      }, function(err, result, code){
+//        if(err){
+//          grunt.log.error('An error occured building angular-wakanda-connector.debug.min.js',err.message);
+//        }
+//        done();
+//      });
+//    });
 
     grunt.registerTask('default', [
         'newer:jshint',

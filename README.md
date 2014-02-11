@@ -38,3 +38,4 @@ Here are the following modifications made to the original yeoman Gruntfile :
 * a wakandaApp attribute, containing infos about your wakanda app server was added to the yeoman attribute in the grunt config (from `wakandaApp.json` file)
 * for each connect task, a `configureProxies:target` task was added
 * added the wakWebFolder target in clean and copy tasks, to be able to transfer your built project to your wakanda WebFolder, just by doing `grunt wakCopyBuild` (expect to have to add --force, I left this warning because it empties the WebFolder before copying the build)
+* added watch tasks to rebuild the connector into a closured file with sourcemaps (see more in the README of the service)
