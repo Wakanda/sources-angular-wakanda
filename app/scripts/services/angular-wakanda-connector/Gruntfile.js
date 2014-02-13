@@ -43,6 +43,8 @@ module.exports = function(grunt) {
             angular: false,
             warnings: true
           },
+          mangle: false,//keep variable names
+          beautify:true,//better to debug
           wrap: true,
           sourceMap: true,
           sourceMapName: 'angular-wakanda-connector.debug.min.js.map'

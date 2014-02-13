@@ -15,6 +15,7 @@ Once you have all above, to init :
 
 * `npm install`
 * `bower install`
+* Go to `app/scripts/services/angular-wakanda-connector` and `npm install` (for this moment, this is necessary for development purposes, more in `app/scripts/services/angular-wakanda-connector/README.md`)
 
 Last step : duplicate wakandaApp.default.json to wakandaApp.json and set your own settings
 
@@ -38,4 +39,4 @@ Here are the following modifications made to the original yeoman Gruntfile :
 * a wakandaApp attribute, containing infos about your wakanda app server was added to the yeoman attribute in the grunt config (from `wakandaApp.json` file)
 * for each connect task, a `configureProxies:target` task was added
 * added the wakWebFolder target in clean and copy tasks, to be able to transfer your built project to your wakanda WebFolder, just by doing `grunt wakCopyBuild` (expect to have to add --force, I left this warning because it empties the WebFolder before copying the build)
-* added watch tasks to rebuild the connector into a closured file with sourcemaps (see more in the README of the service)
+* added watch tasks to rebuild the connector into a closured file with sourcemaps (see more in `app/scripts/services/angular-wakanda-connector/README.md`)

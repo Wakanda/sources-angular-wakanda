@@ -12,8 +12,7 @@ Run `npm install`, it will install the modules needed to build the minified vers
 Then simply run `grunt build` or `grunt build-debug` (if you want the version with sourcemaps)
 
 Watch/reload tasks on the `grunt serve` of the main Gruntfile.js were added, they will automatically rebuild then reload the min file.
-For the moment, those tasks arent activated.
 
-Change the line above by this line : 
+In development, the above lines are changed to :
 
     <script src="scripts/services/angular-wakanda-connector/angular-wakanda-connector.debug.min.js"></script>
