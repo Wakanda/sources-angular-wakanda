@@ -7,6 +7,3 @@ app/bower_components
 /nbproject
 wakandaApp.json
 
-app/scripts/services/angular-wakanda-connector/angular-wakanda-connector.debug.min.js
-
-app/scripts/services/angular-wakanda-connector/angular-wakanda-connector.debug.min.js.map

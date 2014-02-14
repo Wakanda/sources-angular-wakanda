@@ -7,7 +7,7 @@
  * 
  * The boot.js file is a simple file to make the others work outside of the Wakanda Framework.
  */
-WAF = {
+var WAF = {
     core : {},
     config : {}
 };
