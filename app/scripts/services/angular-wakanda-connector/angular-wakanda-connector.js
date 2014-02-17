@@ -2,13 +2,14 @@ var wakConnectorModule = angular.module('wakConnectorModule', []);
 
 wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function($q, $rootScope) {
 
-    var ds = null;
+    var ds = null,
+        NgWakEntityClasses = {},
+        NgWakEntityCollectionClasses = {};
 
     /** connexion part */
 
     var init = function(catalog) {
       console.log('>wakConnectorService init');
-      wakToAngular.prepareWAF();
       var deferred = $q.defer();
       if (typeof catalog !== "string" || catalog === '*' || catalog === '') {
         catalog = null;
@@ -17,7 +18,8 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         new WAF.DataStore({
           onSuccess: function(event) {
             ds = event.dataStore;
-            wakToAngular.transformDatastore(ds);
+            prepare.wafDatastore(ds);
+            prepare.wafDataClasses(ds);
             console.log('>wakConnectorService init > success', event, 'ds', ds);
             deferred.resolve(ds);
           },
@@ -54,25 +56,136 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         $rootScope.$apply(fn);
       }
     };
-
-    /** event transformation part */
-
-    var wakToAngular = {
-      prepareWAF: function() {
+    
+    /** Prepare DataStore, etc ... */
+    
+    var prepare = {
+      wafDatastore : function(dataStore){
+        //expose NgWak*Abstract prototypes
+        dataStore.$Entity = NgWakEntityAbstract.prototype;
+      },
+      wafDataClasses : function(dataStore){
+        var dataClassName;
+        //add some to prototype
         WAF.DataClass.prototype.$find = $$find;
         WAF.DataClass.prototype.$findOne = $$findOne;
         WAF.DataClass.prototype.$create = $$create;
-      },
-      transformDatastore: function(dataStore) {
-        var dataClass;
-        console.group('wakToAngular.transformDatastore()', dataStore);
-        for (dataClass in dataStore) {
-          if (dataStore.hasOwnProperty(dataClass) && dataClass !== "_private") {
-            wakToAngular.transformDataClass(dataStore[dataClass]);
+        
+        //WARN !!!!!!!!!!!!!!!!!!!!! looping through too much infos which were added before
+        //hint test for $* and _* properties when looping through arguments
+        
+        //loop through the dataClasses of the dataStore
+        console.group('prepare.wafDataClasses()', dataStore);
+        for (dataClassName in dataStore) {
+          if (dataStore.hasOwnProperty(dataClassName) && dataClassName !== "_private" && /^\$.*/.test(dataClassName) === false) {            
+            console.group('DataClass[%s]', dataStore[dataClassName]._private.className, dataStore[dataClassName]);
+            prepare.wafDataClassAddMetas(dataStore[dataClassName]);
+            prepare.wafDataClassCreateNgWakEntityClasses(dataStore[dataClassName]);
+            console.groupEnd();
           }
         }
         console.groupEnd();
       },
+      wafDataClassAddMetas : function(dataClass){
+        var methodName,
+            dataClassMethods = [],
+            collectionMethods = [],
+            entityMethods = [];
+    
+        for(methodName in dataClass._private.dataClassMethods){
+          if(dataClass._private.dataClassMethods.hasOwnProperty(methodName)){
+            dataClassMethods.push(methodName);
+          }
+        }
+    
+        for(methodName in dataClass._private.entityCollectionMethods){
+          if(dataClass._private.entityCollectionMethods.hasOwnProperty(methodName)){
+            collectionMethods.push(methodName);
+          }
+        }
+    
+        for(methodName in dataClass._private.entityMethods){
+          if(dataClass._private.entityMethods.hasOwnProperty(methodName)){
+            entityMethods.push(methodName);
+          }
+        }
+        
+        dataClass.$dataClassMethods = function(){
+          return dataClassMethods;
+        };
+        
+        dataClass.$collectionMethods = function(){
+          return collectionMethods;
+        };
+        
+        dataClass.$entityMethods = function(){
+          return entityMethods;
+        };
+      },
+      wafDataClassCreateNgWakEntityClasses : function(dataClass){
+        var proto;
+        proto = prepareHelpers.createUserDefinedEntityMethods(dataClass);
+        NgWakEntityClasses[dataClass._private.className] = NgWakEntityAbstract.extend(proto);
+        ds[dataClass._private.className].$Entity = NgWakEntityClasses[dataClass._private.className].prototype;
+      }
+    };
+    
+    var prepareHelpers = {
+      createUserDefinedEntityMethods: function(dataClass) {
+        var methodName, proto = {};
+        
+        for(methodName in dataClass._private.entityMethods){
+          if(dataClass._private.entityMethods.hasOwnProperty(methodName)){
+            proto[methodName+"Sync"] = function(){
+              return this.$_entity[methodName].apply(this.$_entity,arguments);
+            };
+            prepareHelpers.wakandaUserDefinedEntityMethodToPromisableMethods(proto, methodName, dataClass._private.entityMethods[methodName]);
+          }
+        }
+        
+        return proto;
+      },
+      wakandaUserDefinedEntityMethodToPromisableMethods : function(proto, methodName, method){
+
+        proto[methodName] = function(){
+          var thatArguments = [],
+              wakOptions = {},
+              deferred;
+          //duplicate arguments (simple assignation is not sure enough, his is to be sure to have a real array)
+          if(arguments.length > 0){
+            for(var i = 0; i<arguments.length; i++){
+              thatArguments.push(arguments[i]);
+            }
+          }
+          //frist sync the pojo to the entity
+          this.$syncPojoToEntity();
+          //prepare the promise
+          deferred = $q.defer();        
+          wakOptions.onSuccess = function(event) {
+            rootScopeSafeApply(function() {
+              console.log('userMethods.onSuccess', 'event', event);
+              this.$syncEntityToPojo();//once the entity is save resync the result of the server with the pojo
+              deferred.resolve(event);
+            });
+          };
+          wakOptions.onError = function(error) {
+            rootScopeSafeApply(function() {
+              console.error('userMethods.onError','error', error);
+              deferred.reject(error);
+            });
+          };
+          //add the asynchronous options block
+          thatArguments.unshift(wakOptions);
+          method.apply(this.$_entity,thatArguments);
+          return deferred.promise;
+        };
+
+      }
+    };
+
+    /** event transformation part */
+
+    var wakToAngular = {
       transformQueryEvent: function(event, onlyOne) {
         var result,
             parsedXHRResponse;
@@ -249,6 +362,8 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
      * @returns {Object} POJO with $_entity pointer to WAF.Entity
      */
     var $$create = function(pojo){
+      var dataClassName = this._private.className;
+      console.log(dataClassName,'this',this);
       var entity = this.newEntity();
       for (var key in pojo){
         if(pojo.hasOwnProperty(key)){
@@ -351,6 +466,65 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         onlyOne : true
       });
     };
+
+    /** Code organization, heritage, objects used (todo : split this into multiple files which should be insject by dependency injection OR module) */
+    
+    var NgWakEntityAbstractPrototype = {
+      $save : function(){
+        console.group('$save');
+        var deferred, wakOptions = {}, that = this;
+        this.$syncPojoToEntity();
+        //prepare the promise
+        deferred = $q.defer();
+        wakOptions.onSuccess = function(event) {
+          rootScopeSafeApply(function() {
+            console.log('save.onSuccess', 'event', event);
+            that.$syncEntityToPojo();//once the entity is save resync the result of the server with the pojo
+            deferred.resolve(event);
+          });
+        };
+        wakOptions.onError = function(error) {
+          rootScopeSafeApply(function() {
+            console.error('save.onError','error', error);
+            deferred.reject(error);
+          });
+        };
+        this.$_entity.save(wakOptions);
+        return deferred.promise;
+        console.groupEnd();
+      },
+      $remove : function(){
+        console.log("$remove() not yet implemented");
+      },
+      $syncPojoToEntity : function(){
+        var pojo = this, key;
+        if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
+          for(key in pojo.$_entity._private.values){
+            //only update modified values which are not related entities
+            if(pojo.$_entity[key].getValue() !== pojo[key] && (pojo.$_entity[key] instanceof WAF.EntityAttributeSimple)){
+              pojo.$_entity[key].setValue(pojo[key]);
+            }
+          }
+        }
+        console.log("$syncPojoToEntity (should it be public ?)");
+      },
+      //@todo toutes variable n'atant pas object remonte
+      $syncEntityToPojo : function(){
+        var pojo = this, key;
+        if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
+          for(key in pojo.$_entity._private.values){
+            console.log(key,pojo.$_entity._private.values[key]);
+            //only update modified values which are not related entities
+            if(pojo.$_entity[key].getValue() !== pojo[key] && (pojo.$_entity[key] instanceof WAF.EntityAttributeSimple)){
+              pojo[key] = pojo.$_entity[key].getValue();
+            }
+          }
+        }
+        console.log("$syncEntityToPojo (should it be public ?)");
+      }
+    };
+    
+    var NgWakEntityAbstract = Class.extend(NgWakEntityAbstractPrototype);
 
     /** returned object */
 

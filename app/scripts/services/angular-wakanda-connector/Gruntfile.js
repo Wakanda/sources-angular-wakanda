@@ -1,5 +1,13 @@
 module.exports = function(grunt) {
 
+  var files = [
+    'extras/Class.js',
+    'WAF/extra-init.js',
+    'WAF/Rest.js',
+    'WAF/Data-Provider.js',
+    'angular-wakanda-connector.js'
+  ];
+
 //  require('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-concat-sourcemap');
@@ -11,7 +19,7 @@ module.exports = function(grunt) {
           wrap: true
         },
         files: {
-          'angular-wakanda-connector.min.js': ['WAF/extra-init.js','WAF/Rest.js','WAF/Data-Provider.js','angular-wakanda-connector.js']
+          'angular-wakanda-connector.min.js': files
         }
       },
       debug:{
@@ -50,7 +58,7 @@ module.exports = function(grunt) {
           sourceMapName: 'angular-wakanda-connector.debug.min.js.map'
         },
         files: {
-          'angular-wakanda-connector.debug.min.js': ['WAF/extra-init.js','WAF/Rest.js','WAF/Data-Provider.js','angular-wakanda-connector.js']
+          'angular-wakanda-connector.debug.min.js': files
         }
       }
     }
