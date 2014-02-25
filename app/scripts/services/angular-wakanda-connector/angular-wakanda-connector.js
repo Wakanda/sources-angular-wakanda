@@ -92,20 +92,20 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
             entityMethods = [],
             attributes;
 
-        for(methodName in dataClass._private.dataClassMethods){
-          if(dataClass._private.dataClassMethods.hasOwnProperty(methodName)){
+        for(methodName in dataClass._private.dataClassMethodRefs){
+          if(dataClass._private.dataClassMethodRefs.hasOwnProperty(methodName)){
             dataClassMethods.push(methodName);
           }
         }
     
-        for(methodName in dataClass._private.entityCollectionMethods){
-          if(dataClass._private.entityCollectionMethods.hasOwnProperty(methodName)){
+        for(methodName in dataClass._private.entityCollectionMethodRefs){
+          if(dataClass._private.entityCollectionMethodRefs.hasOwnProperty(methodName)){
             collectionMethods.push(methodName);
           }
         }
     
-        for(methodName in dataClass._private.entityMethods){
-          if(dataClass._private.entityMethods.hasOwnProperty(methodName)){
+        for(methodName in dataClass._private.entityMethodRefs){
+          if(dataClass._private.entityMethodRefs.hasOwnProperty(methodName)){
             entityMethods.push(methodName);
           }
         }
@@ -135,6 +135,11 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         dataClass.$entityMethods = function(){
           return entityMethods;
         };
+        
+        dataClass.$name = dataClass._private.className;
+        
+        dataClass.$collectionName = dataClass._private.collectionName;
+        
       },
       wafDataClassCreateNgWakEntityClasses : function(dataClass){
         var proto;
