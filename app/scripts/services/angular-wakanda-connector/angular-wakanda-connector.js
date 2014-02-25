@@ -158,13 +158,12 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
             proto[methodName+"Sync"] = function(){
               return this.$_entity[methodName].apply(this.$_entity,arguments);
             };
-            prepareHelpers.wakandaUserDefinedEntityMethodToPromisableMethods(proto, methodName, dataClass._private.entityMethods[methodName]);
+            prepareHelpers.wakandaUserDefinedMethodToPromisableMethods(proto, methodName, dataClass._private.entityMethods[methodName]);
           }
         }
         
         return proto;
       },
-      //WARN !!! this is supposed to be used in wafDataClassCreateNgWakEntityCollectionClasses() (for the moment it is commented)
       createUserDefinedEntityCollectionMethods: function(dataClass) {
         var methodName, proto = {};
         
@@ -173,32 +172,53 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
             proto[methodName+"Sync"] = function(){
               return this.$_collection[methodName].apply(this.$_entity,arguments);
             };
-            prepareHelpers.wakandaUserDefinedEntityMethodToPromisableMethods(proto, methodName, dataClass._private.entityMethods[methodName]);
+            prepareHelpers.wakandaUserDefinedMethodToPromisableMethods(proto, methodName, dataClass._private.entityCollectionMethods[methodName]);
           }
         }
         
         return proto;
       },
-      wakandaUserDefinedEntityMethodToPromisableMethods : function(proto, methodName, method){
+      wakandaUserDefinedMethodToPromisableMethods : function(proto, methodName, method){
 
         proto[methodName] = function(){
           var thatArguments = [],
+              that,
               wakOptions = {},
+              mode,
               deferred;
+          //check if we are on an entity or a collection. The mode var will also be used as the name of the pointer later
+          if(this instanceof NgWakEntityAbstract){
+            mode = '$_entity';
+          }
+          else{
+            mode = '$_collection';
+          }
           //duplicate arguments (simple assignation is not sure enough, his is to be sure to have a real array)
           if(arguments.length > 0){
             for(var i = 0; i<arguments.length; i++){
               thatArguments.push(arguments[i]);
             }
           }
-          //frist sync the pojo to the entity
-          this.$syncPojoToEntity();
+          //sync before request
+          if(mode === '$_entity'){
+            this.$syncPojoToEntity();
+          }
+          else{
+            //@todo sync to the collection ???
+          }
           //prepare the promise
-          deferred = $q.defer();        
+          deferred = $q.defer();
+          var that = this;
           wakOptions.onSuccess = function(event) {
             rootScopeSafeApply(function() {
               console.log('userMethods.onSuccess', 'event', event);
-              this.$syncEntityToPojo();//once the entity is save resync the result of the server with the pojo
+              //sync after request
+              if(mode === '$_entity'){
+                that.$syncEntityToPojo();
+              }
+              else{
+                //@todo sync to the collection ???
+              }
               deferred.resolve(event);
             });
           };
@@ -210,7 +230,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           };
           //add the asynchronous options block
           thatArguments.unshift(wakOptions);
-          method.apply(this.$_entity,thatArguments);
+          method.apply(this[mode],thatArguments);
           return deferred.promise;
         };
 
@@ -230,12 +250,20 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       queryEventToNgWakEntityCollection : function(event, onlyOne){
         var rawEntities,
             parsedXhrResponse,
+            userDefinedEntityCollectionMethods,
             result;
         parsedXhrResponse = JSON.parse(event.XHR.response);
         rawEntities = parsedXhrResponse.__ENTITIES;
         result = transform.jsonResponseToNgWakEntityCollection(event.result.getDataClass(), rawEntities);
         if(onlyOne !== true){
-          result._collection = event.result;
+          userDefinedEntityCollectionMethods = prepareHelpers.createUserDefinedEntityCollectionMethods(event.result.getDataClass());
+          console.log('userDefinedEntityCollectionMethods',userDefinedEntityCollectionMethods);
+          for(var methodName in userDefinedEntityCollectionMethods){
+            if(userDefinedEntityCollectionMethods.hasOwnProperty(methodName)){
+              result[methodName] = userDefinedEntityCollectionMethods[methodName];
+            }
+          }
+          result.$_collection = event.result;
           result.$fetch = $$fetch;
           result.$add = $$add;
         }
@@ -269,94 +297,11 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         var result = [],
             dataClass = event.result._private.dataClass;
         console.log('transform.fetchEventToNgWakEntityCollection',event);
-//        return;
         event.entities.forEach(function(entity,index){
           result.push(dataClass.$create(entity));
         });
         console.log('transformFetchEvent','result',result);
         event.result = result;
-      }
-    };
-
-    var wakToAngular = {
-      transformFetchEvent: function(event, mode){
-        var result;
-        console.log('EVENT',event);
-        result = event.entities;
-        result.forEach(function(entity,index){
-          var pojo = {};
-          pojo.$_entity = entity;
-          wakToAngular.addFrameworkMethodsToPojo(pojo);
-          wakToAngular.addUserDefinedEntityMethodsToPojo(pojo);
-          pojo.$syncEntityToPojo();
-          result[index] = pojo;
-        });
-        console.log('transformFetchEvent','result',result);
-        event.result = result;
-      },
-      transformDataClass: function(dataClass) {
-        console.group('wakToAngular.transformDataClass(%s)', dataClass._private.className, dataClass);
-        console.groupEnd();
-      },
-      transformEntityArray: function(entityArray) {
-
-      },
-      addFrameworkMethodsToPojo: function(pojo) {
-        pojo.$save = $WakEntityMethods.$$save;
-        pojo.$remove = $WakEntityMethods.$$remove;
-        pojo.$syncPojoToEntity = $WakEntityMethods.$$syncPojoToEntity;
-        pojo.$syncEntityToPojo = $WakEntityMethods.$$syncEntityToPojo;
-      },
-      addUserDefinedEntityMethodsToPojo: function(pojo) {
-        var key;
-        //add the public entity methods @todo wrap them up into promise
-        if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.methods) {
-          for(key in pojo.$_entity._private.methods){
-            if(pojo.$_entity._private.methods.hasOwnProperty(key)){
-              pojo[key+"Sync"] = function(){
-                return pojo.$_entity[key].apply(pojo.$_entity,arguments);
-              };
-              wakToAngular.wakandaUserDefinedEntityMethodToPromisableMethods(pojo, key, pojo.$_entity._private.methods[key]);
-            }
-          }
-        }
-        return pojo;
-      },
-      wakandaUserDefinedEntityMethodToPromisableMethods : function(pojo, methodName, method){
-
-        pojo[methodName] = function(){
-          var thatArguments = [],
-              wakOptions = {},
-              deferred;
-          //duplicate arguments (simple assignation is not sure enough, his is to be sure to have a real array)
-          if(arguments.length > 0){
-            for(var i = 0; i<arguments.length; i++){
-              thatArguments.push(arguments[i]);
-            }
-          }
-          //frist sync the pojo to the entity
-          pojo.$syncPojoToEntity();
-          //prepare the promise
-          deferred = $q.defer();        
-          wakOptions.onSuccess = function(event) {
-            rootScopeSafeApply(function() {
-              console.log('userMethods.onSuccess', 'event', event);
-              pojo.$syncEntityToPojo();//once the entity is save resync the result of the server with the pojo
-              deferred.resolve(event);
-            });
-          };
-          wakOptions.onError = function(error) {
-            rootScopeSafeApply(function() {
-              console.error('userMethods.onError','error', error);
-              deferred.reject(error);
-            });
-          };
-          //add the asynchronous options block
-          thatArguments.unshift(wakOptions);
-          method.apply(pojo.$_entity,thatArguments);
-          return deferred.promise;
-        };
-
       }
     };
 
@@ -505,7 +450,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         });
       };
       //make the call
-      this._collection.getEntities(skip,top,wakOptions);
+      this.$_collection.getEntities(skip,top,wakOptions);
       return deferred.promise;
     };
 
