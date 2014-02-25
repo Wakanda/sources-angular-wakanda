@@ -308,64 +308,6 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
     /** public methods */
 
     /**
-     * Applied to a WakEntity (POJO inside array result to what we add methods)
-     */
-    var $WakEntityMethods = {
-      $$save : function(){
-        console.group('$save');
-        var deferred, wakOptions = {}, that = this;
-        this.$syncPojoToEntity();
-        //prepare the promise
-        deferred = $q.defer();
-        wakOptions.onSuccess = function(event) {
-          rootScopeSafeApply(function() {
-            console.log('save.onSuccess', 'event', event);
-            that.$syncEntityToPojo();//once the entity is save resync the result of the server with the pojo
-            deferred.resolve(event);
-          });
-        };
-        wakOptions.onError = function(error) {
-          rootScopeSafeApply(function() {
-            console.error('save.onError','error', error);
-            deferred.reject(error);
-          });
-        };
-        this.$_entity.save(wakOptions);
-        return deferred.promise;
-        console.groupEnd();
-      },
-      $$remove : function(){
-        console.log("$remove() not yet implemented");
-      },
-      $$syncPojoToEntity : function(){
-        var pojo = this, key;
-        if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
-          for(key in pojo.$_entity._private.values){
-            //only update modified values which are not related entities
-            if(pojo.$_entity[key].getValue() !== pojo[key] && (pojo.$_entity[key] instanceof WAF.EntityAttributeSimple)){
-              pojo.$_entity[key].setValue(pojo[key]);
-            }
-          }
-        }
-        console.log("$syncPojoToEntity (should it be public ?)");
-      },
-      //@todo toutes variable n'atant pas object remonte
-      $$syncEntityToPojo : function(){
-        var pojo = this, key;
-        if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
-          for(key in pojo.$_entity._private.values){
-            console.log(key,pojo.$_entity._private.values[key]);
-            //only update modified values which are not related entities
-            if(pojo.$_entity[key].getValue() !== pojo[key] && (pojo.$_entity[key] instanceof WAF.EntityAttributeSimple)){
-              pojo[key] = pojo.$_entity[key].getValue();
-            }
-          }
-        }
-        console.log("$syncEntityToPojo (should it be public ?)");
-      }
-    };
-
-    /**
      * Applied to WAF.DataClass.prototype
      * 
      * @argument {Object} Simple JS object matching the dataclass representation
