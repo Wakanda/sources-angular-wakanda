@@ -3,6 +3,7 @@ module.exports = function(grunt) {
   var files = [
     'extras/Class.js',
     'WAF/extra-init.js',
+    'WAF/Dates.js',
     'WAF/Rest.js',
     'WAF/Data-Provider.js',
     'angular-wakanda-connector.js'

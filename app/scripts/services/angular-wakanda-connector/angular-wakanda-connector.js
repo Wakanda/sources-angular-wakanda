@@ -3,8 +3,7 @@ var wakConnectorModule = angular.module('wakConnectorModule', []);
 wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function($q, $rootScope) {
 
     var ds = null,
-        NgWakEntityClasses = {},
-        NgWakEntityCollectionClasses = {};
+        NgWakEntityClasses = {};
 
     /** connexion part */
 
@@ -90,8 +89,9 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         var methodName,
             dataClassMethods = [],
             collectionMethods = [],
-            entityMethods = [];
-    
+            entityMethods = [],
+            attributes;
+
         for(methodName in dataClass._private.dataClassMethods){
           if(dataClass._private.dataClassMethods.hasOwnProperty(methodName)){
             dataClassMethods.push(methodName);
@@ -109,6 +109,20 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
             entityMethods.push(methodName);
           }
         }
+        
+        attributes = dataClass._private.attributesByName;
+        
+        dataClass.$attr = function(attrName){
+          if(typeof attrName === "undefined"){
+            return attributes;
+          }
+          else if(attrName && attributes[attrName]){
+            return attributes[attrName];
+          }
+          else{
+            return null;
+          }
+        };
         
         dataClass.$dataClassMethods = function(){
           return dataClassMethods;
@@ -131,6 +145,11 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
     };
     
     var prepareHelpers = {
+      /**
+       * 
+       * @param {WAF.DataClass} dataClass
+       * @returns {Object} to use as a prototype
+       */
       createUserDefinedEntityMethods: function(dataClass) {
         var methodName, proto = {};
         
@@ -138,6 +157,21 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           if(dataClass._private.entityMethods.hasOwnProperty(methodName)){
             proto[methodName+"Sync"] = function(){
               return this.$_entity[methodName].apply(this.$_entity,arguments);
+            };
+            prepareHelpers.wakandaUserDefinedEntityMethodToPromisableMethods(proto, methodName, dataClass._private.entityMethods[methodName]);
+          }
+        }
+        
+        return proto;
+      },
+      //WARN !!! this is supposed to be used in wafDataClassCreateNgWakEntityCollectionClasses() (for the moment it is commented)
+      createUserDefinedEntityCollectionMethods: function(dataClass) {
+        var methodName, proto = {};
+        
+        for(methodName in dataClass._private.entityCollectionMethods){
+          if(dataClass._private.entityCollectionMethods.hasOwnProperty(methodName)){
+            proto[methodName+"Sync"] = function(){
+              return this.$_collection[methodName].apply(this.$_entity,arguments);
             };
             prepareHelpers.wakandaUserDefinedEntityMethodToPromisableMethods(proto, methodName, dataClass._private.entityMethods[methodName]);
           }
@@ -185,18 +219,21 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
 
     /** event transformation part */
 
-    var wakToAngular = {
-      transformQueryEvent: function(event, onlyOne) {
-        var result,
-            parsedXHRResponse;
-        parsedXHRResponse = JSON.parse(event.XHR.response);
-        result = parsedXHRResponse.__ENTITIES;
-        result.map(function(pojo){
-          pojo.$_entity = new WAF.Entity(event.result.getDataClass(),pojo);//@warn what about deep nested entities ? (related ones)
-          wakToAngular.addFrameworkMethodsToPojo(pojo);
-          wakToAngular.addUserDefinedEntityMethodsToPojo(pojo);
-          return pojo;
-        });
+    var transform = {
+      /**
+       * Transforms the WAF.Event event and adds a result attribute with the NgWakEntityCollection of the event
+       * 
+       * @param {WAF.Event} event
+       * @param {Boolean} onlyOne
+       * @returns {WAF.Event}
+       */
+      queryEventToNgWakEntityCollection : function(event, onlyOne){
+        var rawEntities,
+            parsedXhrResponse,
+            result;
+        parsedXhrResponse = JSON.parse(event.XHR.response);
+        rawEntities = parsedXhrResponse.__ENTITIES;
+        result = transform.jsonResponseToNgWakEntityCollection(event.result.getDataClass(), rawEntities);
         if(onlyOne !== true){
           result._collection = event.result;
           result.$fetch = $$fetch;
@@ -211,9 +248,37 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           }
         }
         event.result = result;
-        console.log('after transformQueryEvent','event',event);
+        console.log('after transform.queryEventToNgWakEntityCollection','event',event);
         return event;
       },
+      /**
+       * 
+       * @param {WAF.DataClass} dataClass
+       * @param {Object} xhrResponse
+       * @returns {Object}
+       */
+      jsonResponseToNgWakEntityCollection : function(dataClass,xhrResponse){
+        var ngWakEntityCollection = [];
+        console.log('dataClass',dataClass);
+        xhrResponse.map(function(pojo){
+          ngWakEntityCollection.push(dataClass.$create(pojo));
+        });
+        return ngWakEntityCollection;
+      },
+      fetchEventToNgWakEntityCollection : function(event, mode) {
+        var result = [],
+            dataClass = event.result._private.dataClass;
+        console.log('transform.fetchEventToNgWakEntityCollection',event);
+//        return;
+        event.entities.forEach(function(entity,index){
+          result.push(dataClass.$create(entity));
+        });
+        console.log('transformFetchEvent','result',result);
+        event.result = result;
+      }
+    };
+
+    var wakToAngular = {
       transformFetchEvent: function(event, mode){
         var result;
         console.log('EVENT',event);
@@ -359,21 +424,62 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
      * Applied to WAF.DataClass.prototype
      * 
      * @argument {Object} Simple JS object matching the dataclass representation
-     * @returns {Object} POJO with $_entity pointer to WAF.Entity
+     * @returns {NgWakEntity}
      */
     var $$create = function(pojo){
-      var dataClassName = this._private.className;
-      console.log(dataClassName,'this',this);
-      var entity = this.newEntity();
-      for (var key in pojo){
-        if(pojo.hasOwnProperty(key)){
-          entity[key].setValue(pojo[key]);
+      var dataClassName = this._private.className,
+          ngWakEntity,
+          entity,
+          key,
+          attributes;
+      ngWakEntity = new NgWakEntityClasses[dataClassName]();
+      if(pojo instanceof WAF.Entity){
+        entity = pojo;
+        reccursiveFillNgWakEntityFromEntity(entity,ngWakEntity);
+      }
+      else {
+        entity = this.newEntity();
+        for (key in pojo){
+          if(pojo.hasOwnProperty(key) && key === "__KEY"){
+            ngWakEntity[key] = pojo[key];
+            entity.setKey(pojo[key]);
+          }
+          else if(pojo.hasOwnProperty(key) && key === "__STAMP"){
+            ngWakEntity[key] = pojo[key];
+            entity.setStamp(pojo[key]);         
+          }
+          else if(pojo.hasOwnProperty(key) && entity.hasOwnProperty(key)){
+            ngWakEntity[key] = pojo[key];
+            //only setValue on an entity if the attribute is not a related one (at least for the moment)
+            if(entity[key] instanceof WAF.EntityAttributeSimple){
+              entity[key].setValue(pojo[key]);
+            }
+          }
         }
       }
-      pojo.$_entity = entity;
-      wakToAngular.addFrameworkMethodsToPojo(pojo);
-      wakToAngular.addUserDefinedEntityMethodsToPojo(pojo);
-      return pojo;
+      ngWakEntity.$_entity = entity;
+      return ngWakEntity;
+    };
+    
+    var reccursiveFillNgWakEntityFromEntity = function(entity, ngWakEntityNestedObject){
+      var key,
+          attributes = entity.getDataClass().$attr();
+      //first init __KEY and __STAMP - to be compatible with data retrieved by $find
+      ngWakEntityNestedObject.__KEY = entity.getKey();
+      ngWakEntityNestedObject.__STAMP = entity.getStamp();
+      //then init the values
+      for(key in attributes){
+        if(attributes[key].kind === "storage"){
+          ngWakEntityNestedObject[key] = entity[key].getValue();
+        }
+        else if (attributes[key].kind === "relatedEntities") {
+          ngWakEntityNestedObject[key] = entity[key].getRawValue();
+        }
+        else if (entity[key].relEntity) {
+          ngWakEntityNestedObject[key] = {};
+          reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key]);
+        }
+      }
     };
 
     /**
@@ -387,7 +493,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
           console.log('onSuccess', 'originalEvent', event);
-          wakToAngular.transformFetchEvent(event);
+          transform.fetchEventToNgWakEntityCollection(event);
           console.log('onSuccess', 'processedEvent', event);
           deferred.resolve(event);
         });
@@ -443,7 +549,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
           console.log('onSuccess', 'originalEvent', event);
-          wakToAngular.transformQueryEvent(event, onlyOne);
+          transform.queryEventToNgWakEntityCollection(event, onlyOne);
           console.log('onSuccess', 'processedEvent', event);
           deferred.resolve(event);
         });
