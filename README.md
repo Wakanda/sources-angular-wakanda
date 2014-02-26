@@ -4,6 +4,10 @@ If you want to directly use the angular-wakanda-connector : [get it here](master
 
 Scaffolded with yeoman angular generator in order to follow the yeoman+grunt+bower workflow.
 
+Included :
+
+A wakanda solution on which the tests are based is included : Contact.zip - extract it anywhere, launch it with Wakanda Server before sou `grunt serve` (see bellow).
+
 Needed :
 
 * node
