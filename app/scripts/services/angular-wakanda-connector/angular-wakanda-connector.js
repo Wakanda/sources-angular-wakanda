@@ -374,75 +374,60 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           attributes;
       ngWakEntity = new NgWakEntityClasses[dataClassName]();
       if(pojo instanceof WAF.Entity){
-        entity = pojo;
-        reccursiveFillNgWakEntityFromEntity(entity,ngWakEntity);
+        reccursiveFillNgWakEntityFromEntity(pojo, ngWakEntity, this);
       }
       else {
-        entity = this.newEntity();
-        for (key in pojo){
-          if(pojo.hasOwnProperty(key) && key === "__KEY"){
-            ngWakEntity[key] = pojo[key];
-            entity.setKey(pojo[key]);
-          }
-          else if(pojo.hasOwnProperty(key) && key === "__STAMP"){
-            ngWakEntity[key] = pojo[key];
-            entity.setStamp(pojo[key]);         
-          }
-          else if(pojo.hasOwnProperty(key) && entity.hasOwnProperty(key)){
-            ngWakEntity[key] = pojo[key];
-            //only setValue on an entity if the attribute is not a related one (at least for the moment)
-            console.log('WAF.EntityAttributeSimple',key,pojo[key]);
-            if(entity[key] instanceof WAF.EntityAttributeSimple){
-              console.log('WAF.EntityAttributeSimple',true);
-              entity[key].setValue(pojo[key]);
-            }
-          }
-        }
+        reccursiveFillNgWakEntityFromEntity(pojo, ngWakEntity, this);
       }
-      ngWakEntity.$_entity = entity;
       return ngWakEntity;
     };
     
-//    var reccursiveFillNgWakEntityFromPojo = function(pojo, ngWakEntityNestedObject, currentDataClass){
-//      var key,
-//          attributes = currentDataClass.$attr();
-//      //first init __KEY and __STAMP - to be compatible with data retrieved by $find
-//      ngWakEntityNestedObject.__KEY = pojo.__KEY;
-//      ngWakEntityNestedObject.__STAMP = pojo.__STAMP;
-//      //then init the values
-//      for(key in attributes){
-//        if(attributes[key].kind === "storage"){
-//          ngWakEntityNestedObject[key] = entity[key].getValue();
-//        }
-//        else if (attributes[key].kind === "relatedEntities") {
-//          ngWakEntityNestedObject[key] = entity[key].getRawValue();
-//        }
-//        else if (entity[key].relEntity) {
-//          ngWakEntityNestedObject[key] = new NgWakEntityClasses[entity[key].relEntity.getDataClass().$name]();
-//          ngWakEntityNestedObject[key].$_entity = entity[key].relEntity;
-//          reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key]);
-//        }
-//      }
-//    };
-    
-    var reccursiveFillNgWakEntityFromEntity = function(entity, ngWakEntityNestedObject){
+    /**
+     * Fills ngWakEntityNestedObject with entity (deep mode)
+     * Param entity can as well be an Object or a WAF.Entity
+     * 
+     * @param {Object | WAF.Entity} entity
+     * @param {NgWakEntity} ngWakEntityNestedObject
+     * @param {WAF.DataClass} currentDataClass
+     * @returns {undefined}
+     */
+    var reccursiveFillNgWakEntityFromEntity = function(entity, ngWakEntityNestedObject, currentDataClass){
       var key,
-          attributes = entity.getDataClass().$attr();
-      //first init __KEY and __STAMP - to be compatible with data retrieved by $find
-      ngWakEntityNestedObject.__KEY = entity.getKey();
-      ngWakEntityNestedObject.__STAMP = entity.getStamp();
-      //then init the values
+          attributes = currentDataClass.$attr(),
+          isEntityWafEntity = entity instanceof WAF.Entity;
+  
+      //attach $_entity pointer (which is an instance of WAF.Entity) from the param entity whatever it is (a pojo or a WAF.Entity)
+      if(isEntityWafEntity === false){
+        ngWakEntityNestedObject.$_entity = currentDataClass.newEntity(entity);
+      }
+      else{
+        ngWakEntityNestedObject.$_entity = entity;
+      }
+  
+      // set __KEY and __STAMP on the NgWakEntity whatever entity is (a pojo or a WAF.Entity)
+      ngWakEntityNestedObject.__KEY = isEntityWafEntity ? entity.getKey() : entity.__KEY;
+      ngWakEntityNestedObject.__STAMP = isEntityWafEntity ? entity.getStamp() : entity.__STAMP;
+      
+      //init the values - same way as above : set the values on the NgWakEntity instance from entity whatever entity is (a pojo or a WAF.Entity)
       for(key in attributes){
         if(attributes[key].kind === "storage"){
-          ngWakEntityNestedObject[key] = entity[key].getValue();
+          ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
         }
         else if (attributes[key].kind === "relatedEntities") {
-          ngWakEntityNestedObject[key] = entity[key].getRawValue();
+          //todo - add $fetch - cast the object ?
+          console.warn('relatedEntities',key,isEntityWafEntity ? entity[key].getRawValue() : entity[key]);
+          ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getRawValue() : entity[key];
         }
-        else if (entity[key].relEntity) {
-          ngWakEntityNestedObject[key] = new NgWakEntityClasses[entity[key].relEntity.getDataClass().$name]();
-          ngWakEntityNestedObject[key].$_entity = entity[key].relEntity;
-          reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key]);
+        else if (attributes[key].kind === "relatedEntity") {
+          console.log('REL ENTITY - kind',isEntityWafEntity,attributes[key].kind,ds[currentDataClass.$name].$attr(key).type);
+          ngWakEntityNestedObject[key] = new NgWakEntityClasses[isEntityWafEntity ? entity[key].relEntity.getDataClass().$name : ds[currentDataClass.$name].$attr(key).type]();
+          if(isEntityWafEntity){
+            reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key],entity[key].relEntity.getDataClass());
+          }
+          else{
+            console.log('NEXT dataClass',ds[ds[currentDataClass.$name].$attr(key).type]);
+            reccursiveFillNgWakEntityFromEntity(entity[key],ngWakEntityNestedObject[key],ds[ds[currentDataClass.$name].$attr(key).type]);
+          }
         }
       }
     };
