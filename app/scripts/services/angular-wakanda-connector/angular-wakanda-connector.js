@@ -56,6 +56,27 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       }
     };
     
+    /** base helpers */
+    
+    var helpers = {
+      //deeply inspired by the one in AngularJS ngResource source code
+      shallowClearAndCopy: function(src, dst) {
+        dst = dst || {};
+
+        angular.forEach(dst, function(value, key){
+          delete dst[key];
+        });
+
+        for (var key in src) {
+          if (src.hasOwnProperty(key)) {
+            dst[key] = src[key];
+          }
+        }
+
+        return dst;
+      }
+    };
+    
     /** Prepare DataStore, etc ... */
     
     var prepare = {
@@ -307,6 +328,33 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         });
         console.log('transformFetchEvent','result',result);
         event.result = result;
+      },
+      asyncResult : function(data, result, promise){
+        var collectionMethods,i;
+        if (data instanceof Array) {
+          collectionMethods = data.$_collection.getDataClass().$collectionMethods();
+          //update values
+          result.length = 0;
+          angular.forEach(data, function(item) {
+            result.push(item);
+          });
+          //update user defined collection methods
+          if(collectionMethods.length > 0){
+            for(i=0; i<collectionMethods.length; i++){
+              result[collectionMethods[i]] = data[collectionMethods[i]];
+            }
+          }
+          //update $_collection pointer
+          result.$_collection = data.$_collection;
+          //update framework collection methods
+          result.$fetch = $$fetch;
+          result.$add = $$add;
+          //update promise
+          result.$promise = promise;
+        } else {
+          helpers.shallowClearAndCopy(data, result);
+          result.$promise = promise;
+        }
       }
     };
 
@@ -343,7 +391,9 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           else if(pojo.hasOwnProperty(key) && entity.hasOwnProperty(key)){
             ngWakEntity[key] = pojo[key];
             //only setValue on an entity if the attribute is not a related one (at least for the moment)
+            console.log('WAF.EntityAttributeSimple',key,pojo[key]);
             if(entity[key] instanceof WAF.EntityAttributeSimple){
+              console.log('WAF.EntityAttributeSimple',true);
               entity[key].setValue(pojo[key]);
             }
           }
@@ -352,6 +402,28 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       ngWakEntity.$_entity = entity;
       return ngWakEntity;
     };
+    
+//    var reccursiveFillNgWakEntityFromPojo = function(pojo, ngWakEntityNestedObject, currentDataClass){
+//      var key,
+//          attributes = currentDataClass.$attr();
+//      //first init __KEY and __STAMP - to be compatible with data retrieved by $find
+//      ngWakEntityNestedObject.__KEY = pojo.__KEY;
+//      ngWakEntityNestedObject.__STAMP = pojo.__STAMP;
+//      //then init the values
+//      for(key in attributes){
+//        if(attributes[key].kind === "storage"){
+//          ngWakEntityNestedObject[key] = entity[key].getValue();
+//        }
+//        else if (attributes[key].kind === "relatedEntities") {
+//          ngWakEntityNestedObject[key] = entity[key].getRawValue();
+//        }
+//        else if (entity[key].relEntity) {
+//          ngWakEntityNestedObject[key] = new NgWakEntityClasses[entity[key].relEntity.getDataClass().$name]();
+//          ngWakEntityNestedObject[key].$_entity = entity[key].relEntity;
+//          reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key]);
+//        }
+//      }
+//    };
     
     var reccursiveFillNgWakEntityFromEntity = function(entity, ngWakEntityNestedObject){
       var key,
@@ -368,7 +440,8 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           ngWakEntityNestedObject[key] = entity[key].getRawValue();
         }
         else if (entity[key].relEntity) {
-          ngWakEntityNestedObject[key] = {};
+          ngWakEntityNestedObject[key] = new NgWakEntityClasses[entity[key].relEntity.getDataClass().$name]();
+          ngWakEntityNestedObject[key].$_entity = entity[key].relEntity;
           reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key]);
         }
       }
@@ -411,7 +484,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
      * @returns {$q.promise}
      */
     var $$find = function(options) {
-      var deferred, wakOptions = {}, query = null, onlyOne;
+      var deferred, wakOptions = {}, query = null, onlyOne, result;
       //input check
       if (!options || typeof options !== "object") {
         throw new Error("Please pass an object as options");
@@ -435,14 +508,24 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       if (typeof options.pages) {
         wakOptions.pages = options.pages;
       }
+      //prepare the returned object
+      onlyOne = options.onlyOne;
+      if(onlyOne){
+        result = new NgWakEntityClasses[this.$name]();
+      }
+      else{
+        result = [];
+      }
       //prepare the promise
       deferred = $q.defer();
-      onlyOne = options.onlyOne;
+      result.$promise = deferred.promise;
+      console.log('RESULT',result);
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
           console.log('onSuccess', 'originalEvent', event);
           transform.queryEventToNgWakEntityCollection(event, onlyOne);
-          console.log('onSuccess', 'processedEvent', event);
+          transform.asyncResult(event.result, result, deferred.promise);
+          console.log('onSuccess', 'processedEvent', event, result.$_collection ? result.$_collection : result.$_entity);
           deferred.resolve(event);
         });
       };
@@ -455,7 +538,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       //make the call
       options = null;
       this.query(query, wakOptions);
-      return deferred.promise;
+      return result;
     };
 
     var $$findOne = function(id){
