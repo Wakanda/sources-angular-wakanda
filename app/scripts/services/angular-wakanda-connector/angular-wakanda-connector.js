@@ -431,13 +431,56 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         }
       }
     };
+    
+    /**
+     * 
+     * @param {Array[NgWakEntity]} resultSet
+     * @param {Int} pageSize
+     * @param {Int} start
+     * @param @optional {String} filter (won't be updated if null or '')
+     * @returns {undefined}
+     */
+    var updateQueryInfos = function(resultSet, pageSize, start, filter){
+      if(typeof resultSet.$query === 'undefined'){
+        resultSet.$query = {};
+      }
+      resultSet.$query.pageSize   = pageSize;
+      resultSet.$query.start      = start;
+      resultSet.$query.filter     = filter ? filter : resultSet.$query.filter;
+    };
 
     /**
      * Applied to arrays of pojos representing collections
      */
-    var $$fetch = function(skip, top, mode){
-      var deferred, wakOptions = {}, that = this;
+    var $$fetch = function(options, mode){
+      var deferred, wakOptions = {}, that = this, skip, top;
       mode = (typeof mode === "undefined" || mode === "replace") ? "replace" : mode;
+      //input check
+      if (!options || typeof options !== "object") {
+        throw new Error("Please pass an object as options");
+      }
+      if (typeof options.start === 'undefined') {
+        throw new Error("Please specify a start index");
+      }
+      if (typeof options.orderBy !== 'undefined') {
+        throw new Error("orderBy can't be change on a $fetch (query collection's cached on server side)");
+      }
+      if (typeof options.select !== 'undefined') {
+        throw new Error("select can't be change on a $fetch (query collection's cached on server side)");
+      }
+      options.pageSize = options.pageSize || this.$query.pageSize;
+      //prepare options
+      if (typeof options.start !== 'undefined') {
+        skip = options.start;
+      }
+      if (typeof options.pageSize !== 'undefined') {
+        top = options.pageSize;
+      }
+      //prepare options
+      if (options.params) {
+        wakOptions.params = options.params;
+      }
+      console.log(wakOptions);
       //prepare the promise
       deferred = $q.defer();
       var that = this;
@@ -457,6 +500,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
               that.push(event.result[i]);
             }
           }
+          updateQueryInfos(that, options.pageSize || that.$_collection._private.pageSize, skip);
           console.log('onSuccess', 'processedEvent', event);
           deferred.resolve(event);
         });
@@ -487,7 +531,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       if (!options || typeof options !== "object") {
         throw new Error("Please pass an object as options");
       }
-      //prepare options / map to the WAF.DataStore.toArray() signature
+      //prepare options
       if (options.select) {
         wakOptions.autoExpand = options.select;
       }
@@ -523,6 +567,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           console.log('onSuccess', 'originalEvent', event);
           transform.queryEventToNgWakEntityCollection(event, onlyOne);
           transform.asyncResult(event.result, result, deferred.promise);
+          updateQueryInfos(result, result.$_collection._private.pageSize, 0, query);
           console.log('onSuccess', 'processedEvent', event, result.$_collection ? result.$_collection : result.$_entity);
           deferred.resolve(event);
         });
