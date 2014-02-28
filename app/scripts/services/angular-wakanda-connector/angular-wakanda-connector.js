@@ -319,7 +319,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         });
         return ngWakEntityCollection;
       },
-      fetchEventToNgWakEntityCollection : function(event, mode) {
+      fetchEventToNgWakEntityCollection : function(event) {
         var result = [],
             dataClass = event.result._private.dataClass;
         console.log('transform.fetchEventToNgWakEntityCollection',event);
@@ -437,13 +437,26 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
      */
     var $$fetch = function(skip, top, mode){
       var deferred, wakOptions = {}, that = this;
-      mode = (typeof mode === "undefined" || "replace") ? "replace" : mode;
+      mode = (typeof mode === "undefined" || mode === "replace") ? "replace" : mode;
       //prepare the promise
       deferred = $q.defer();
+      var that = this;
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
           console.log('onSuccess', 'originalEvent', event);
           transform.fetchEventToNgWakEntityCollection(event);
+          if(mode === 'replace'){
+            that.length = 0;
+            for(var i=0; i<event.result.length; i++){
+              that[i] = event.result[i];
+            }
+          }
+          else if(mode === 'append'){
+            for(var i=0; i<event.result.length; i++){
+              console.log(event.result[i]);
+              that.push(event.result[i]);
+            }
+          }
           console.log('onSuccess', 'processedEvent', event);
           deferred.resolve(event);
         });

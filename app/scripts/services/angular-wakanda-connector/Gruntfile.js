@@ -8,15 +8,19 @@ module.exports = function(grunt) {
     'WAF/Data-Provider.js',
     'angular-wakanda-connector.js'
   ];
+  
+  var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' + '<%= grunt.template.today("yyyy-mm-dd") %> */';
 
 //  require('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-concat-sourcemap');
   
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
     uglify:{
       prod:{
         options:{
+          banner: banner,
           wrap: true
         },
         files: {
@@ -25,6 +29,7 @@ module.exports = function(grunt) {
       },
       debug:{
         options:{
+          banner: banner,
           compress: {
             sequences: true,
             properties: true,

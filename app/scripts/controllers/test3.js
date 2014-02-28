@@ -19,7 +19,8 @@ angular.module('angularWakandaFrontApp')
     ds = wakConnectorService.getDatastore();
     employees = $scope.employees = ds.Employee.$find({
       select : 'firstName, lastName, salary, employer',
-      pageSize:5
+      pageSize:5,
+      orderBy : 'firstName asc'
     });
     employees.$promise.then(function(event){
         console.log('CTRL - employees',event,employees);
