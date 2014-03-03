@@ -8,7 +8,8 @@ angular.module('angularWakandaFrontApp')
     //retrieve infos from db
     ds = wakConnectorService.getDatastore();
     products = $scope.products = ds.Product.$find({
-      pageSize:5
+      pageSize:5,
+      orderBy : 'name asc'
     });
     products.$promise.then(function(event){
         console.log('CTRL - products',event,products);

@@ -360,6 +360,9 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       addFrameworkMethodsToResult: function(result){
         result.$fetch = $$fetch;
         result.$add = $$add;
+        result.$more = $$more;
+        result.$nextPage = $$nextPage;
+        result.$prevPage = $$prevPage;
         result.$totalCount = result.$_collection.length;
       }
     };
@@ -526,6 +529,75 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       //make the call
       this.$_collection.getEntities(skip,top,wakOptions);
       return deferred.promise;
+    };
+    
+    /**
+     * shortcuts for fetch - @todo spectify the exact return value when no more result
+     * for the moment, when there is still data loaded, returns the promise from $fetch
+     * if there is no data, returns a promise to be resolved with an object at noMore : true
+     */
+    
+    var $$more = function(){
+      var start, pageSize, deferred;
+      start = this.$query.start + this.$query.pageSize;
+      pageSize = this.$query.pageSize;
+      //prevent asking for non existant pages
+      //@todo throw some kind of warning ?
+      if(start > this.$totalCount){
+        deferred = new $q.defer();
+        deferred.resolve({
+          noMore : true
+        });
+        return deferred.promise;
+      }
+      else{
+        return this.$fetch({
+          'start' : start,
+          'pageSize' : pageSize
+        },'append');
+      }
+    };
+    
+    var $$nextPage = function(){
+      var start, pageSize, deferred;
+      start = this.$query.start + this.$query.pageSize;
+      pageSize = this.$query.pageSize;
+      //prevent asking for non existant pages
+      //@todo throw some kind of warning ?
+      if(start > this.$totalCount){
+        deferred = new $q.defer();
+        deferred.resolve({
+          noMore : true
+        });
+        return deferred.promise;
+      }
+      else{
+        return this.$fetch({
+          'start' : start,
+          'pageSize' : pageSize
+        });
+      }
+    };
+    
+    var $$prevPage = function(){
+      var start, pageSize, deferred;
+      start = this.$query.start - this.$query.pageSize;
+      pageSize = this.$query.pageSize;
+      //prevent asking for non existant pages
+      //@todo throw some kind of warning ?
+      if(start < 0){
+        deferred = new $q.defer();
+        deferred.resolve({
+          noMore : true
+        });
+        return deferred.promise;
+      }
+      else{
+        return this.$fetch({
+          'start' : start,
+          'pageSize' : pageSize
+        });
+      }
     };
 
     var $$add = function(){
