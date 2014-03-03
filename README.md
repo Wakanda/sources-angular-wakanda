@@ -4,26 +4,29 @@ If you want to directly use the angular-wakanda-connector : [get it here](master
 
 Scaffolded with yeoman angular generator in order to follow the yeoman+grunt+bower workflow.
 
-Included :
+###Included :
 
-A wakanda solution on which the tests are based is included : Contact.zip - extract it anywhere, launch it with Wakanda Server before sou `grunt serve` (see bellow).
+A wakanda solution on which the tests are based is included : **Contact.zip** - extract it anywhere, launch it with Wakanda Server before `grunt serve` (see bellow).
 
-Needed :
+###Needed :
 
 * node
-* yeoman : `npm install yo -g`
-* bower (shipped with yeoman)
-* grunt (shipped with yeoman)
+* yeoman : `npm install yo -g` (optional this was used to scaffold the project)
+* bower `npm install bower -g` (shipped with yeoman)
+* grunt `npm install grunt -g` (shipped with yeoman)
+* grunt `npm karma grunt -g` (for unit test - though there arent many for the moment)
+
+###Init
 
 Once you have all above, to init :
 
-* `npm install`
-* `bower install`
+* `npm install` (install the local dependencies)
+* `bower install` (install the frontend dependencies)
 * Go to `app/scripts/services/angular-wakanda-connector` and `npm install` (for this moment, this is necessary for development purposes, more in `app/scripts/services/angular-wakanda-connector/README.md`)
 
-Last step : duplicate wakandaApp.default.json to wakandaApp.json and set your own settings
+Last step : duplicate `wakandaApp.default.json` to wakandaApp.json and set your own settings
 
-Grunt tasks :
+###Grunt tasks :
 
 * To test (will launch a test server) : `grunt serve` (will launch your app in livereload mode)
 * To test in build mode (will build AND launch a server) : `grunt serve:dist`

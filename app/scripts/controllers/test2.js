@@ -7,9 +7,9 @@ angular.module('angularWakandaFrontApp')
     
     //retrieve infos from db
     ds = wakConnectorService.getDatastore();
-    ds.Product.$find({}).then(function(event){
+    products = $scope.products = ds.Product.$find({});
+    products.$promise.then(function(event){
         console.log(event);
-        products = $scope.products = event.result;
     });
     
     //expose scoped methods

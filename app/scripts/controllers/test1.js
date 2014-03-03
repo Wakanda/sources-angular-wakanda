@@ -57,11 +57,11 @@ angular.module('angularWakandaFrontApp')
                     query = 'name = *';
                 }
             
-                ds.Product.$find({
+                products = $scope.products = ds.Product.$find({
                     filter : query
-                }).then(function(event){
+                });
+                products.$promise.then(function(event){
                     console.log(event);
-                    products = $scope.products = event.result;
                 });
                 
             });
@@ -78,7 +78,7 @@ angular.module('angularWakandaFrontApp')
                     query = 'firstName = "*"';
                 }
             
-                ds.Employee.$find({
+                employees = $scope.employees = ds.Employee.$find({
                     select : 'firstName, lastName, salary, employer',
 //                    select : 'firstName, lastName, salary',
                     filter : query,
@@ -86,10 +86,9 @@ angular.module('angularWakandaFrontApp')
 //                    offset : 5,
                     pageSize : 70,//no pageSize on toArray
                     orderBy : 'firstName asc'
-                }).then(function(event){
+                });
+                employees.$promise.then(function(event){
                     console.log(event);
-                    employees = $scope.employees = $scope.employeesFiltered = event.result;
-                    employeesEvent = event;
                 });
                 
             });

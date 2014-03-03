@@ -398,7 +398,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
   
       //attach $_entity pointer (which is an instance of WAF.Entity) from the param entity whatever it is (a pojo or a WAF.Entity)
       if(isEntityWafEntity === false){
-        ngWakEntityNestedObject.$_entity = currentDataClass.newEntity(entity);
+        ngWakEntityNestedObject.$_entity = new WAF.Entity(currentDataClass, entity);
       }
       else{
         ngWakEntityNestedObject.$_entity = entity;
@@ -551,7 +551,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         wakOptions.pages = options.pages;
       }
       //prepare the returned object
-      onlyOne = options.onlyOne;
+      onlyOne = !!options.onlyOne;
       if(onlyOne){
         result = new NgWakEntityClasses[this.$name]();
       }
@@ -567,7 +567,9 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           console.log('onSuccess', 'originalEvent', event);
           transform.queryEventToNgWakEntityCollection(event, onlyOne);
           transform.asyncResult(event.result, result, deferred.promise);
-          updateQueryInfos(result, result.$_collection._private.pageSize, 0, query);
+          if(onlyOne === false){
+            updateQueryInfos(result, result.$_collection._private.pageSize, 0, query);
+          }
           console.log('onSuccess', 'processedEvent', event, result.$_collection ? result.$_collection : result.$_entity);
           deferred.resolve(event);
         });
