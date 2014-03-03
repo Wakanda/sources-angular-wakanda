@@ -1,11 +1,11 @@
 <div id="view-test2" ng-cloak>
   <h3>Test 3</h3>
   <p>Tests on fetching infos from an entityCollection</p>
-  <h4>products from Product</h4>
+  <h4>products from Product <img src="./images/ajax-loader.gif" ng-show="products.$fetching"></h4>
   <ul>
     <li ng-repeat="product in products">{{product.name}}</li>
   </ul>
-  <h4>employees from Product</h4>
+  <h4>employees from Employee <img src="./images/ajax-loader.gif" ng-show="employees.$fetching"></h4>
   <ul>
     <li ng-repeat="employee in employees">{{employee.firstName}} {{employee.lastName}} / {{employee.employer.name}}</li>
   </ul>

@@ -290,8 +290,10 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
             }
           }
           result.$_collection = event.result;
-          result.$fetch = $$fetch;
-          result.$add = $$add;
+          //update framework collection methods @todo - yes it's done a second time when asyncResult (but if you take in account the parameter in callback,
+          // you should have those methods
+          // hint : maybe, since we changed the calling method to ngResource like, maybe, there should be nothing passed in parameter in the callback
+          transform.addFrameworkMethodsToResult(result);
         }
         else{
           if(result.length === 1){
@@ -347,14 +349,18 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           //update $_collection pointer
           result.$_collection = data.$_collection;
           //update framework collection methods
-          result.$fetch = $$fetch;
-          result.$add = $$add;
+          transform.addFrameworkMethodsToResult(result);
           //update promise
           result.$promise = promise;
         } else {
           helpers.shallowClearAndCopy(data, result);
           result.$promise = promise;
         }
+      },
+      addFrameworkMethodsToResult: function(result){
+        result.$fetch = $$fetch;
+        result.$add = $$add;
+        result.$totalCount = result.$_collection.length;
       }
     };
 
@@ -484,6 +490,10 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       //prepare the promise
       deferred = $q.defer();
       var that = this;
+      //update $fteching ($apply needed)
+      rootScopeSafeApply(function() {
+        that.$fetching = true;
+      });
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
           console.log('onSuccess', 'originalEvent', event);
@@ -502,12 +512,14 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           }
           updateQueryInfos(that, options.pageSize || that.$_collection._private.pageSize, skip);
           console.log('onSuccess', 'processedEvent', event);
+          that.$fetching = false;
           deferred.resolve(event);
         });
       };
       wakOptions.onError = function(event) {
         rootScopeSafeApply(function() {
           console.error('onError', event);
+          that.$fetching = false;
           deferred.reject(event);
         });
       };
@@ -561,6 +573,10 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       //prepare the promise
       deferred = $q.defer();
       result.$promise = deferred.promise;
+      //update $fteching ($apply needed)
+      rootScopeSafeApply(function() {
+        result.$fetching = true;
+      });
       console.log('RESULT',result);
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
@@ -571,12 +587,14 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
             updateQueryInfos(result, result.$_collection._private.pageSize, 0, query);
           }
           console.log('onSuccess', 'processedEvent', event, result.$_collection ? result.$_collection : result.$_entity);
+          result.$fetching = false;
           deferred.resolve(event);
         });
       };
       wakOptions.onError = function(event) {
         rootScopeSafeApply(function() {
           console.error('onError', event);
+          result.$fetching = false;
           deferred.reject(event);
         });
       };
