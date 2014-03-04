@@ -405,8 +405,12 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           attributes = currentDataClass.$attr(),
           isEntityWafEntity = entity instanceof WAF.Entity;
   
+      //if no data or entity, do nothing - @todo check
+      if(entity === null){
+        return;
+      }
       //attach $_entity pointer (which is an instance of WAF.Entity) from the param entity whatever it is (a pojo or a WAF.Entity)
-      if(isEntityWafEntity === false){
+      else if(isEntityWafEntity === false){
         ngWakEntityNestedObject.$_entity = new WAF.Entity(currentDataClass, entity);
       }
       else{
@@ -465,11 +469,8 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       var deferred, wakOptions = {}, that = this, skip, top;
       mode = (typeof mode === "undefined" || mode === "replace") ? "replace" : mode;
       //input check
-      if (!options || typeof options !== "object") {
-        throw new Error("Please pass an object as options");
-      }
-      if (typeof options.start === 'undefined') {
-        throw new Error("Please specify a start index");
+      if (!options) {
+        options = {};
       }
       if (typeof options.orderBy !== 'undefined') {
         throw new Error("orderBy can't be change on a $fetch (query collection's cached on server side)");
@@ -477,15 +478,9 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       if (typeof options.select !== 'undefined') {
         throw new Error("select can't be change on a $fetch (query collection's cached on server side)");
       }
-      options.pageSize = options.pageSize || this.$query.pageSize;
       //prepare options
-      if (typeof options.start !== 'undefined') {
-        skip = options.start;
-      }
-      if (typeof options.pageSize !== 'undefined') {
-        top = options.pageSize;
-      }
-      //prepare options
+      skip = options.start = typeof options.start === 'undefined' ? this.$query.start : options.start;
+      top = options.pageSize = options.pageSize || this.$query.pageSize;
       if (options.params) {
         wakOptions.params = options.params;
       }
@@ -543,7 +538,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       pageSize = this.$query.pageSize;
       //prevent asking for non existant pages
       //@todo throw some kind of warning ?
-      if(start > this.$totalCount){
+      if(start >= this.$totalCount){
         deferred = new $q.defer();
         deferred.resolve({
           noMore : true
@@ -564,7 +559,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       pageSize = this.$query.pageSize;
       //prevent asking for non existant pages
       //@todo throw some kind of warning ?
-      if(start > this.$totalCount){
+      if(start >= this.$totalCount){
         deferred = new $q.defer();
         deferred.resolve({
           noMore : true
