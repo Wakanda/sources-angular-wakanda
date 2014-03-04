@@ -16,6 +16,13 @@ angular.module('angularWakandaFrontApp')
 //        products = $scope.products = event.result;
     });
     
+    //call to a user method
+    $scope.callProduct = function(product){
+      product.myEntityMethod('how','do',(new Date()).getTime()).then(function(e){
+        product.infos = e.result;
+      });
+    };
+    
     //retrieve infos from db
     ds = wakConnectorService.getDatastore();
     employees = $scope.employees = ds.Employee.$find({

@@ -710,7 +710,25 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
         console.groupEnd();
       },
       $remove : function(){
-        console.log("$remove() not yet implemented");
+        console.group('$remove');
+        var deferred, wakOptions = {}, that = this;
+        //prepare the promise
+        deferred = $q.defer();
+        wakOptions.onSuccess = function(event) {
+          rootScopeSafeApply(function() {
+            console.log('remove.onSuccess', 'event', event);
+            deferred.resolve(event);
+          });
+        };
+        wakOptions.onError = function(error) {
+          rootScopeSafeApply(function() {
+            console.error('remove.onError','error', error);
+            deferred.reject(error);
+          });
+        };
+        this.$_entity.remove(wakOptions);
+        return deferred.promise;
+        console.groupEnd();
       },
       $syncPojoToEntity : function(){
         var pojo = this, key;

@@ -31,9 +31,9 @@ module.exports = function(grunt) {
         options:{
           banner: banner,
           compress: {
-            sequences: true,
-            properties: true,
-            dead_code: true,
+            sequences: false,
+            properties: false,
+            dead_code: false,
             drop_debugger: false,
             unsafe: false,
             unsafe_comps: false,
