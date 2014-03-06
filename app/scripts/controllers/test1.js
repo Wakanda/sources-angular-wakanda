@@ -78,7 +78,7 @@ angular.module('angularWakandaFrontApp')
                     query = 'firstName = "*"';
                 }
             
-                employees = $scope.employees = ds.Employee.$find({
+                employees = $scope.employees = $scope.employeesFiltered = ds.Employee.$find({
                     select : 'firstName, lastName, salary, employer',
 //                    select : 'firstName, lastName, salary',
                     filter : query,
