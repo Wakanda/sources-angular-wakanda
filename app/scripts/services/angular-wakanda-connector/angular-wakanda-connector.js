@@ -401,9 +401,13 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
      * @returns {undefined}
      */
     var reccursiveFillNgWakEntityFromEntity = function(entity, ngWakEntityNestedObject, currentDataClass){
-      var key,
+      var key, defferedKey,
           attributes = currentDataClass.$attr(),
-          isEntityWafEntity = entity instanceof WAF.Entity;
+          isEntityWafEntity = entity instanceof WAF.Entity,
+          tmpDeferredInfos,
+          imageDeferredAttributesMapping = { //use this hash to change the name of the attributes from the json into the NgWakEntity (not declared attribute will kep same name)
+            'uri' : 'src'
+          };
   
       //if no data or entity, do nothing - @todo check
       if(entity === null){
@@ -424,25 +428,41 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       //init the values - same way as above : set the values on the NgWakEntity instance from entity whatever entity is (a pojo or a WAF.Entity)
       for(key in attributes){
         if(attributes[key].kind === "storage"){
-          ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
+          if(attributes[key].type === "image"){
+            ngWakEntityNestedObject[key] = {};
+            tmpDeferredInfos = isEntityWafEntity ? entity[key].getValue() : entity[key];
+            if(tmpDeferredInfos.__deferred){
+              for (defferedKey in tmpDeferredInfos.__deferred){
+                ngWakEntityNestedObject[key][imageDeferredAttributesMapping[defferedKey] ? imageDeferredAttributesMapping[defferedKey] : defferedKey] = tmpDeferredInfos.__deferred[defferedKey];
+              }
+            }
+            else{
+              ngWakEntityNestedObject[key][imageDeferredAttributesMapping['uri']] = null;
+            }
+            ngWakEntityNestedObject[key].$upload = $$upload;
+          }
+          else{
+            ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
+          }
         }
         else if (attributes[key].kind === "relatedEntities") {
           //todo - add $fetch - cast the object ?
-          console.warn('relatedEntities',key,isEntityWafEntity ? entity[key].getRawValue() : entity[key]);
           ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getRawValue() : entity[key];
         }
         else if (attributes[key].kind === "relatedEntity") {
-          console.log('REL ENTITY - kind',isEntityWafEntity,attributes[key].kind,ds[currentDataClass.$name].$attr(key).type);
           ngWakEntityNestedObject[key] = new NgWakEntityClasses[isEntityWafEntity ? entity[key].relEntity.getDataClass().$name : ds[currentDataClass.$name].$attr(key).type]();
           if(isEntityWafEntity){
             reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key],entity[key].relEntity.getDataClass());
           }
           else{
-            console.log('NEXT dataClass',ds[ds[currentDataClass.$name].$attr(key).type]);
             reccursiveFillNgWakEntityFromEntity(entity[key],ngWakEntityNestedObject[key],ds[ds[currentDataClass.$name].$attr(key).type]);
           }
         }
       }
+    };
+    
+    var $$upload = function(file){
+      console.log('$upload not yet implemented');
     };
     
     /**
