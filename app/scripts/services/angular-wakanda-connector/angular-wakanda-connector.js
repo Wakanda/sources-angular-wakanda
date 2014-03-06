@@ -431,7 +431,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           if(attributes[key].type === "image"){
             ngWakEntityNestedObject[key] = {};
             tmpDeferredInfos = isEntityWafEntity ? entity[key].getValue() : entity[key];
-            if(tmpDeferredInfos.__deferred){
+            if(tmpDeferredInfos && tmpDeferredInfos.__deferred){
               for (defferedKey in tmpDeferredInfos.__deferred){
                 ngWakEntityNestedObject[key][imageDeferredAttributesMapping[defferedKey] ? imageDeferredAttributesMapping[defferedKey] : defferedKey] = tmpDeferredInfos.__deferred[defferedKey];
               }
