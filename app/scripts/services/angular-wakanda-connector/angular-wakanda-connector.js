@@ -442,7 +442,8 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
             ngWakEntityNestedObject[key].$upload = $$upload;
           }
           else{
-            ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
+            //ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
+            ngWakEntityNestedObject[key] = manage1nRelationShips(entity[key], currentDataClass);
           }
         }
         else if (attributes[key].kind === "relatedEntities") {
@@ -459,6 +460,12 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           }
         }
       }
+    };
+    
+    var manage1nRelationShips = function(entity, currentDataClass){
+      var isEntityWafEntity = entity instanceof WAF.Entity;
+      
+      return isEntityWafEntity ? entity.getRawValue() : entity;
     };
     
     var $$upload = function(file){
