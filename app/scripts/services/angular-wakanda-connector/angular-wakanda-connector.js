@@ -446,7 +446,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       
       //init the values - same way as above : set the values on the NgWakEntity instance from entity whatever entity is (a pojo or a WAF.Entity)
       for(key in attributes){
-        if(attributes[key].kind === "storage"){
+        if(attributes[key].kind === "storage" || attributes[key].kind === "calculated"){
           if(attributes[key].type === "image"){
             ngWakEntityNestedObject[key] = {};
             tmpDeferredInfos = isEntityWafEntity ? entity[key].getValue() : entity[key];
