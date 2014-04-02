@@ -1,6 +1,6 @@
 var wakConnectorModule = angular.module('wakConnectorModule', []);
 
-wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function($q, $rootScope) {
+wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', function($q, $rootScope, $http) {
 
     var ds = null,
         NgWakEntityClasses = {};
@@ -280,6 +280,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
             result;
         parsedXhrResponse = JSON.parse(event.XHR.response);
         rawEntities = parsedXhrResponse.__ENTITIES;
+        console.log('rawEntities',rawEntities);
         result = transform.jsonResponseToNgWakEntityCollection(event.result.getDataClass(), rawEntities);
         if(onlyOne !== true){
           userDefinedEntityCollectionMethods = prepareHelpers.createUserDefinedEntityCollectionMethods(event.result.getDataClass());
@@ -315,7 +316,6 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
        */
       jsonResponseToNgWakEntityCollection : function(dataClass,xhrResponse){
         var ngWakEntityCollection = [];
-        console.log('dataClass',dataClass);
         xhrResponse.map(function(pojo){
           ngWakEntityCollection.push(dataClass.$create(pojo));
         });
@@ -413,17 +413,36 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
       if(entity === null){
         return;
       }
-      //attach $_entity pointer (which is an instance of WAF.Entity) from the param entity whatever it is (a pojo or a WAF.Entity)
+      //attach $_entity pointer (which is an instance of WAF.Entity) from the param entity whatever it is (a pojo or a WAF.Entity) but not on null or empty entities
       else if(isEntityWafEntity === false){
-        ngWakEntityNestedObject.$_entity = new WAF.Entity(currentDataClass, entity);
+        //console.log('TEST null entities','entity',entity);
+        if(entity.__deferred){
+          //if this is a deferred, keep a private reference and add a $fetch method - withour creating the $_entity
+          ngWakEntityNestedObject.$_deferredUri = entity.__deferred.uri;
+          ngWakEntityNestedObject.$fetch = function(){console.warn('$fetch on deferred not yet implemented');};
+        }
+        else{
+          //only create the $_entity when data is passed
+          ngWakEntityNestedObject.$_entity = new WAF.Entity(currentDataClass, entity);
+        }
       }
       else{
         ngWakEntityNestedObject.$_entity = entity;
       }
-  
-      // set __KEY and __STAMP on the NgWakEntity whatever entity is (a pojo or a WAF.Entity)
-      ngWakEntityNestedObject.__KEY = isEntityWafEntity ? entity.getKey() : entity.__KEY;
-      ngWakEntityNestedObject.__STAMP = isEntityWafEntity ? entity.getStamp() : entity.__STAMP;
+
+      // set __KEY and __STAMP on the NgWakEntity whatever entity is (a pojo or a WAF.Entity), but only if present (dont set it on null or empty entities)
+      if(isEntityWafEntity){
+        ngWakEntityNestedObject.__KEY = entity.getKey();
+        ngWakEntityNestedObject.__STAMP = entity.getStamp();
+      }
+      else{
+        if(typeof entity.__KEY !== 'undefined'){
+          ngWakEntityNestedObject.__KEY = entity.__KEY;
+        }
+        if(typeof entity.__STAMP !== 'undefined'){
+          ngWakEntityNestedObject.__STAMP = entity.__STAMP;
+        }
+      }
       
       //init the values - same way as above : set the values on the NgWakEntity instance from entity whatever entity is (a pojo or a WAF.Entity)
       for(key in attributes){
@@ -442,15 +461,24 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
             ngWakEntityNestedObject[key].$upload = $$upload;
           }
           else{
-            //ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
-            ngWakEntityNestedObject[key] = manage1nRelationShips(entity[key], currentDataClass);
+            if(isEntityWafEntity){
+              ngWakEntityNestedObject[key] = entity[key].getValue();
+            }
+            else if(typeof entity[key] !== 'undefined'){
+              ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
+            }
           }
         }
         else if (attributes[key].kind === "relatedEntities") {
-          //todo - add $fetch - cast the object ?
-          ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getRawValue() : entity[key];
+          if(entity[key] && entity[key].__ENTITIES){
+            ngWakEntityNestedObject[key] = transform.jsonResponseToNgWakEntityCollection(attributes[key].getRelatedClass(),entity[key].__ENTITIES);
+          }
+          else if(!ngWakEntityNestedObject.$_deferredUri){
+            ngWakEntityNestedObject[key] = [];
+          }
         }
         else if (attributes[key].kind === "relatedEntity") {
+          //console.log('relatedEntity',key,entity,entity[key]);
           ngWakEntityNestedObject[key] = new NgWakEntityClasses[isEntityWafEntity ? entity[key].relEntity.getDataClass().$name : ds[currentDataClass.$name].$attr(key).type]();
           if(isEntityWafEntity){
             reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key],entity[key].relEntity.getDataClass());
@@ -460,12 +488,6 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', function(
           }
         }
       }
-    };
-    
-    var manage1nRelationShips = function(entity, currentDataClass){
-      var isEntityWafEntity = entity instanceof WAF.Entity;
-      
-      return isEntityWafEntity ? entity.getRawValue() : entity;
     };
     
     var $$upload = function(file){
