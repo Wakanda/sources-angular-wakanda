@@ -7,6 +7,13 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
 
     /** connexion part */
 
+    /**
+     * Init method to execute once on your application (that will retrieve the WAF catalog, a description of your db)
+     * Asynchronous method which returns a promise, so easy to put in the route resolver or whatever way you want
+     * 
+     * @param {String} catalog
+     * @returns {$q.promise}
+     */
     var init = function(catalog) {
       console.log('>wakConnectorService init');
       var deferred = $q.defer();
@@ -36,6 +43,11 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       return deferred.promise;
     };
 
+    /**
+     * After the init part done, you can access to the datastore via this singleton method
+     * 
+     * @returns {event.dataStore}
+     */
     var getDatastore = function() {
       if (ds !== null) {
         return ds;
@@ -45,6 +57,12 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       }
     };
 
+    /**
+     * Safe $rootScope.$apply which check for $apply or $digest phase before
+     * 
+     * @param {Function} fn
+     * @returns {undefined}
+     */
     var rootScopeSafeApply = function(fn) {
       var phase = $rootScope.$$phase;
       if (phase === '$apply' || phase === '$digest') {
@@ -372,7 +390,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
     /**
      * Applied to WAF.DataClass.prototype
      * 
-     * @argument {Object} Simple JS object matching the dataclass representation
+     * @argument {Object} pojo Simple JS object matching the dataclass representation
      * @returns {NgWakEntity}
      */
     var $$create = function(pojo){
@@ -410,7 +428,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           };
   
       //if no data or entity, do nothing - @todo check
-      if(entity === null){
+      if(entity === null || typeof entity === 'undefined'){
         return;
       }
       //attach $_entity pointer (which is an instance of WAF.Entity) from the param entity whatever it is (a pojo or a WAF.Entity) but not on null or empty entities
@@ -419,7 +437,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         if(entity.__deferred){
           //if this is a deferred, keep a private reference and add a $fetch method - withour creating the $_entity
           ngWakEntityNestedObject.$_deferredUri = entity.__deferred.uri;
-          ngWakEntityNestedObject.$fetch = function(){console.warn('$fetch on deferred not yet implemented');};
+          ngWakEntityNestedObject.$fetch = function(){console.warn('$fetch on deferred not yet implemented (this one fetches only one entity)');};
         }
         else{
           //only create the $_entity when data is passed
@@ -473,9 +491,14 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           if(entity[key] && entity[key].__ENTITIES){
             ngWakEntityNestedObject[key] = transform.jsonResponseToNgWakEntityCollection(attributes[key].getRelatedClass(),entity[key].__ENTITIES);
           }
-          else if(!ngWakEntityNestedObject.$_deferredUri){
+          else{
             ngWakEntityNestedObject[key] = [];
+            if(entity[key].__deferred){
+              ngWakEntityNestedObject[key].$_deferredUri = entity[key].__deferred.uri;
+              ngWakEntityNestedObject[key].$fetch = function(){console.warn('$fetch on deferred not yet implemented (this one fetches a ollection of entities)');};
+            }
           }
+          //@todo whatever add collection methods
         }
         else if (attributes[key].kind === "relatedEntity") {
           //console.log('relatedEntity',key,entity,entity[key]);
@@ -499,7 +522,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
      * @param {Array[NgWakEntity]} resultSet
      * @param {Int} pageSize
      * @param {Int} start
-     * @param @optional {String} filter (won't be updated if null or '')
+     * @param {String} filter (won't be updated if null or '') @optional
      * @returns {undefined}
      */
     var updateQueryInfos = function(resultSet, pageSize, start, filter){
@@ -513,6 +536,10 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
 
     /**
      * Applied to arrays of pojos representing collections
+     * 
+     * @param {Object} options
+     * @param {String} mode
+     * @returns {$q.promise}
      */
     var $$fetch = function(options, mode){
       var deferred, wakOptions = {}, that = this, skip, top;
@@ -651,7 +678,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
     /**
      * 
      * @param {Object} options
-     * @returns {$q.promise}
+     * @returns {Array[NgWakEntity]|NgWakEntity}
      */
     var $$find = function(options) {
       var deferred, wakOptions = {}, query = null, onlyOne, result;
