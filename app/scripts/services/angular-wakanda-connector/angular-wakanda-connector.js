@@ -464,50 +464,50 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       
       //init the values - same way as above : set the values on the NgWakEntity instance from entity whatever entity is (a pojo or a WAF.Entity)
       for(key in attributes){
-        if(attributes[key].kind === "storage" || attributes[key].kind === "calculated"){
-          if(attributes[key].type === "image"){
-            ngWakEntityNestedObject[key] = {};
-            tmpDeferredInfos = isEntityWafEntity ? entity[key].getValue() : entity[key];
-            if(tmpDeferredInfos && tmpDeferredInfos.__deferred){
-              for (defferedKey in tmpDeferredInfos.__deferred){
-                ngWakEntityNestedObject[key][imageDeferredAttributesMapping[defferedKey] ? imageDeferredAttributesMapping[defferedKey] : defferedKey] = tmpDeferredInfos.__deferred[defferedKey];
+        if(entity[key]){
+          if(attributes[key].kind === "storage" || attributes[key].kind === "calculated"){
+            if(attributes[key].type === "image"){
+              ngWakEntityNestedObject[key] = {};
+              tmpDeferredInfos = isEntityWafEntity ? entity[key].getValue() : entity[key];
+              if(tmpDeferredInfos && tmpDeferredInfos.__deferred){
+                for (defferedKey in tmpDeferredInfos.__deferred){
+                  ngWakEntityNestedObject[key][imageDeferredAttributesMapping[defferedKey] ? imageDeferredAttributesMapping[defferedKey] : defferedKey] = tmpDeferredInfos.__deferred[defferedKey];
+                }
               }
+              else{
+                ngWakEntityNestedObject[key][imageDeferredAttributesMapping['uri']] = null;
+              }
+              ngWakEntityNestedObject[key].$upload = $$upload;
             }
             else{
-              ngWakEntityNestedObject[key][imageDeferredAttributesMapping['uri']] = null;
-            }
-            ngWakEntityNestedObject[key].$upload = $$upload;
-          }
-          else{
-            if(isEntityWafEntity){
-              ngWakEntityNestedObject[key] = entity[key].getValue();
-            }
-            else if(typeof entity[key] !== 'undefined'){
-              ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
+              if(isEntityWafEntity){
+                ngWakEntityNestedObject[key] = entity[key].getValue();
+              }
+              else if(typeof entity[key] !== 'undefined'){
+                ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
+              }
             }
           }
-        }
-        else if (attributes[key].kind === "relatedEntities") {
-          if(entity[key] && entity[key].__ENTITIES){
-            ngWakEntityNestedObject[key] = transform.jsonResponseToNgWakEntityCollection(attributes[key].getRelatedClass(),entity[key].__ENTITIES);
-          }
-          else{
-            ngWakEntityNestedObject[key] = [];
-            if(entity[key].__deferred){
+          else if (attributes[key].kind === "relatedEntities") {
+            if(entity[key].__ENTITIES){
+              ngWakEntityNestedObject[key] = transform.jsonResponseToNgWakEntityCollection(attributes[key].getRelatedClass(),entity[key].__ENTITIES);
+            }
+            else if(entity[key].__deferred){
+              ngWakEntityNestedObject[key] = [];
               ngWakEntityNestedObject[key].$_deferredUri = entity[key].__deferred.uri;
               ngWakEntityNestedObject[key].$fetch = function(){console.warn('$fetch on deferred not yet implemented (this one fetches a ollection of entities)');};
             }
+            //@todo whatever add collection methods
           }
-          //@todo whatever add collection methods
-        }
-        else if (attributes[key].kind === "relatedEntity") {
-          //console.log('relatedEntity',key,entity,entity[key]);
-          ngWakEntityNestedObject[key] = new NgWakEntityClasses[isEntityWafEntity ? entity[key].relEntity.getDataClass().$name : ds[currentDataClass.$name].$attr(key).type]();
-          if(isEntityWafEntity){
-            reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key],entity[key].relEntity.getDataClass());
-          }
-          else{
-            reccursiveFillNgWakEntityFromEntity(entity[key],ngWakEntityNestedObject[key],ds[ds[currentDataClass.$name].$attr(key).type]);
+          else if (attributes[key].kind === "relatedEntity") {
+            //console.log('relatedEntity',key,entity,entity[key]);
+            ngWakEntityNestedObject[key] = new NgWakEntityClasses[isEntityWafEntity ? entity[key].relEntity.getDataClass().$name : ds[currentDataClass.$name].$attr(key).type]();
+            if(isEntityWafEntity){
+              reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key],entity[key].relEntity.getDataClass());
+            }
+            else{
+              reccursiveFillNgWakEntityFromEntity(entity[key],ngWakEntityNestedObject[key],ds[ds[currentDataClass.$name].$attr(key).type]);
+            }
           }
         }
       }
