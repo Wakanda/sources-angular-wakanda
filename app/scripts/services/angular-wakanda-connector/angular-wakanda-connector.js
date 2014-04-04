@@ -436,8 +436,10 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         //console.log('TEST null entities','entity',entity);
         if(entity.__deferred){
           //if this is a deferred, keep a private reference and add a $fetch method - withour creating the $_entity
-          ngWakEntityNestedObject.$_deferredUri = entity.__deferred.uri;
-          ngWakEntityNestedObject.$fetch = function(){console.warn('$fetch on deferred not yet implemented (this one fetches only one entity)');};
+          ngWakEntityNestedObject.$_deferred = {
+            uri : entity.__deferred.uri,
+            dataClass : currentDataClass
+          };
         }
         else{
           //only create the $_entity when data is passed
@@ -494,7 +496,10 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
             }
             else if(entity[key].__deferred){
               ngWakEntityNestedObject[key] = [];
-              ngWakEntityNestedObject[key].$_deferredUri = entity[key].__deferred.uri;
+              ngWakEntityNestedObject[key].$_deferred = {
+                uri : entity[key].__deferred.uri,
+                dataClass : attributes[key].getRelatedClass()
+              };
               ngWakEntityNestedObject[key].$fetch = function(){console.warn('$fetch on deferred not yet implemented (this one fetches a ollection of entities)');};
             }
             //@todo whatever add collection methods
@@ -826,6 +831,77 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           }
         }
         console.log("$syncEntityToPojo (should it be public ?)");
+      },
+      /**
+       * If entity not loaded, fetched is from the server with the $_deferred.uri
+       * If entity is loaded, executes a serverRefresh
+       * 
+       * Both ways, makes sure your entity is up to date
+       * 
+       * @returns {$q.promise}
+       */
+      $fetch : function(){
+        var deferred, that = this, result, wakOptions = {};
+        //prepare the promise
+        deferred = $q.defer();
+        
+        //2 cases
+        //- serverRefresh if $_entity
+        //- fetch on deferred if $_deferred
+        
+        if(this.$_entity){
+          wakOptions.onSuccess = function(event) {
+            rootScopeSafeApply(function() {
+              result = that.$_entity.getDataClass().$create(event.entity);
+              //populate current object
+              for(var key in result){
+                if(result.hasOwnProperty(key)){
+                  that[key] = result[key];
+                }
+              }
+              deferred.resolve(result);
+            });
+          };
+          wakOptions.onError = function(error) {
+            rootScopeSafeApply(function() {
+              console.error('$fetch > Error while serverRefresh', error);
+              deferred.reject('$fetch > Error while serverRefresh'+error);
+            });
+          };
+          this.$_entity.serverRefresh(wakOptions);
+          return deferred.promise;
+        }
+        else if(this.$_deferred){
+          $http({method: 'GET', url: this.$_deferred.uri})
+            .success(function(data, status, headers, config){
+              result = that.$_deferred.dataClass.$create(data);
+              //populate current object
+              for(var key in result){
+                if(result.hasOwnProperty(key)){
+                  that[key] = result[key];
+                }
+              }
+              //remove the deferred pointer which isn't needed any more
+              delete that.$_deferred;
+              deferred.resolve(result);
+            })
+            .error(function(data, status, headers, config){
+              console.error('$fetch > Error while fetching deferred entity',data, 'status',status);
+              deferred.reject('$fetch > Error while fetching deferred entity'+data);
+            });
+        }
+        else{
+          throw new Error('Couldn\'t fetch, an error occured, no $_entity or $_deferred');
+        }
+        return deferred.promise;
+      },
+      $isLoaded : function(){
+        if(this.$_entity){
+          return true;
+        }
+        else{
+          return false;
+        }
       }
     };
     
