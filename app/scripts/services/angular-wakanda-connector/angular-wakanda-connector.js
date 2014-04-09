@@ -381,6 +381,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         result.$nextPage = $$nextPage;
         result.$prevPage = $$prevPage;
         result.$totalCount = result.$_collection.length;
+        result.$toJSON = $$toJSON;
       }
     };
 
@@ -604,6 +605,44 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       //make the call
       this.$_collection.getEntities(skip,top,wakOptions);
       return deferred.promise;
+    };
+    
+    /**
+     * Return a JSON representation of an NgWak object (must clean the object before to avoid circular references)
+     * @returns {String}
+     */
+    $$toJSON = function(){
+
+      var getCleanObject = function(obj){
+        var tmp, key, i;
+        if(obj instanceof Array){
+          tmp = [];
+          if(obj.length > 0){
+            for(i=0; i<obj.length; i++){
+              tmp.push(getCleanObject(obj[i]));
+            }
+          }
+        }
+        else{
+          tmp = {};
+          for(key in obj){
+            if(obj.hasOwnProperty(key) && key !== '$_entity'){
+              if(obj[key] instanceof Array){
+                tmp[key] = getCleanObject(obj[key]);
+              }
+              else if(obj[key] && !obj[key].$_deferred){
+                tmp[key] = obj[key];
+              }
+            }
+          }
+        }
+        return tmp;
+      };
+
+      var cleanObject = getCleanObject(this);
+
+      return JSON.stringify(cleanObject);
+
     };
     
     /**
@@ -902,7 +941,9 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         else{
           return false;
         }
-      }
+      },
+      $toJSON : $$toJSON
+      
     };
     
     var NgWakEntityAbstract = Class.extend(NgWakEntityAbstractPrototype);
