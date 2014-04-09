@@ -210,16 +210,14 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       },
       createUserDefinedEntityCollectionMethods: function(dataClass) {
         var methodName, proto = {};
-        
         for(methodName in dataClass._private.entityCollectionMethods){
           if(dataClass._private.entityCollectionMethods.hasOwnProperty(methodName)){
             proto[methodName+"Sync"] = function(){
-              return this.$_collection[methodName].apply(this.$_entity,arguments);
+              return this.$_collection[methodName].apply(this.$_collection,arguments);
             };
             prepareHelpers.wakandaUserDefinedMethodToPromisableMethods(proto, methodName, dataClass._private.entityCollectionMethods[methodName]);
           }
         }
-        
         return proto;
       },
       wakandaUserDefinedMethodToPromisableMethods : function(proto, methodName, method){
@@ -232,6 +230,9 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
               deferred;
           //check if we are on an entity or a collection. The mode var will also be used as the name of the pointer later
           if(this instanceof NgWakEntityAbstract){
+            if(typeof this.$_entity === 'undefined' || !this.$_entity instanceof WAF.Entity){
+              throw new Error('Calling user defined method on unfetched entity, please call $fetch before or retrieve data on $find');
+            }
             mode = '$_entity';
           }
           else{
@@ -274,7 +275,15 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           };
           //add the asynchronous options block
           thatArguments.unshift(wakOptions);
-          method.apply(this[mode],thatArguments);
+          if(mode === '$_entity'){
+            method.apply(this[mode],thatArguments);
+          }
+          else{
+            if(!this.$_collection){
+              throw new Error("Couldn't call user defined method on collection because no pointer on this collection");
+            }
+            method.apply(this[mode],thatArguments);//@todo maybe not on this[mode] ?...
+          }
           return deferred.promise;
         };
 
@@ -301,18 +310,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         console.log('rawEntities',rawEntities);
         result = transform.jsonResponseToNgWakEntityCollection(event.result.getDataClass(), rawEntities);
         if(onlyOne !== true){
-          userDefinedEntityCollectionMethods = prepareHelpers.createUserDefinedEntityCollectionMethods(event.result.getDataClass());
-          console.log('userDefinedEntityCollectionMethods',userDefinedEntityCollectionMethods);
-          for(var methodName in userDefinedEntityCollectionMethods){
-            if(userDefinedEntityCollectionMethods.hasOwnProperty(methodName)){
-              result[methodName] = userDefinedEntityCollectionMethods[methodName];
-            }
-          }
           result.$_collection = event.result;
-          //update framework collection methods @todo - yes it's done a second time when asyncResult (but if you take in account the parameter in callback,
-          // you should have those methods
-          // hint : maybe, since we changed the calling method to ngResource like, maybe, there should be nothing passed in parameter in the callback
-          transform.addFrameworkMethodsToResult(result);
         }
         else{
           if(result.length === 1){
@@ -350,24 +348,25 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         event.result = result;
       },
       asyncResult : function(data, result, promise){
-        var collectionMethods,i;
+        //@todo change the collection part (it erase the previous added methods)
+        var userDefinedEntityCollectionMethods;
         if (data instanceof Array) {
-          collectionMethods = data.$_collection.getDataClass().$collectionMethods();
           //update values
           result.length = 0;
           angular.forEach(data, function(item) {
             result.push(item);
           });
-          //update user defined collection methods
-          if(collectionMethods.length > 0){
-            for(i=0; i<collectionMethods.length; i++){
-              result[collectionMethods[i]] = data[collectionMethods[i]];
-            }
-          }
           //update $_collection pointer
           result.$_collection = data.$_collection;
           //update framework collection methods
           transform.addFrameworkMethodsToResult(result);
+          //add user defined methods for only on the root collection
+          userDefinedEntityCollectionMethods = prepareHelpers.createUserDefinedEntityCollectionMethods(data.$_collection.getDataClass());
+          for(var methodName in userDefinedEntityCollectionMethods){
+            if(userDefinedEntityCollectionMethods.hasOwnProperty(methodName)){
+              result[methodName] = userDefinedEntityCollectionMethods[methodName];
+            }
+          }
           //update promise
           result.$promise = promise;
         } else {
@@ -502,7 +501,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
               };
               ngWakEntityNestedObject[key].$fetch = function(){console.warn('$fetch on deferred not yet implemented (this one fetches a ollection of entities)');};
             }
-            //@todo whatever add collection methods
+            //@todo whatever add collection methods - may not be possible
           }
           else if (attributes[key].kind === "relatedEntity") {
             //console.log('relatedEntity',key,entity,entity[key]);
@@ -713,6 +712,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       //prepare the returned object
       onlyOne = !!options.onlyOne;
       if(onlyOne){
+        console.error('$findOne has a bug');
         result = new NgWakEntityClasses[this.$name]();
       }
       else{
