@@ -5,6 +5,9 @@ Understand this module is still under development and the current releases are a
 
 The versions provided can be unstable, the features may not be finished. I'll try to keep this document up to date (it may not be completly accurate).
 
+##v0.0.9
+* fixed "Converting circular structure to JSON" bug in .$toJSON() method
+
 ##v0.0.8
 * $fetch on deferred entities (not yet on collections)
 * $isLoaded method (makes it easier to check if your entity/collection was fetched or not)
