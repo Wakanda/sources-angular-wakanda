@@ -626,7 +626,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         else{
           tmp = {};
           for(key in obj){
-            if(obj.hasOwnProperty(key) && key !== '$_entity'){
+            if(obj.hasOwnProperty(key) && key !== '$_entity' && key !== '$_deferred'){
               if(obj[key] instanceof Array || obj[key] instanceof NgWakEntityAbstract){
                 tmp[key] = getCleanObject(obj[key]);
               }
