@@ -303,7 +303,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       queryEventToNgWakEntityCollection : function(event, onlyOne){
         var rawEntities,
             parsedXhrResponse,
-            userDefinedEntityCollectionMethods,
+//            userDefinedEntityCollectionMethods,
             result;
         parsedXhrResponse = JSON.parse(event.XHR.response);
         rawEntities = parsedXhrResponse.__ENTITIES;
@@ -630,7 +630,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
               if(obj[key] instanceof Array || obj[key] instanceof NgWakEntityAbstract){
                 tmp[key] = getCleanObject(obj[key]);
               }
-              else if(typeof obj[key] !== 'undefined' && !obj[key].$_deferred){
+              else if(obj[key] !== null && typeof obj[key] !== 'undefined' && !obj[key].$_deferred){
                 tmp[key] = obj[key];
               }
             }
