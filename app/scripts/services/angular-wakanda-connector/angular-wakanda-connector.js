@@ -359,7 +359,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           //update $_collection pointer
           result.$_collection = data.$_collection;
           //update framework collection methods
-          transform.addFrameworkMethodsToResult(result);
+          transform.addFrameworkMethodsToRootCollection(result);
           //add user defined methods for only on the root collection
           userDefinedEntityCollectionMethods = prepareHelpers.createUserDefinedEntityCollectionMethods(data.$_collection.getDataClass());
           for(var methodName in userDefinedEntityCollectionMethods){
@@ -374,7 +374,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           result.$promise = promise;
         }
       },
-      addFrameworkMethodsToResult: function(result){
+      addFrameworkMethodsToRootCollection: function(result){
         result.$fetch = $$fetch;
         result.$add = $$add;
         result.$more = $$more;
@@ -382,6 +382,12 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         result.$prevPage = $$prevPage;
         result.$totalCount = result.$_collection.length;
         result.$toJSON = $$toJSON;
+      },
+      addFrameworkMethodsToNestedCollection : function(result){
+        result.$fetch = $fetchOnNestedDeferredCollection;
+        result.$toJSON = $$toJSON;
+        result.$isLoaded = $$isLoadedOnNestedDeferredCollection;
+        result.$totalCount = function(){console.error('$totalCount not yet implemented on nested collections');};
       }
     };
 
@@ -395,17 +401,9 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
      */
     var $$create = function(pojo){
       var dataClassName = this._private.className,
-          ngWakEntity,
-          entity,
-          key,
-          attributes;
+          ngWakEntity;
       ngWakEntity = new NgWakEntityClasses[dataClassName]();
-      if(pojo instanceof WAF.Entity){
-        reccursiveFillNgWakEntityFromEntity(pojo, ngWakEntity, this);
-      }
-      else {
-        reccursiveFillNgWakEntityFromEntity(pojo, ngWakEntity, this);
-      }
+      reccursiveFillNgWakEntityFromEntity(pojo, ngWakEntity, this);
       return ngWakEntity;
     };
     
@@ -493,16 +491,19 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           else if (attributes[key].kind === "relatedEntities") {
             if(entity[key].__ENTITIES){
               ngWakEntityNestedObject[key] = transform.jsonResponseToNgWakEntityCollection(attributes[key].getRelatedClass(),entity[key].__ENTITIES);
+              transform.addFrameworkMethodsToNestedCollection(ngWakEntityNestedObject[key]);
             }
             else if(entity[key].__deferred){
               ngWakEntityNestedObject[key] = [];
               ngWakEntityNestedObject[key].$_deferred = {
                 uri : entity[key].__deferred.uri,
-                dataClass : attributes[key].getRelatedClass()
+                dataClass : attributes[key].getRelatedClass(),
+                attr : key
               };
               ngWakEntityNestedObject[key].$fetch = function(){console.warn('$fetch on deferred not yet implemented (this one fetches a ollection of entities)');};
+              transform.addFrameworkMethodsToNestedCollection(ngWakEntityNestedObject[key]);
             }
-            //@todo whatever add collection methods - may not be possible
+            //@todo whatever add collection methods - may not be possible - done before
           }
           else if (attributes[key].kind === "relatedEntity") {
             //console.log('relatedEntity',key,entity,entity[key]);
@@ -520,6 +521,47 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
     
     var $$upload = function(file){
       console.log('$upload not yet implemented');
+    };
+    
+    var $fetchOnNestedDeferredCollection = function(){
+      console.warn('$fetch on nested collection is unstable for the moment');
+      var that = this,
+          deferred = $q.defer();
+      if(typeof that.$_deferred === 'undefined'){
+        console.warn('Your collection was already loaded, you can\'t reload it.');
+        deferred.reject('Your collection was already loaded, you can\'t reload it.');
+      }
+      else{
+      $http({method: 'GET', url: this.$_deferred.uri})
+        .success(function(data, status, headers, config){
+          var result, i;
+          result = transform.jsonResponseToNgWakEntityCollection(that.$_deferred.dataClass,data[that.$_deferred.attr].__ENTITIES);
+          that.length = 0;//reset current collection          
+          //populate current collection
+          if(result.length > 0){
+            for(i=0; i<result.length; i++){
+              that.push(result[i]);
+            }
+          }
+          //remove the deferred pointer which isn't needed any more
+          delete that.$_deferred;
+          deferred.resolve(result);
+        })
+        .error(function(data, status, headers, config){
+          console.error('$fetch > Error while fetching deferred collection',data, 'status',status);
+          deferred.reject('$fetch > Error while fetching deferred collection'+data);
+        });
+      }
+      return deferred.promise;
+    };
+    
+    $$isLoadedOnNestedDeferredCollection = function(){
+      if(this.$_deferred){
+        return false;
+      }
+      else{
+        return true;
+      }
     };
     
     /**
@@ -751,7 +793,6 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       //prepare the returned object
       onlyOne = !!options.onlyOne;
       if(onlyOne){
-        console.error('$findOne has a bug');
         result = new NgWakEntityClasses[this.$name]();
       }
       else{
