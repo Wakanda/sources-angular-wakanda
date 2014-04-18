@@ -545,7 +545,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           }
           //remove the deferred pointer which isn't needed any more
           delete that.$_deferred;
-          deferred.resolve(result);
+          deferred.resolve(that);
         })
         .error(function(data, status, headers, config){
           console.error('$fetch > Error while fetching deferred collection',data, 'status',status);
