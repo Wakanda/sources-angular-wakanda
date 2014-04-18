@@ -5,6 +5,10 @@ Understand this module is still under development and the current releases are a
 
 The versions provided can be unstable, the features may not be finished. I'll try to keep this document up to date (it may not be completly accurate).
 
+##v0.0.11
+* added $fetch, $toJSON, $isLoaded on nested collection
+* integrated patch on error between null and $_deferred (undefined)
+
 ##v0.0.10
 * fixed another "Converting circular structure to JSON" bug in .$toJSON() method
 
