@@ -769,7 +769,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       var deferred, wakOptions = {}, query = null, onlyOne, result;
       //input check
       if (!options || typeof options !== "object") {
-        throw new Error("Please pass an object as options");
+        options = {};
       }
       //prepare options
       if (options.select) {
