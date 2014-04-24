@@ -500,9 +500,13 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
                 dataClass : attributes[key].getRelatedClass(),
                 attr : key
               };
-              ngWakEntityNestedObject[key].$fetch = function(){console.warn('$fetch on deferred not yet implemented (this one fetches a ollection of entities)');};
               transform.addFrameworkMethodsToNestedCollection(ngWakEntityNestedObject[key]);
             }
+            //@todo @warn - this part is for the setValue on collection, reactivate it when getting back to it - see also $fetchOnNestedCollection method
+//            ngWakEntityNestedObject[key].$_collection = ngWakEntityNestedObject.$_entity[key];
+//            ngWakEntityNestedObject[key].$_parent = ngWakEntityNestedObject.$_entity;
+//            console.log('ngWakEntityNestedObject.$_entity',ngWakEntityNestedObject.$_entity,'ngWakEntityNestedObject.$_entity.staff',ngWakEntityNestedObject.$_entity.staff);
+            //end of the @todo @warn part
             //@todo whatever add collection methods - may not be possible - done before
           }
           else if (attributes[key].kind === "relatedEntity") {
@@ -521,6 +525,11 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
     
     var $$upload = function(file){
       console.log('$upload not yet implemented');
+    };
+    
+    //@todo change the pageSize to the collection length
+    var $fetchOnNestedCollection = function(){
+      console.warn('This method is currently under refactoring');
     };
     
     var $fetchOnNestedDeferredCollection = function(){
