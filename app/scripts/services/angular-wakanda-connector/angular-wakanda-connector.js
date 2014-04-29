@@ -361,18 +361,41 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           //update framework collection methods
           transform.addFrameworkMethodsToRootCollection(result);
           //add user defined methods for only on the root collection
-          userDefinedEntityCollectionMethods = prepareHelpers.createUserDefinedEntityCollectionMethods(data.$_collection.getDataClass());
-          for(var methodName in userDefinedEntityCollectionMethods){
-            if(userDefinedEntityCollectionMethods.hasOwnProperty(methodName)){
-              result[methodName] = userDefinedEntityCollectionMethods[methodName];
-            }
-          }
+          transform.addUserDefinedMethodsToCollection(result,true);
           //update promise
           result.$promise = promise;
         } else {
           helpers.shallowClearAndCopy(data, result);
           result.$promise = promise;
         }
+      },
+      addUserDefinedMethodsToCollection: function(result, root){
+        var userDefinedEntityCollectionMethods,
+                dataClass = null;
+        //if in anyway the private $_collection pointer isn't here, simply return the object
+        //@todo optimize conditionals
+        if(root === true){
+          if(typeof result.$_collection !== 'undefined'){
+            dataClass = result.$_collection.getDataClass();
+          }
+        }
+        else if(root === false){
+          if(typeof result.$_collection !== 'undefined' && result.$_collection.relEntityCollection !== 'undefined'){
+            dataClass = result.$_collection.relEntityCollection;
+          }
+        }
+        //if couldn(t retrieve the dataClass (there may not be always a pointer alredy) - return the object untouched
+        if(dataClass === null){
+          return result;
+        }
+        //add user defined methods for only on the root collection
+        userDefinedEntityCollectionMethods = prepareHelpers.createUserDefinedEntityCollectionMethods(dataClass);
+        for(var methodName in userDefinedEntityCollectionMethods){
+          if(userDefinedEntityCollectionMethods.hasOwnProperty(methodName)){
+            result[methodName] = userDefinedEntityCollectionMethods[methodName];
+          }
+        }
+        return result;
       },
       addFrameworkMethodsToRootCollection: function(result){
         result.$fetch = $$fetch;
@@ -384,7 +407,8 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         result.$toJSON = $$toJSON;
       },
       addFrameworkMethodsToNestedCollection : function(result){
-        result.$fetch = $fetchOnNestedDeferredCollection;
+//        result.$fetch = $fetchOnNestedDeferredCollection;
+        result.$fetch = $fetchOnNestedCollection;
         result.$toJSON = $$toJSON;
         result.$isLoaded = $$isLoadedOnNestedDeferredCollection;
         result.$totalCount = function(){console.error('$totalCount not yet implemented on nested collections');};
@@ -431,11 +455,18 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       }
       //attach $_entity pointer (which is an instance of WAF.Entity) from the param entity whatever it is (a pojo or a WAF.Entity) but not on null or empty entities
       else if(isEntityWafEntity === false){
-        //console.log('TEST null entities','entity',entity);
+        //if this is a deferred, keep a private reference and add a $fetch method - withour creating the $_entity
         if(entity.__deferred){
-          //if this is a deferred, keep a private reference and add a $fetch method - withour creating the $_entity
+          //case from direct XHR
           ngWakEntityNestedObject.$_deferred = {
             uri : entity.__deferred.uri,
+            dataClass : currentDataClass
+          };
+        }
+        else if(entity.value && entity.value.__deferred){
+          //case from getValue (via DataProvider)
+          ngWakEntityNestedObject.$_deferred = {
+            uri : entity.value.__deferred.uri,
             dataClass : currentDataClass
           };
         }
@@ -503,7 +534,9 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
               transform.addFrameworkMethodsToNestedCollection(ngWakEntityNestedObject[key]);
             }
             //@todo @warn - this part is for the setValue on collection, reactivate it when getting back to it - see also $fetchOnNestedCollection method
-//            ngWakEntityNestedObject[key].$_collection = ngWakEntityNestedObject.$_entity[key];
+            ngWakEntityNestedObject[key].$_collection = ngWakEntityNestedObject.$_entity[key];
+//            console.log('ngWakEntityNestedObject.$_entity[key]',ngWakEntityNestedObject.$_entity[key]);
+//            ngWakEntityNestedObject[key].$_collection = ngWakEntityNestedObject.$_entity[key].relEntityCollection;
 //            ngWakEntityNestedObject[key].$_parent = ngWakEntityNestedObject.$_entity;
 //            console.log('ngWakEntityNestedObject.$_entity',ngWakEntityNestedObject.$_entity,'ngWakEntityNestedObject.$_entity.staff',ngWakEntityNestedObject.$_entity.staff);
             //end of the @todo @warn part
@@ -511,11 +544,16 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           }
           else if (attributes[key].kind === "relatedEntity") {
             //console.log('relatedEntity',key,entity,entity[key]);
-            ngWakEntityNestedObject[key] = new NgWakEntityClasses[isEntityWafEntity ? entity[key].relEntity.getDataClass().$name : ds[currentDataClass.$name].$attr(key).type]();
-            if(isEntityWafEntity){
+            //@warn the error is here .relEntity doesn't exist
+            //debugger;
+            ngWakEntityNestedObject[key] = new NgWakEntityClasses[(isEntityWafEntity && entity[key].relEntity) ? entity[key].relEntity.getDataClass().$name : ds[currentDataClass.$name].$attr(key).type]();
+            if(isEntityWafEntity && entity[key].relEntity !== null){
               reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key],entity[key].relEntity.getDataClass());
             }
             else{
+//              if(entity[key].getValue) console.warn('deferred1',key,entity[key].value,entity[key].getRawValue());
+//              if(entity[key].__deferred) console.warn('deferred2',key,entity[key].__deferred);
+//              console.log(key,entity[key],ngWakEntityNestedObject[key],ds[ds[currentDataClass.$name].$attr(key).type]);
               reccursiveFillNgWakEntityFromEntity(entity[key],ngWakEntityNestedObject[key],ds[ds[currentDataClass.$name].$attr(key).type]);
             }
           }
@@ -528,8 +566,33 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
     };
     
     //@todo change the pageSize to the collection length
-    var $fetchOnNestedCollection = function(){
+    var $fetchOnNestedCollection = function(options){
+      //@todo take options in account
+      //@todo add collection methods if not present
       console.warn('This method is currently under refactoring');
+      var that = this,
+          deferred = $q.defer();
+      if(!that.$_collection){
+        deferred.reject('Missing $_collection private pointer (WAF.EntityAttributeRelatedSet), check if you used $find or $fetch to load the collection');
+        console.warn('Missing $_collection private pointer (WAF.EntityAttributeRelatedSet), check if you used $find or $fetch to load the collection');
+      }
+      else{
+        that.$_collection.getValue({
+          onSuccess: function(e){
+            console.group('$fetchOnNestedCollection > onSuccess','e',e);
+            that.length = 0;
+            e.entityCollection.forEach(function(item){
+              console.log(item.entity,that.$_collection.relEntityCollection.getDataClass());
+              that.push(that.$_collection.relEntityCollection.getDataClass().$create(item.entity));
+            });
+            console.groupEnd();
+            //remove the deferred pointer to show that the collection has been loaded anyway
+            delete that.$_deferred;
+            deferred.resolve(that);
+          }
+        });
+      }
+      return deferred.promise;
     };
     
     var $fetchOnNestedDeferredCollection = function(){
