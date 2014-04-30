@@ -3,7 +3,8 @@ var wakConnectorModule = angular.module('wakConnectorModule', []);
 wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', function($q, $rootScope, $http) {
 
     var ds = null,
-        NgWakEntityClasses = {};
+        NgWakEntityClasses = {},
+        DEFAULT_PAGESIZE_NESTED_COLLECTIONS = 40;
 
     /** connexion part */
 
@@ -602,7 +603,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         }
         //prepare options
         wakOptions.skip = options.start = typeof options.start === 'undefined' ? (this.$query ? this.$query.start : 0) : options.start;
-        wakOptions.top = options.pageSize = typeof options.pageSize === 'undefined' ? (this.$query ? this.$query.pageSize : 40) : options.pageSize;
+        wakOptions.top = options.pageSize = typeof options.pageSize === 'undefined' ? (this.$query ? this.$query.pageSize : DEFAULT_PAGESIZE_NESTED_COLLECTIONS) : options.pageSize;
         //update $fetching ($apply needed)
         rootScopeSafeApply(function() {
           that.$fetching = true;
@@ -618,8 +619,10 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
             }
             e.entityCollection.forEach({
               onSuccess : function(item){
-                console.log(item.position,item.entity,that.$_collection.relEntityCollection.getDataClass());
-                that.push(that.$_collection.relEntityCollection.getDataClass().$create(item.entity));
+                rootScopeSafeApply(function(){
+                  console.log(item.position,item.entity,that.$_collection.relEntityCollection.getDataClass());
+                  that.push(that.$_collection.relEntityCollection.getDataClass().$create(item.entity));
+                });
               },
               atTheEnd: function(e){
                 console.log('atTheEnd','e',e);
