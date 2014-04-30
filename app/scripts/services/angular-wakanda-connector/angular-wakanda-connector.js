@@ -566,33 +566,85 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       console.log('$upload not yet implemented');
     };
     
+    /**
+     * 
+     * @param {Array[NgWakEntity} resultSet (nested collection)
+     * @param {Int} pageSize
+     * @param {Int} start
+     * @returns {undefined}
+     */
+    var updateCollectionQueryInfos = function(resultSet, pageSize, start){
+      if(typeof resultSet.$query === 'undefined'){
+        resultSet.$query = {};
+      }
+      resultSet.$query.pageSize   = pageSize;
+      resultSet.$query.start      = start;
+    };
+    
     //@todo change the pageSize to the collection length
-    var $fetchOnNestedCollection = function(options){
-      //@todo $scope.$apply
-      //@todo take options in account
+    var $fetchOnNestedCollection = function(options, mode){
+      //@todo take mode param in account for pagination / also $query
+      //@todo bug inside getValue + forEach with boundaries
       //@todo add collection methods if not present
       console.warn('This method is currently under refactoring');
       var that = this,
-          deferred = $q.defer();
+          deferred = $q.defer(),
+          wakOptions = {};
+      mode = (typeof mode === "undefined" || mode === "replace") ? "replace" : mode;
       if(!that.$_collection){
         deferred.reject('Missing $_collection private pointer (WAF.EntityAttributeRelatedSet), check if you used $find or $fetch to load the collection');
         console.warn('Missing $_collection private pointer (WAF.EntityAttributeRelatedSet), check if you used $find or $fetch to load the collection');
       }
       else{
-        that.$_collection.getValue({
-          onSuccess: function(e){
-            console.group('$fetchOnNestedCollection > onSuccess','e',e);
-            that.length = 0;
-            e.entityCollection.forEach(function(item){
-              console.log(item.entity,that.$_collection.relEntityCollection.getDataClass());
-              that.push(that.$_collection.relEntityCollection.getDataClass().$create(item.entity));
+        //options check
+        if(!options){
+          options = {};
+        }
+        //prepare options
+        wakOptions.skip = options.start = typeof options.start === 'undefined' ? (this.$query ? this.$query.start : 0) : options.start;
+        wakOptions.top = options.pageSize = typeof options.pageSize === 'undefined' ? (this.$query ? this.$query.pageSize : 40) : options.pageSize;
+        //update $fetching ($apply needed)
+        rootScopeSafeApply(function() {
+          that.$fetching = true;
+        });
+//        wakOptions.method = 'subentityset';
+//        wakOptions.forceReload = true;
+        wakOptions.onSuccess = function(e){
+          console.log('$fetchOnNestedCollection > onSuccess','e',e);
+          rootScopeSafeApply(function(){
+//            console.group('$fetchOnNestedCollection > onSuccess','e',e);
+            if(mode === 'replace'){
+              that.length = 0;
+            }
+            e.entityCollection.forEach({
+              onSuccess : function(item){
+                console.log(item.position,item.entity,that.$_collection.relEntityCollection.getDataClass());
+                that.push(that.$_collection.relEntityCollection.getDataClass().$create(item.entity));
+              },
+              atTheEnd: function(e){
+                console.log('atTheEnd','e',e);
+              },
+              //@todo not always passed
+              first : wakOptions.skip,
+              limit : wakOptions.skip + wakOptions.top
             });
-            console.groupEnd();
+//            console.groupEnd();
             //remove the deferred pointer to show that the collection has been loaded anyway
             delete that.$_deferred;
+            updateCollectionQueryInfos(that, options.pageSize, options.start);
+            that.$fetching = false;
             deferred.resolve(that);
-          }
-        });
+          });
+        };
+        wakOptions.onError = function(event){
+          rootScopeSafeApply(function() {
+            console.error('$fetch (nestedEntities) ) > onError', event);
+            that.$fetching = false;
+            deferred.reject(event);
+          });
+        };
+        console.log('wakOptions',wakOptions);
+        that.$_collection.getValue(wakOptions);
       }
       return deferred.promise;
     };

@@ -75,6 +75,11 @@ angular.module('angularWakandaFrontApp', [
                       controller: 'Basics1Ctrl',
                       resolve: routeResolver
                     })
+                    .when('/basics2', {
+                      templateUrl: 'views/basics2.html',
+                      controller: 'Basics2Ctrl',
+                      resolve: routeResolver
+                    })
                     .otherwise({
                       redirectTo: '/'
                     });
