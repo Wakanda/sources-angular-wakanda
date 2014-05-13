@@ -1,0 +1,15 @@
+<div id="view-bug-test2" ng-cloak>
+  <h3>Bug Test 2</h3>
+  <p>Test relation</p>
+  <div ng-show="error" style="color:red;">Please specify an employeeId in the route</div>
+  <div ng-show="!error">
+    <p>firstName : {{employee.firstName}}</p>
+    <p>lastName : {{employee.lastName}}</p>
+    <p>employee.employer : {{employee.employer}}</p>
+    <select ng-model="employee.employer" ng-options="company as company.name for company in companies track by company.ID" ng-change="updateRelation(employee)"></select>
+    <!--<select ng-model="employee.employer" ng-options="company as company.name for company in companies" ng-change="updateRelation(employee)"></select>-->
+    <!--<select ng-model="employee.employer.ID" ng-options="company.ID as company.name for company in companies"></select>-->
+    <button ng-click="employee.$save()">Save</button>
+    <button ng-click="doSomething()">$scope.$apply</button>
+  </div>
+</div>

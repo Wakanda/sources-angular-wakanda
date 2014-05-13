@@ -536,7 +536,9 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
               transform.addFrameworkMethodsToNestedCollection(ngWakEntityNestedObject[key]);
             }
             //@todo @warn - this part is for the setValue on collection, reactivate it when getting back to it - see also $fetchOnNestedCollection method
-            ngWakEntityNestedObject[key].$_collection = ngWakEntityNestedObject.$_entity[key];
+            if(ngWakEntityNestedObject[key]){
+              ngWakEntityNestedObject[key].$_collection = ngWakEntityNestedObject.$_entity[key];
+            }
 //            console.log('ngWakEntityNestedObject.$_entity[key]',ngWakEntityNestedObject.$_entity[key]);
 //            ngWakEntityNestedObject[key].$_collection = ngWakEntityNestedObject.$_entity[key].relEntityCollection;
 //            ngWakEntityNestedObject[key].$_parent = ngWakEntityNestedObject.$_entity;
@@ -961,11 +963,11 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       return result;
     };
 
-    var $$findOne = function(id){
-      return this.$find({
-        filter:'ID = '+id,
-        onlyOne : true
-      });
+    var $$findOne = function(id,options){
+      options = typeof options === 'undefined' ? {} : options;
+      options.filter = 'ID = '+id;
+      options.onlyOne = true;
+      return this.$find(options);
     };
 
     /** Code organization, heritage, objects used (todo : split this into multiple files which should be insject by dependency injection OR module) */
@@ -1016,16 +1018,31 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         console.groupEnd();
       },
       $syncPojoToEntity : function(){
-        var pojo = this, key;
+        console.group('$syncPojoToEntity');
+        var pojo = this, key, infos, info;
         if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
           for(key in pojo.$_entity._private.values){
             //only update modified values which are not related entities
             if(pojo.$_entity[key].getValue() !== pojo[key] && (pojo.$_entity[key] instanceof WAF.EntityAttributeSimple)){
               pojo.$_entity[key].setValue(pojo[key]);
             }
+            //@todo to sync related attributes (it's a start)
+//            //update attribute related (only if is loaded for the moment)
+//            if((pojo.$_entity[key] instanceof WAF.EntityAttributeRelated) && pojo[key].$isLoaded()){
+//              console.log('related',key,'pojo.$_entity[key]',pojo.$_entity[key],'pojo[key]',pojo[key]);
+//              console.log('$_entity',pojo.$_entity[key].getValue(),'pojo',pojo[key]);
+//              console.log(pojo.$_entity[key].relEntity.getDataClass().$attr());
+//              infos = pojo.$_entity[key].relEntity.getDataClass().$attr();
+//              //find the id field's name
+//              for(info in infos){
+//                if(infos[info].identifying === true){
+//                  console.log(info,'pojo',pojo[key][info],'$_entity',pojo.$_entity[key][info]);
+//                }
+//              }
+//            }
           }
         }
-//        console.log("$syncPojoToEntity (should it be public ?)");
+        console.groupEnd();
       },
       //@todo toutes variable n'atant pas object remonte
       $syncEntityToPojo : function(){

@@ -70,6 +70,16 @@ angular.module('angularWakandaFrontApp', [
                       controller: 'BugTest1Ctrl',
                       resolve: routeResolver
                     })
+                    .when('/bug-test2/:employeeId', {
+                      templateUrl: 'views/bug-test2.html',
+                      controller: 'BugTest2Ctrl',
+                      resolve: routeResolver
+                    })
+                    .when('/bug-test2', {
+                      templateUrl: 'views/bug-test2.html',
+                      controller: 'BugTest2Ctrl',
+                      resolve: routeResolver
+                    })
                     .when('/basics1', {
                       templateUrl: 'views/basics1.html',
                       controller: 'Basics1Ctrl',
