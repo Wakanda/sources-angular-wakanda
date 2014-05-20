@@ -408,12 +408,13 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         result.$toJSON = $$toJSON;
       },
       addFrameworkMethodsToNestedCollection : function(result){
-        //@todo $totalCount
-//        result.$fetch = $fetchOnNestedDeferredCollection;
         result.$fetch = $fetchOnNestedCollection;
+        result.$more = $$more;
+        result.$nextPage = $$nextPage;
+        result.$prevPage = $$prevPage;
         result.$toJSON = $$toJSON;
-        result.$isLoaded = $$isLoadedOnNestedDeferredCollection;
-        result.$totalCount = function(){console.error('$totalCount not yet implemented on nested collections');};
+        result.$isLoaded = $$isLoadedOnNestedCollection;
+        result.$totalCount = null;
       }
     };
 
@@ -637,6 +638,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
             //remove the deferred pointer to show that the collection has been loaded anyway
             delete that.$_deferred;
             updateCollectionQueryInfos(that, options.pageSize, options.start);
+            that.$totalCount = e.entityCollection.length;//@todo check if not e.entityCollection.length or e.result.length
             that.$fetching = false;
             deferred.resolve(that);
           });
@@ -654,39 +656,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       return deferred.promise;
     };
     
-    var $fetchOnNestedDeferredCollection = function(){
-      console.warn('$fetch on nested collection is unstable for the moment');
-      var that = this,
-          deferred = $q.defer();
-      if(typeof that.$_deferred === 'undefined'){
-        console.warn('Your collection was already loaded, you can\'t reload it.');
-        deferred.reject('Your collection was already loaded, you can\'t reload it.');
-      }
-      else{
-      $http({method: 'GET', url: this.$_deferred.uri})
-        .success(function(data, status, headers, config){
-          var result, i;
-          result = transform.jsonResponseToNgWakEntityCollection(that.$_deferred.dataClass,data[that.$_deferred.attr].__ENTITIES);
-          that.length = 0;//reset current collection          
-          //populate current collection
-          if(result.length > 0){
-            for(i=0; i<result.length; i++){
-              that.push(result[i]);
-            }
-          }
-          //remove the deferred pointer which isn't needed any more
-          delete that.$_deferred;
-          deferred.resolve(that);
-        })
-        .error(function(data, status, headers, config){
-          console.error('$fetch > Error while fetching deferred collection',data, 'status',status);
-          deferred.reject('$fetch > Error while fetching deferred collection'+data);
-        });
-      }
-      return deferred.promise;
-    };
-    
-    $$isLoadedOnNestedDeferredCollection = function(){
+    $$isLoadedOnNestedCollection = function(){
       if(this.$_deferred){
         return false;
       }
@@ -825,12 +795,21 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
      */
     
     var $$more = function(){
-      var start, pageSize, deferred;
-      start = this.$query.start + this.$query.pageSize;
-      pageSize = this.$query.pageSize;
+      var start, pageSize, totalCount, deferred;
+      if(typeof this.$query !== 'undefined'){
+        start = this.$query.start + this.$query.pageSize;
+        pageSize = this.$query.pageSize;
+        totalCount = this.$totalCount;
+      }
+      else{
+        //case the query hasn't been done yet (only happens on nested collections), the first time, set arbitrary query
+        start = 0;
+        pageSize = DEFAULT_PAGESIZE_NESTED_COLLECTIONS;
+        totalCount = DEFAULT_PAGESIZE_NESTED_COLLECTIONS;//as we don't know the total (we'll retrieve it at this call)
+      }
       //prevent asking for non existant pages
       //@todo throw some kind of warning ?
-      if(start >= this.$totalCount){
+      if(start >= totalCount){
         deferred = new $q.defer();
         deferred.resolve({
           noMore : true
@@ -846,12 +825,21 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
     };
     
     var $$nextPage = function(){
-      var start, pageSize, deferred;
-      start = this.$query.start + this.$query.pageSize;
-      pageSize = this.$query.pageSize;
+      var start, pageSize, totalCount, deferred;
+      if(typeof this.$query !== 'undefined'){
+        start = this.$query.start + this.$query.pageSize;
+        pageSize = this.$query.pageSize;
+        totalCount = this.$totalCount;
+      }
+      else{
+        //case the query hasn't been done yet (only happens on nested collections), the first time, set arbitrary query
+        start = 0;
+        pageSize = DEFAULT_PAGESIZE_NESTED_COLLECTIONS;
+        totalCount = DEFAULT_PAGESIZE_NESTED_COLLECTIONS;//as we don't know the total (we'll retrieve it at this call)
+      }
       //prevent asking for non existant pages
       //@todo throw some kind of warning ?
-      if(start >= this.$totalCount){
+      if(start >= totalCount){
         deferred = new $q.defer();
         deferred.resolve({
           noMore : true
@@ -868,8 +856,16 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
     
     var $$prevPage = function(){
       var start, pageSize, deferred;
-      start = this.$query.start - this.$query.pageSize;
-      pageSize = this.$query.pageSize;
+      if(typeof this.$query !== 'undefined'){
+        start = this.$query.start - this.$query.pageSize;
+        pageSize = this.$query.pageSize;
+      }
+      else{
+        deferred = new $q.defer();
+        deferred.reject(new Error("No collection fetched to $prevPage() on."));
+        console.error("No collection fetched to $prevPage() on.");
+        return deferred.promise;
+      }
       //prevent asking for non existant pages
       //@todo throw some kind of warning ?
       if(start < 0){
@@ -993,8 +989,8 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           });
         };
         this.$_entity.save(wakOptions);
-        return deferred.promise;
         console.groupEnd();
+        return deferred.promise;
       },
       $remove : function(){
         console.group('$remove');
@@ -1014,8 +1010,8 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
           });
         };
         this.$_entity.remove(wakOptions);
-        return deferred.promise;
         console.groupEnd();
+        return deferred.promise;
       },
       $syncPojoToEntity : function(){
         console.group('$syncPojoToEntity');
