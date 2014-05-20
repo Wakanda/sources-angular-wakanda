@@ -1,6 +1,6 @@
 {
   "name": "angular-wakanda-connector",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Connector between Wakanda Server and Angular Framework",
   "main": "angular-wakanda-connector.js",
   "scripts": {
