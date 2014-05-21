@@ -36,9 +36,16 @@ angular.module('angularWakandaFrontApp')
     };
     
     /** comp2 */
+      
+    $scope.findComp2 = function(){
+      $scope.comp1 = comp1 = ds.Company.$find({select:'staff'});
+      comp1.$promise.then(function(){
+        console.log('comp1',comp1);
+      });
+    };
     
     $scope.dispComp2StaffInfos = function(){
-      console.log('comp1[15].staff',comp1[15].staff,'comp1[15].staff.$query',comp1[15].staff.$query,'comp1[15].staff.$totalCount',comp1[15].staff.$totalCount,'comp1[15].staff.length',comp1[15].staff.length);      
+      console.log('comp1[15].staff',comp1[15].staff,'comp1[15].staff.$query',comp1[15].staff.$query,'comp1[15].staff.$totalCount',comp1[15].staff.$totalCount,'comp1[15].staff.length',comp1[15].staff.length);
     };
     
     $scope.isLoadedComp2Staff = function(){
