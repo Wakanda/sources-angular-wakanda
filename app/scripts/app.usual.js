@@ -4,8 +4,7 @@ angular.module('angularWakandaFrontApp', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
-  'ngRoute',
-  'wakandaConnect1Module'
+  'ngRoute'
 ])
         .config(function($routeProvider) {
           $routeProvider

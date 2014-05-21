@@ -105,6 +105,14 @@ module.exports = function(grunt) {
                     https: false,
                     changeOrigin: true,
                     xforward: false
+                },
+                {
+                    context: '/wakUnitTestDrive',
+                    host: '<%= yeoman.wakandaApp.host %>',
+                    port: '<%= yeoman.wakandaApp.port %>',
+                    https: false,
+                    changeOrigin: true,
+                    xforward: false
                 }
             ],
             options: {

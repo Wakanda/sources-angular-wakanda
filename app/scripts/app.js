@@ -5,8 +5,7 @@ angular.module('angularWakandaFrontApp', [
   'ngResource',
   'ngSanitize',
   'ngRoute',
-  'wakConnectorModule',
-  'wakandaConnect1Module'
+  'wakConnectorModule'
 ])
         .config(['$routeProvider', function($routeProvider) {
             //there maybe other ways or even services (ones that handles resolve for all routes),

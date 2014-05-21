@@ -17,17 +17,23 @@ module.exports = function(config) {
       'app/bower_components/angular-cookies/angular-cookies.js',
       'app/bower_components/angular-sanitize/angular-sanitize.js',
       'app/bower_components/angular-route/angular-route.js',
-      'app/scripts/*.js',
-      'app/scripts/**/*.js',
-      'test/mock/**/*.js',
+      'app/scripts/app.js',
+      'app/scripts/services/angular-wakanda-connector/angular-wakanda-connector.debug.min.js',
+      'app/scripts/controllers/*.js',
+//      'test/mock/**/*.js',
       'test/spec/**/*.js'
     ],
+    
+    proxies:  {
+      '/rest': 'http://localhost:8081/rest',
+      '/wakUnitTestDrive': 'http://localhost:8081/wakUnitTestDrive'
+    },
 
     // list of files / patterns to exclude
     exclude: [],
 
     // web server port
-    port: 8080,
+    port: 9001,
 
     // level of logging
     // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
@@ -51,6 +57,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun: false
+    singleRun: true
   });
 };

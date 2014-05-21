@@ -3,7 +3,10 @@
 describe('Controller: AboutCtrl', function() {
 
     // load the controller's module
-    beforeEach(module('angularWakandaFrontApp'));
+    beforeEach(function(){
+      module('angularWakandaFrontApp');
+      module('wakConnectorModule');
+    });
 
     var AboutCtrl,
             scope;
@@ -16,7 +19,8 @@ describe('Controller: AboutCtrl', function() {
         });
     }));
 
-    it('should attach a list of awesomeThings to the scope', function() {
-        expect(scope.awesomeThings.length).toBe(3);
+    it('should attach url1 and url2 to the scope', function() {
+        expect(typeof scope.url1).toBe('string');
+        expect(typeof scope.url2).toBe('string');
     });
 });

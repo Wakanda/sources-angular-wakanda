@@ -1,4 +1,3 @@
-
 {
   "node": true,
   "browser": true,
@@ -21,7 +20,7 @@
     "after": false,
     "afterEach": false,
     "angular": false,
-    "WAF" : false
+    "WAF" : false,
     "before": false,
     "beforeEach": false,
     "browser": false,
@@ -33,4 +32,3 @@
     "spyOn": false
   }
 }
-
