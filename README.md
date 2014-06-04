@@ -13,8 +13,8 @@ A wakanda solution on which the tests are based is included : **Contact.zip** - 
 * node
 * yeoman : `npm install yo -g` (optional this was used to scaffold the project)
 * bower `npm install bower -g` (shipped with yeoman)
-* grunt `npm install grunt -g` (shipped with yeoman)
-* grunt `npm karma grunt -g` (for unit test - though there arent many for the moment)
+* grunt `npm install grunt-cli -g` (shipped with yeoman)
+* grunt `npm karma -g` (for unit tests)
 
 ###Init
 
@@ -22,18 +22,22 @@ Once you have all above, to init :
 
 * `npm install` (install the local dependencies)
 * `bower install` (install the frontend dependencies)
+* `grunt initConfig` (duplicate `wakandaApp.default.json` to wakandaApp.json), then customize your own settings
 * Go to `app/scripts/services/angular-wakanda-connector` and `npm install` (for this moment, this is necessary for development purposes, more in `app/scripts/services/angular-wakanda-connector/README.md`)
-
-Last step : duplicate `wakandaApp.default.json` to wakandaApp.json and set your own settings
 
 ###Grunt tasks :
 
 * To test (will launch a test server) : `grunt serve` (will launch your app in livereload mode)
 * To test in build mode (will build AND launch a server) : `grunt serve:dist`
-* To build only : `grunt build` (your build is in `dist` flder)
+* To build only : `grunt build` (your build is in `dist` folder)
 * To copy your build to your Wakanda Project folder :
     * first run `grunt build`
-    * then run `grunt wakCopyBuild` probably with `--force` (warning, before copying, it cleans up the WebFolder so be sure of what you set in wakandaApp.json)
+    * then run `grunt wakCopyBuild` probably with `--force` (warning, before copying, it cleans up the WebFolder so be sure of what you set in `wakandaApp.json`)
+    
+###Test
+
+* To launch the tests : your wakanda server (which is described in `wakandaApp.json`) must be running. It exposes handlers that will reset the database.
+* To launch the tests, just type : `karma start`
 
 ---
 

@@ -2,6 +2,7 @@
 // http://karma-runner.github.io/0.10/config/configuration-file.html
 
 module.exports = function(config) {
+  var wakandaApp = require('./wakandaApp.json');
   config.set({
     // base path, that will be used to resolve files and exclude
     basePath: '',
@@ -19,14 +20,15 @@ module.exports = function(config) {
       'app/bower_components/angular-route/angular-route.js',
       'app/scripts/app.js',
       'app/scripts/services/angular-wakanda-connector/angular-wakanda-connector.debug.min.js',
+      'app/scripts/services/unitTestsHelpers.js',
       'app/scripts/controllers/*.js',
 //      'test/mock/**/*.js',
       'test/spec/**/*.js'
     ],
     
     proxies:  {
-      '/rest': 'http://localhost:8081/rest',
-      '/wakUnitTestDrive': 'http://localhost:8081/wakUnitTestDrive'
+      '/rest': 'http://'+wakandaApp.host+':'+wakandaApp.port+'/rest',
+      '/unit-tests': 'http://'+wakandaApp.host+':'+wakandaApp.port+'/unit-tests'
     },
 
     // list of files / patterns to exclude

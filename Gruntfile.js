@@ -8,6 +8,18 @@
 // 'test/spec/**/*.js'
 
 module.exports = function(grunt) {
+    
+    var wakandaApp;
+    
+    try{
+        wakandaApp = require('./wakandaApp.json');
+    }
+    catch(e){
+        var currentTaskFromCli = process.argv.slice(2);
+        if(currentTaskFromCli.length && currentTaskFromCli[0] !== 'initConfig'){
+            grunt.fail.warn('wakandaApp.json file missing. Please run grunt initConfig to create it and then customize it');
+        }
+    }
 
     // Load grunt tasks automatically
     require('load-grunt-tasks')(grunt);
@@ -34,8 +46,6 @@ module.exports = function(grunt) {
         middlewares.push(connect.directory(directory));
         return middlewares;
     };
-    
-    var wakandaApp = require('./wakandaApp.json');
 
     // Define the configuration for all the tasks
     grunt.initConfig({
@@ -107,7 +117,7 @@ module.exports = function(grunt) {
                     xforward: false
                 },
                 {
-                    context: '/wakUnitTestDrive',
+                    context: '/unit-tests',
                     host: '<%= yeoman.wakandaApp.host %>',
                     port: '<%= yeoman.wakandaApp.port %>',
                     https: false,
@@ -338,6 +348,10 @@ module.exports = function(grunt) {
                         ]
                     }]
             },
+            wakandaConfig: {
+                src: 'wakandaApp.default.json',
+                dest : 'wakandaApp.json'
+            },
             styles: {
                 expand: true,
                 cwd: '<%= yeoman.app %>/styles',
@@ -446,6 +460,10 @@ module.exports = function(grunt) {
     grunt.registerTask('wakCopyBuild',[
         'clean:wakWebFolder',
         'copy:wakWebFolder'
+    ]);
+    
+    grunt.registerTask('initConfig',[
+        'copy:wakandaConfig'
     ]);
     
     grunt.registerTask('wakConnector-build', function(){

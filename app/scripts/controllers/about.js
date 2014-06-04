@@ -2,8 +2,8 @@
 
 angular.module('angularWakandaFrontApp')
         .controller('AboutCtrl', ['$http', '$scope', function($http, $scope) {
-            $scope.url1 = "http://127.0.0.1:8081/rest/$catalog/Products/";
-            $scope.url2 = "http://127.0.0.1:9000/rest/$catalog/Products/";
+            $scope.url1 = "http://127.0.0.1:8081/rest/$catalog/Product/";
+            $scope.url2 = "http://127.0.0.1:9000/rest/$catalog/Product/";
             $scope.xhrToWakanda = function(url) {
               console.log(url);
 //                var xhr = new XMLHttpRequest();

@@ -5,7 +5,7 @@ describe('Controller: AboutCtrl', function() {
     // load the controller's module
     beforeEach(function(){
       module('angularWakandaFrontApp');
-      module('wakConnectorModule');
+      module('unitTestsHelpersModule');
     });
 
     var AboutCtrl,
