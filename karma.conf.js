@@ -23,7 +23,7 @@ module.exports = function(config) {
       'app/scripts/services/unitTestsHelpers.js',
       'app/scripts/controllers/*.js',
 //      'test/mock/**/*.js',
-      'test/spec/**/*.js'
+      'test/spec/**/*spec.js'
     ],
     
     proxies:  {

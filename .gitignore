@@ -7,3 +7,12 @@ app/bower_components
 /nbproject
 wakandaApp.json
 
+WakandaBaseSolution/Contacts/Contacts Solution/breakpoints.json
+WakandaBaseSolution/Contacts/Contacts Solution/*.waPreferences
+WakandaBaseSolution/Contacts/Contacts Solution/*.cacheUAG
+WakandaBaseSolution/Contacts/Contacts Solution/Logs/*.txt
+WakandaBaseSolution/Contacts/Contacts/DataFolder/*
+WakandaBaseSolution/Contacts/Contacts/Logs/*
+WakandaBaseSolution/Contacts/Contacts/*.Match
+WakandaBaseSolution/Contacts/Contacts/*.waSym
+WakandaBaseSolution/Contacts/Contacts/*.waSymData

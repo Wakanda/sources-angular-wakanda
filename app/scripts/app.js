@@ -90,6 +90,11 @@ angular.module('angularWakandaFrontApp', [
                       controller: 'Basics2Ctrl',
                       resolve: routeResolver
                     })
+                    .when('/e2e-tests/main', {
+                      templateUrl: 'views/e2e-tests/main.html',
+                      controller: 'E2E.MainCtrl',
+                      resolve: routeResolver
+                    })
                     .otherwise({
                       redirectTo: '/'
                     });
