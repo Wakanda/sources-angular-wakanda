@@ -53,11 +53,12 @@ Once you have all above, to init :
 ###Grunt tasks :
 
 * **To test (will launch a test server)** : `grunt serve` (will launch your app in livereload mode)
-* To test in build mode (will build AND launch a server) : `grunt serve:dist`
+* To test in build mode (will build AND launch a server) : `grunt serve:dist` 
 * To build only : `grunt build` (your build is in `dist` folder)
 * To copy your build to your Wakanda Project folder :
     * first run `grunt build`
-    * then run `grunt wakCopyBuild` probably with `--force` (warning, before copying, it cleans up the WebFolder so be sure of what you set in `wakandaApp.json`)
+    * then run `grunt wakCopyBuild` (warning, before copying, it cleans up the WebFolder so be sure of what you set in `wakandaApp.json`)
+* You can also copy the sources to your wakanda server webfolder by : `grunt wakCopy`
     
 ###Tests (end to end)
 

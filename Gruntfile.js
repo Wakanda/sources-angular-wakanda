@@ -333,6 +333,29 @@ module.exports = function(grunt) {
                 files: [{
                         expand: true,
                         dot: true,
+                        cwd: '<%= yeoman.app %>',
+                        dest: '<%= yeoman.wakandaApp.wakWebFolder %>',
+                        src: [
+                            '*.{ico,png,txt}',
+                            '.htaccess',
+                            '*.html',
+                            'views/*.html',
+                            'views/**/*.html',
+                            'scripts/*.js',
+                            'scripts/**/*.js',
+                            '!scripts/**/node_modules/**',
+                            'styles/*.css',
+                            'styles/**/*.css',
+                            'bower_components/**/*',
+                            'images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+                            'fonts/*'
+                        ]
+                    }]
+            },
+            wakWebFolderBuild: {
+                files: [{
+                        expand: true,
+                        dot: true,
                         cwd: '<%= yeoman.dist %>',
                         dest: '<%= yeoman.wakandaApp.wakWebFolder %>',
                         src: [
@@ -457,9 +480,14 @@ module.exports = function(grunt) {
         'htmlmin'
     ]);
     
-    grunt.registerTask('wakCopyBuild',[
+    grunt.registerTask('wakCopy',[
         'clean:wakWebFolder',
         'copy:wakWebFolder'
+    ]);
+    
+    grunt.registerTask('wakCopyBuild',[
+        'clean:wakWebFolder',
+        'copy:wakWebFolderBuild'
     ]);
     
     grunt.registerTask('initConfig',[

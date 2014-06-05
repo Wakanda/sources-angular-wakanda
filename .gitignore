@@ -16,3 +16,6 @@ WakandaBaseSolution/Contacts/Contacts/Logs/*
 WakandaBaseSolution/Contacts/Contacts/*.Match
 WakandaBaseSolution/Contacts/Contacts/*.waSym
 WakandaBaseSolution/Contacts/Contacts/*.waSymData
+!WakandaBaseSolution/Contacts/Contacts/WebFolder/index.html
+!WakandaBaseSolution/Contacts/Contacts/WebFolder/.htaccess
+WakandaBaseSolution/Contacts/Contacts/WebFolder/*
