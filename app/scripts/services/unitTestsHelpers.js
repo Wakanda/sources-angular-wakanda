@@ -11,7 +11,14 @@ angular.module('unitTestsHelpersModule', [])
         var httpRequest = new XMLHttpRequest();
         httpRequest.open('GET', url, false);
         httpRequest.send();
-        return JSON.parse(httpRequest.responseText);
+        if(httpRequest.status !== 200){
+          return {
+            error : true
+          };
+        }
+        else{
+          return JSON.parse(httpRequest.responseText);
+        }
       }
     };
 

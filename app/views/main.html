@@ -11,20 +11,6 @@
     <p>This is an angular website, originally scaffolded with the <a href="http://yeoman.io/gettingstarted.html" title="GETTING STARTED WITH YEOMAN">yeoman generator</a> for angular.</p>
     <p>This website is part of the test workflow for the <strong>angular-wakanda-connector</strong> project</p>
     <p>You may have launched it via grunt, creating a node server and proxying rest requests through it to the wakanda server or directly form the wakanda server.</p>
-    <div ng-show="dbState">
-      <ul>
-        <li ng-repeat="(tableName,totalCount) in dbState">{{tableName}} : {{totalCount}}</li>
-      </ul>
-      <p>You can do the following from here (those are also used in unit testing). <strong>If you launch this project for the first time, you should fill the db with resetDb</strong></p>
-      <ul>
-        <li ng-click="refreshState()">Refresh db state (no insert, no delete, just to know what's in the db)</li>
-        <li ng-click="initDb()">Reset db</lI>
-        <li ng-click="flushDb()">Flush db</lI>
-      </ul>
-    </div>
-    <div ng-show="!dbState">
-      <p class="error">It seems your wakanda server isn't up, check if you started it.</p>
-    </div>
-    <pre style="width:100%;overflow-x:scroll;">{{log}}</pre>
+    <div db-state></div>
   </div>
 </div>
