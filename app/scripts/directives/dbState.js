@@ -9,7 +9,6 @@
  */
 angular.module('angularWakandaFrontApp')
   .directive('dbState', function (unitTestsHelpers) {
-    console.log(unitTestsHelpers);
     return {
 //      restrict: 'E',
       templateUrl: './views/templates/dbState.html',
@@ -50,7 +49,6 @@ angular.module('angularWakandaFrontApp')
           else{
             $scope.dbState = false;
           }
-          $scope.loading = false;
         }
         
         $scope.toggleBody = function(){
@@ -81,7 +79,6 @@ angular.module('angularWakandaFrontApp')
             else{
               $scope.log = "An error occured\n";
             }
-            $scope.loading = false;
           }
         };
 
@@ -109,7 +106,6 @@ angular.module('angularWakandaFrontApp')
             else{
               $scope.log = "An error occured\n";
             }
-            $scope.loading = false;
           }
         };
 
@@ -137,7 +133,6 @@ angular.module('angularWakandaFrontApp')
             else{
               $scope.log = "An error occured\n";
             }
-            $scope.loading = false;
           }
         };
     
