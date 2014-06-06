@@ -1,12 +1,17 @@
 #angular-wakanda-front
 
-If you want to directly use the angular-wakanda-connector : [get it here](master/app/scripts/services/angular-wakanda-connector).
+If you want to directly use the angular-wakanda-connector in a wakanda project, just download the following file : 
+`app/scripts/services/angular-wakanda-connector/angular-wakanda-connector.min`
 
-Scaffolded with yeoman angular generator in order to follow the yeoman+grunt+bower workflow.
+If you want to contribute to the development of the connector, read the following instructions.
+
+
 
 ###Included :
 
-A wakanda solution on which the tests are based is included in `WakandaBaseSolution/Contacts`, launch it with Wakanda Server before `grunt serve` (see bellow).
+* An angular application, scaffolded with yeoman angular generator in order to follow the yeoman+grunt+bower workflow. You can launch it on a server with `grunt serve` (see bellow).
+* A wakanda solution on which the tests are based is included in `WakandaBaseSolution/Contacts`, launch it with Wakanda Server before `grunt serve` (see bellow).
+
 
 ###Needed (only for the development of the connector) :
 
@@ -22,7 +27,44 @@ For unit tests (end-to-end) :
 
 * `npm install protractor -g` will install the e2e test runner
 * `webdriver-manager update`
-* If this doesn't work, look at the log, you should see something like this :
+* If this didn't work, see the section about it bellow.
+
+
+###Init
+
+Once you have all above, to init :
+
+* `npm install` (install the local dependencies)
+* `bower install` (install the frontend dependencies)
+* `grunt initConfig` (duplicate `wakandaApp.default.json` to wakandaApp.json), **then customize your own settings**
+* Go to `app/scripts/services/angular-wakanda-connector` and `npm install` (for this moment, this is necessary for development purposes, more in `app/scripts/services/angular-wakanda-connector/README.md`)
+
+###Grunt tasks :
+
+* **To test (will launch a test server)** : `grunt serve` (will launch your app in livereload mode) - don't forget to launch the Wakanda solution in `WakandaBaseSolution/Contacts` (so that the front could call the backend - those requests are proxied).
+* To test in build mode (will build AND launch a server) : `grunt serve:dist` 
+* To build only : `grunt build` (your build is in `dist` folder)
+* To copy your build to your Wakanda Project folder :
+    * first run `grunt build`
+    * then run `grunt wakCopyBuild` (warning, before copying, it cleans up the WebFolder so be sure of what you set in `wakandaApp.json`)
+* You can also copy the sources to your wakanda server webfolder by : `grunt wakCopy`
+* `grunt wakInit` will reinit the WebFolder of your Wakanda solution
+
+    
+###Tests (end to end)
+
+The tests are end to end tests, not unit tests, since we have statefull tests with the db+REST.
+
+* To launch the tests : 
+	* your wakanda server (which is described in `wakandaApp.json`) must be running. It exposes handlers that will reset the database.
+	* your node server should be running (the tests on the front are made through it)
+* To launch the tests, just type : `npm run e2e-test` or `npm run test` (those are aliases)
+
+---
+
+###If you had troubles installing protractor
+
+* If `webdriver-manager update` didn't work, look at the log, you may see something like this :
 <pre>
 Updating selenium standalone
 downloading http://selenium-release.storage.googleapis.com/2.42/selenium-server-standalone-2.42.0.jar...
@@ -39,35 +81,6 @@ downloading https://chromedriver.storage.googleapis.com/2.10/chromedriver_mac32.
 		* `cd /usr/lib/node_modules/protractor/selenium/`
 		* `unzip chromedriver_mac32.zip`
 	* finally : `webdriver-manager update`
-
-
-###Init
-
-Once you have all above, to init :
-
-* `npm install` (install the local dependencies)
-* `bower install` (install the frontend dependencies)
-* `grunt initConfig` (duplicate `wakandaApp.default.json` to wakandaApp.json), **then customize your own settings**
-* Go to `app/scripts/services/angular-wakanda-connector` and `npm install` (for this moment, this is necessary for development purposes, more in `app/scripts/services/angular-wakanda-connector/README.md`)
-
-###Grunt tasks :
-
-* **To test (will launch a test server)** : `grunt serve` (will launch your app in livereload mode)
-* To test in build mode (will build AND launch a server) : `grunt serve:dist` 
-* To build only : `grunt build` (your build is in `dist` folder)
-* To copy your build to your Wakanda Project folder :
-    * first run `grunt build`
-    * then run `grunt wakCopyBuild` (warning, before copying, it cleans up the WebFolder so be sure of what you set in `wakandaApp.json`)
-* You can also copy the sources to your wakanda server webfolder by : `grunt wakCopy`
-    
-###Tests (end to end)
-
-The tests are end to end tests, not unit tests, since we have statefull tests with the db+REST.
-
-* To launch the tests : 
-	* your wakanda server (which is described in `wakandaApp.json`) must be running. It exposes handlers that will reset the database.
-	* your node server should be running (the tests on the front are made through it)
-* To launch the tests, just type : `npm run e2e-test` or `npm run test` (those are aliases)
 
 ---
 

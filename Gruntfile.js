@@ -329,6 +329,10 @@ module.exports = function(grunt) {
                         src: ['generated/*']
                     }]
             },
+            wakInit:{
+                src: '<%= yeoman.wakandaApp.wakWebFolder %>/../Import/index.original.html',
+                dest : '<%= yeoman.wakandaApp.wakWebFolder %>/index.html'
+            },
             wakWebFolder: {
                 files: [{
                         expand: true,
@@ -488,6 +492,11 @@ module.exports = function(grunt) {
     grunt.registerTask('wakCopyBuild',[
         'clean:wakWebFolder',
         'copy:wakWebFolderBuild'
+    ]);
+    
+    grunt.registerTask('wakInit',[
+        'clean:wakWebFolder',
+        'copy:wakInit'
     ]);
     
     grunt.registerTask('initConfig',[
