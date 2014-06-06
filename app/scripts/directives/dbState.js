@@ -1,19 +1,32 @@
 'use strict';
-
+/**
+ * This directive exposes the database state manager
+ * 
+ * init-async and init-collapsed are optional
+ * 
+ * @example <div db-state init-async="false" init-collapsed="false"></div>
+ * 
+ */
 angular.module('angularWakandaFrontApp')
   .directive('dbState', function (unitTestsHelpers) {
     console.log(unitTestsHelpers);
     return {
 //      restrict: 'E',
       templateUrl: './views/templates/dbState.html',
+      scope : {
+        initAsync : '&initAsync',
+        initCollapsed : '&initCollapsed'
+      },
       link: function($scope, element, attrs){
         var tempResult;
         $scope.dbState = null;
         $scope.log = "";
         
-        $scope.collapsed = false;
-        $scope.async = true;
+        $scope.collapsed = typeof $scope.initCollapsed() === 'undefined' ? false : $scope.initCollapsed();
+        $scope.async =  typeof $scope.initAsync() === 'undefined' ? true : $scope.initAsync();
         $scope.loading = false;
+        
+        $scope.initCollapsed = true;
         
         if($scope.async === true){
           console.log('call async');
