@@ -5,11 +5,11 @@
       <li ng-repeat="(tableName,totalCount) in dbState">{{tableName}} : <span id='count-{{tableName}}'>{{totalCount}}</span></li>
     </ul>
     <p>You can do the following from here (those are also used in unit testing). <strong>If you launch this project for the first time, you should fill the db with resetDb</strong></p>
-    <p><input type="checkbox" ng-model="async">Async mode <img src="./images/ajax-loader.gif" ng-show="loading"></p>
+    <p><label><input type="checkbox" ng-model="async">Async mode</label> <img src="./images/ajax-loader.gif" ng-show="loading"></p>
     <ul>
-      <li ng-click="refreshState()">Refresh db state (no insert, no delete, just to know what's in the db)</li>
-      <li ng-click="initDb()">Reset db</lI>
-      <li ng-click="flushDb()">Flush db</lI>
+      <li ng-click="refreshState()" id="db-state-action-refresh-state">Refresh db state (no insert, no delete, just to know what's in the db)</li>
+      <li ng-click="initDb()" id="db-state-action-init-db">Reset db</lI>
+      <li ng-click="flushDb()" id="db-state-action-flush-db">Flush db</lI>
     </ul>
   </div>
   <div ng-show="!dbState">
