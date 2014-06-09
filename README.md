@@ -19,16 +19,18 @@ If you want to contribute to the development of the connector, read the followin
 * yeoman : `npm install yo -g` (optional this was used to scaffold the project)
 * bower `npm install bower -g` (shipped with yeoman)
 * grunt `npm install grunt-cli -g` (shipped with yeoman)
-* grunt `npm karma -g` (for unit tests) **optional now, since we switched to e2e tests**
 
-You may have to execute those commands with `sudo`
+For karma unit tests (optional, most of the testing is e2e)
 
-For unit tests (end-to-end) :
+* grunt `npm karma -g` (for unit tests)
+
+For end-to-end unit tests :
 
 * `npm install protractor -g` will install the e2e test runner
 * `webdriver-manager update`
 * If this didn't work, see the section about it bellow.
 
+You may have to execute those commands with `sudo`
 
 ###Init
 
@@ -41,15 +43,14 @@ Once you have all above, to init :
 
 ###Grunt tasks :
 
-* **To test (will launch a test server)** : `grunt serve` (will launch your app in livereload mode) - don't forget to launch the Wakanda solution in `WakandaBaseSolution/Contacts` (so that the front could call the backend - those requests are proxied).
-* To test in build mode (will build AND launch a server) : `grunt serve:dist` 
-* To build only : `grunt build` (your build is in `dist` folder)
-* To copy your build to your Wakanda Project folder :
+* `grunt serve` : starts an http server in your app folder (with livereload mode) - don't forget to launch the Wakanda solution in `WakandaBaseSolution/Contacts` (so that the front could call the backend - those requests are proxied).
+* `grunt serve:dist` : same as `grunt serve` but builds the projects before in `dist/` 
+* `grunt build` builds your project in the `dist/` folder
+* To copy your build to your Wakanda Project folder **before, check your wakandaApp.json file** :
     * first run `grunt build`
     * then run `grunt wakCopyBuild` (warning, before copying, it cleans up the WebFolder so be sure of what you set in `wakandaApp.json`)
 * You can also copy the sources to your wakanda server webfolder by : `grunt wakCopy`
 * `grunt wakInit` will reinit the WebFolder of your Wakanda solution
-
     
 ###Tests (end to end)
 
@@ -57,8 +58,14 @@ The tests are end to end tests, not unit tests, since we have statefull tests wi
 
 * To launch the tests : 
 	* your wakanda server (which is described in `wakandaApp.json`) must be running. It exposes handlers that will reset the database.
+	* your node server must be running (you should have done a `grunt serve`)
 	* your node server should be running (the tests on the front are made through it)
-* To launch the tests, just type : `npm run e2e-test` or `npm run test` (those are aliases)
+* To launch the tests, just type : `npm run e2e-test` (this will launch the test on your )
+
+You can also launch the e2e tests directly on the Wakanda server (without using the node server launched with `grunt serve`). You may use it some times to confirm, nothing differs (since it's only front-end code, it shouldn't). For that :
+
+* `grunt wakCopy` will copy your sources to your wakanda project webfolder
+* `npm run e2e-test-wak` will run the e2e tests on your wakanda server specified in `wakandaApp.json`
 
 ---
 
