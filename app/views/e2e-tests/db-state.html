@@ -1,4 +1,5 @@
 <div id="view-e2e-tests-db-state" ng-cloak>
   <h3>E2E Tests - DB State</h3>
-  <div db-state init-async="false" init-collapsed></div>
+  <div db-state init-async="false" init-collapsed change-callback="testCallback()"></div>
+  <div id="callback-called">{{callbackCalledNumberTimes}}</div>
 </div>

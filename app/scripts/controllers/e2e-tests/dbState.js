@@ -3,6 +3,9 @@
 var test;
 
 angular.module('angularWakandaFrontApp')
-  .controller('E2E.DbStateCtrl', ['$scope','unitTestsHelpers',function($scope) {
-    
+  .controller('E2E.DbStateCtrl', ['$scope',function($scope) {
+    $scope.callbackCalledNumberTimes = 0;
+    $scope.testCallback = function(){
+      $scope.callbackCalledNumberTimes++;
+    };
   }]);

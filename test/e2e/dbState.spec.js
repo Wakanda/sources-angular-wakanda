@@ -23,14 +23,23 @@ describe("e2e-test main",function(){
   
   describe("check the database connection", function(){
     
-    var start = dbStateHelper.launch([
+    var tasks = [
       'flush',
       'refresh-empty',
       'init',
       'refresh-full',
       'flush',
       'refresh-empty'
-    ]);
+    ];
+    
+    var start = dbStateHelper.launch(tasks);
+    
+    it("check the callbacks where called", function(){
+      var divCallbackCalled = element(by.id('callback-called'));
+      divCallbackCalled.getText().then(function(text){
+        expect(parseInt(text)).toBe(tasks.length+1);
+      });
+    });
     
   });
   

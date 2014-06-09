@@ -2,9 +2,9 @@
 /**
  * This directive exposes the database state manager
  * 
- * init-async and init-collapsed are optional
+ * init-async, init-collapsed change-callback and are optional
  * 
- * @example <div db-state init-async="false" init-collapsed="false"></div>
+ * @example <div db-state init-async="false" init-collapsed="false" change-callback="myCallback()"></div>
  * 
  */
 angular.module('angularWakandaFrontApp')
@@ -14,10 +14,12 @@ angular.module('angularWakandaFrontApp')
       templateUrl: './views/templates/dbState.html',
       scope : {
         initAsync : '&initAsync',
-        initCollapsed : '&initCollapsed'
+        initCollapsed : '&initCollapsed',
+        changeCallback : '&changeCallback'
       },
       link: function($scope, element, attrs){
         var tempResult;
+        
         $scope.dbState = null;
         $scope.log = "";
         
@@ -34,9 +36,11 @@ angular.module('angularWakandaFrontApp')
             $scope.dbState = result;
             $scope.log += "State updated\n";
             $scope.loading = false;
+            $scope.changeCallback();
           }).error(function(result){
             $scope.dbState = false;
             $scope.loading = false;
+            $scope.changeCallback();
           });
         }
         else{
@@ -45,9 +49,11 @@ angular.module('angularWakandaFrontApp')
           if(tempResult.error !== true){
             $scope.dbState = tempResult;
             $scope.log += "State updated\n";
+            $scope.changeCallback();
           }
           else{
             $scope.dbState = false;
+            $scope.changeCallback();
           }
         }
         
@@ -64,9 +70,11 @@ angular.module('angularWakandaFrontApp')
                 $scope.dbState = result.after;
                 $scope.log += ">resetDb\n"+result.log+"\n";
                 $scope.loading = false;
+                $scope.changeCallback();
               }).error(function(result){
                 $scope.log = "An error occured\n";
                 $scope.loading = false;
+                $scope.changeCallback();
               });
           }
           else{
@@ -75,9 +83,11 @@ angular.module('angularWakandaFrontApp')
             if(tempResult.error !== true){
               $scope.dbState = tempResult.after;
               $scope.log += ">resetDb\n"+tempResult.log+"\n";
+              $scope.changeCallback();
             }
             else{
               $scope.log = "An error occured\n";
+              $scope.changeCallback();
             }
           }
         };
@@ -91,9 +101,11 @@ angular.module('angularWakandaFrontApp')
                 $scope.dbState = result;
                 $scope.log += "State updated\n";
                 $scope.loading = false;
+                $scope.changeCallback();
               }).error(function(result){
                 $scope.log += "An error occured\n";
                 $scope.loading = false;
+                $scope.changeCallback();
               });
           }
           else{
@@ -102,9 +114,11 @@ angular.module('angularWakandaFrontApp')
             if(tempResult.error !== true){
               $scope.dbState = tempResult;
               $scope.log += "State updated\n";
+              $scope.changeCallback();
             }
             else{
               $scope.log = "An error occured\n";
+              $scope.changeCallback();
             }
           }
         };
@@ -118,9 +132,11 @@ angular.module('angularWakandaFrontApp')
                 $scope.dbState = result.after;
                 $scope.log += ">flushDb\n"+result.log+"\n";
                 $scope.loading = false;
+                $scope.changeCallback();
               }).error(function(result){
                 $scope.log += "An error occured\n";
                 $scope.loading = false;
+                $scope.changeCallback();
               });
           }
           else{
@@ -129,9 +145,11 @@ angular.module('angularWakandaFrontApp')
             if(tempResult.error !== true){
               $scope.dbState = tempResult.after;
               $scope.log += ">flushDb\n"+tempResult.log+"\n";
+              $scope.changeCallback();
             }
             else{
               $scope.log = "An error occured\n";
+              $scope.changeCallback();
             }
           }
         };
