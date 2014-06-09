@@ -19,7 +19,8 @@ angular.module('angularWakandaFrontApp')
                 {href: '/basics2', text: 'Basics2'}
               ],
               'e2e-tests' : [
-                {href: '/e2e-tests/main', text: 'Main'}
+                {href: '/e2e-tests/main', text: 'Main'},
+                {href: '/e2e-tests/db-state', text: 'DbState'}
               ]
             };
             $scope.isActive = function(viewLocation) {
