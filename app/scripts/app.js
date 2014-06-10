@@ -101,6 +101,11 @@ angular.module('angularWakandaFrontApp', [
                       controller: 'E2E.DbStateCtrl',
                       resolve: routeResolver
                     })
+                    .when('/e2e-tests/first-draft', {
+                      templateUrl: 'views/e2e-tests/first-draft.html',
+                      controller: 'E2E.FirstDraftCtrl',
+                      resolve: routeResolver
+                    })
                     .otherwise({
                       redirectTo: '/'
                     });
