@@ -36,11 +36,9 @@ angular.module('angularWakandaFrontApp')
             $scope.dbState = result;
             $scope.log += "State updated\n";
             $scope.loading = false;
-            $scope.changeCallback();
           }).error(function(result){
             $scope.dbState = false;
             $scope.loading = false;
-            $scope.changeCallback();
           });
         }
         else{
@@ -49,11 +47,9 @@ angular.module('angularWakandaFrontApp')
           if(tempResult.error !== true){
             $scope.dbState = tempResult;
             $scope.log += "State updated\n";
-            $scope.changeCallback();
           }
           else{
             $scope.dbState = false;
-            $scope.changeCallback();
           }
         }
         
@@ -101,11 +97,9 @@ angular.module('angularWakandaFrontApp')
                 $scope.dbState = result;
                 $scope.log += "State updated\n";
                 $scope.loading = false;
-                $scope.changeCallback();
               }).error(function(result){
                 $scope.log += "An error occured\n";
                 $scope.loading = false;
-                $scope.changeCallback();
               });
           }
           else{
@@ -114,11 +108,9 @@ angular.module('angularWakandaFrontApp')
             if(tempResult.error !== true){
               $scope.dbState = tempResult;
               $scope.log += "State updated\n";
-              $scope.changeCallback();
             }
             else{
               $scope.log = "An error occured\n";
-              $scope.changeCallback();
             }
           }
         };

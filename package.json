@@ -47,9 +47,9 @@
     "node": ">=0.8.0"
   },
   "scripts": {
-    "test": "protractor protractor.conf.js",
-    "e2e-test": "protractor protractor.conf.js",
-    "e2e-test-wak": "protractor protractor.wak.conf.js",
+    "test": "protractor protractor.conf.js --verbose",
+    "e2e-test": "protractor protractor.conf.js --verbose",
+    "e2e-test-wak": "protractor protractor.wak.conf.js --verbose",
     "unit-test": "karma start"
   }
 }
