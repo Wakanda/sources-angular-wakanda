@@ -15,13 +15,13 @@ describe("dbState directive",function(){
       }));
     });
 
-    describe("check we are on the correct page", function(){
+    describe("> check we are on the correct page", function(){
 
-      it("shoud have a title",function(){
+      it("> shoud have a title",function(){
         expect(ptor.getTitle()).toBe("angular-wakanda-front");
       });
 
-      it("shoud have an h3 tag",function(){
+      it("> shoud have an h3 tag",function(){
         var h3 = element(by.css('#view-e2e-tests-db-state > h3'));
         h3.getText().then(function(text){
           expect(text).toBe("E2E Tests - DB State");
@@ -30,7 +30,7 @@ describe("dbState directive",function(){
 
     });
 
-    describe("check the database connection", function(){
+    describe("> check the database connection", function(){
 
       var tasks = [
         'flush',
@@ -43,7 +43,7 @@ describe("dbState directive",function(){
 
       dbStateHelper.launch(tasks);
 
-      it("check the callbacks where called", function(){
+      it("> check the callbacks where called", function(){
         var divCallbackCalled = element(by.id('callback-called'));
         divCallbackCalled.getText().then(function(text){
           expect(parseInt(text)).toBe(3);//only calls callbacks on flush and init

@@ -42,7 +42,7 @@ module.exports = {
     for(var i=0; i<list.length; i++){
       if(list[i] === 'flush'){
         (function(number){
-          it((start+number)+") flush db",function(){
+          it("> "+(start+number)+") flush db",function(){
             element(by.id("db-state-action-flush-db")).click().then(function(){
               var countCompanies = element(by.id("count-companies"));
               countCompanies.getText().then(function(text){
@@ -62,7 +62,7 @@ module.exports = {
       }
       else if(list[i] === 'refresh-empty'){
         (function(number){
-          it((start+number)+") state db (empty)",function(){
+          it("> "+(start+number)+") state db (empty)",function(){
             element(by.id("db-state-action-refresh-state-db")).click().then(function(){
               var countCompanies = element(by.id("count-companies"));
               countCompanies.getText().then(function(text){
@@ -82,7 +82,7 @@ module.exports = {
       }
       else if(list[i] === 'refresh-full'){
         (function(number){
-          it((start+number)+") state db (full)",function(){
+          it("> "+(start+number)+") state db (full)",function(){
             element(by.id("db-state-action-refresh-state-db")).click().then(function(){
               var countCompanies = element(by.id("count-companies"));
               countCompanies.getText().then(function(text){
@@ -102,7 +102,7 @@ module.exports = {
       }
       else if(list[i] === 'init'){
         (function(number){
-          it((start+number)+") init db",function(){
+          it("> "+(start+number)+") init db",function(){
             element(by.id("db-state-action-init-db")).click().then(function(){
               var countCompanies = element(by.id("count-companies"));
               countCompanies.getText().then(function(text){
