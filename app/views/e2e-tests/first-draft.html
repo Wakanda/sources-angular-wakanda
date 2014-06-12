@@ -1,10 +1,21 @@
 <div id="view-e2e-tests-first-draft" ng-cloak>
   <h3>E2E Tests - First draft</h3>
   <div db-state init-async="false" init-collapsed="true" change-callback="init()"></div>
-  <div ng-if="employees.length > 0">
+  <div>
     <h3>Employees list</h3>
     <ul class="employees-list">
       <li ng-repeat="employee in employees"><span class="last-name">{{employee.lastName}}</span>, <span class="first-name">{{employee.firstName}}</span> - <span class="salary">{{employee.salary | currency}}</span> - <span class="employer-name">{{employee.employer.name}}</span></li>
+    </ul>
+    <h4>Infos</h4>
+    <ul class="infos">
+      <li>employees.$query
+        <ul>
+          <li>pageSize : <span class="query-page-size">{{employees.$query.pageSize}}</span></li>
+          <li>start : <span class="query-page-start">{{employees.$query.start}}</span></li>
+          <li>filter : <span class="query-page-filter">{{employees.$query.filter}}</span></li>
+        </ul>
+      </li>
+      <li>employees.$totalCount : <span class="total-count">{{employees.$totalCount}}</span></li>
     </ul>
     <h4>Pagination</h4>
     <ul class="pagination">
@@ -16,22 +27,21 @@
           <li ng-click="employees.$more()"><span>+</span> employees.$more()</li>
         </ul>
       </li>
-      <li>
-        employees.$query
-        <ul>
-          <li>pageSize : <span class="query-page-size">{{employees.$query.pageSize}}</span></li>
-          <li>start : <span class="query-page-start">{{employees.$query.start}}</span></li>
-          <li>filter : <span class="query-page-filter">{{employees.$query.filter}}</span></li>
-        </ul>
-      </li>
-      <li>employees.$totalCount : <span class="total-count">{{employees.$totalCount}}</span></li>
     </ul>
     <h4>Ordering</h4>
     <ul class="ordering">
-      <p>Server : <input type="radio"></p>
+      <li>Order by (from server) : <select ng-model="wak.orderBy" ng-options="orderByOption.label for orderByOption in orderByOptions" ng-change="init()"></select></li>
+    </ul>
+    <h4>Filtering</h4>
+    <ul class="filtering">
+      <li>Type any filter on employees, like <code>firstName=s*</code> <input type="text" ng-model="filter" ng-keyup="applyFilter($event.keyCode)"></li>
     </ul>
   </div>
   <div class="error" ng-if="employees.length === 0">
-    <p class="error">No employees found. You're database may be empty, please refill it - use the DB Manager above</p>
+    <p class="error">
+      No employees found.<br>
+      If you're only filtering, that's ok.<br>
+      Otherwise, your database may be empty, please refill it, using the DB Manager above.
+    </p>
   </div>
 </div>

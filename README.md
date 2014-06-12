@@ -16,6 +16,7 @@ If you want to contribute to the development of the connector, read the followin
 ###Needed (only for the development of the connector) :
 
 * node
+* Java (only for e2e testing)
 * yeoman : `npm install yo -g` (optional this was used to scaffold the project)
 * bower `npm install bower -g` (shipped with yeoman)
 * grunt `npm install grunt-cli -g` (shipped with yeoman)

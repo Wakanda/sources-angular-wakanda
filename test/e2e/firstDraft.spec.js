@@ -7,6 +7,20 @@ describe("firstDraft test",function(){
   
   describe("> "+urlToTest,function(){
     
+    //those are helpers for this specific page
+    function getLastName(el){
+      return el.findElement(by.className('last-name')).getText();
+    }
+    function getFirstName(el){
+      return el.findElement(by.className('first-name')).getText();
+    }
+    function getSalary(el){
+      return el.findElement(by.className('salary')).getText();
+    }
+    function getEmployer(el){
+      return el.findElement(by.className('employer-name')).getText();
+    }
+    
     beforeEach(function(){
       if(browser.getCurrentUrl().then(function(url){
         if(url.indexOf(urlToTest) === -1){
@@ -32,8 +46,6 @@ describe("firstDraft test",function(){
     });
 
     describe("> reset db", function(){
-    
-      ptor.get('/#/e2e-tests/first-draft');
 
       dbStateHelper.launch(['init']);
       
@@ -44,18 +56,6 @@ describe("firstDraft test",function(){
       
       it("> check first and last employee of the first raw page",function(){
         ptor.findElements(by.repeater("employee in employees")).then(function(employees){
-          function getLastName(el){
-            return el.findElement(by.className('last-name')).getText();
-          }
-          function getFirstName(el){
-            return el.findElement(by.className('first-name')).getText();
-          }
-          function getSalary(el){
-            return el.findElement(by.className('salary')).getText();
-          }
-          function getEmployer(el){
-            return el.findElement(by.className('employer-name')).getText();
-          }
           //test first line
           expect(getFirstName(employees[0])).toBe('HARRY');
           expect(getLastName(employees[0])).toBe('LUHEJI');
@@ -71,6 +71,42 @@ describe("firstDraft test",function(){
           });
           expect(getEmployer(employees[9])).toBe('Earth Sable Andloging');
         });
+      });
+      
+      describe("> orderBy lastName asc",function(){
+        
+        it("employees should be correctly ordered", function(){
+        
+          ptor.findElements(by.css("ul.ordering select option")).then(function(options){
+            options.map(function(item){
+              item.getText().then(function(text){
+                if(text === "lastName asc"){
+                  console.log(">>clicking on select option",text);
+                  item.click().then(function(){
+                    ptor.findElements(by.repeater("employee in employees")).then(function(employees){
+                      //test first line
+                      expect(getFirstName(employees[0])).toBe('ARLEN');
+                      expect(getLastName(employees[0])).toBe('AHLARS');
+                      getSalary(employees[0]).then(function(salary){
+                        expect(e2eHelpers.filters.unCurrency(salary)).toBe(33226);
+                      });
+                      expect(getEmployer(employees[0])).toBe('Network Rocket See');
+                      //test last line
+                      expect(getFirstName(employees[9])).toBe('CHARITY');
+                      expect(getLastName(employees[9])).toBe('BADONE');
+                      getSalary(employees[9]).then(function(salary){
+                        expect(e2eHelpers.filters.unCurrency(salary)).toBe(29647);
+                      });
+                      expect(getEmployer(employees[9])).toBe('Earth Sable Andloging');
+                    });
+                  });
+                }
+              });
+            });
+          });
+          
+        });
+        
       });
 
     });
