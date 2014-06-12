@@ -13,8 +13,8 @@ describe('Directive: dbState', function () {
   }));
 
   it('should make hidden element visible', inject(function ($compile) {
-    element = angular.element('<db-state></db-state>');
+    element = angular.element('<div db-state></db-state>');
     element = $compile(element)(scope);
-    expect(element.text()).toBe('this is the dbState directive');
+//    expect(element.find('h3').text()).toBe('E2E Tests - First draft');
   }));
 });

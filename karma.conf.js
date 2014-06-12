@@ -21,6 +21,7 @@ module.exports = function(config) {
       'app/scripts/app.js',
       'app/scripts/services/angular-wakanda-connector/angular-wakanda-connector.debug.min.js',
       'app/scripts/services/unitTestsHelpers.js',
+      'app/scripts/services/rootScopeSafeApply.js',
       'app/scripts/controllers/*.js',
 //      'test/mock/**/*.js',
       'test/spec/**/*spec.js'

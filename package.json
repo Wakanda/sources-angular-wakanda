@@ -47,7 +47,7 @@
     "node": ">=0.8.0"
   },
   "scripts": {
-    "test": "protractor protractor.conf.js --verbose",
+    "test": "echo please use \\\"npm run e2e-test\\\" or \\\"npm run unit-test\\\" \\(even \\\"npm run e2e-test-wak\\\" if you want to launch e2e test on your wakanda server after a \\\"grunt wakCopy\\\"\\)",
     "e2e-test": "protractor protractor.conf.js --verbose",
     "e2e-test-wak": "protractor protractor.wak.conf.js --verbose",
     "unit-test": "karma start"

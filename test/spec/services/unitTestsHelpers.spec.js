@@ -1,63 +1,10 @@
 'use strict';
 
-describe('Service: unitTestsHelpers', function () {
-  
-  var $httpBackend, $http;
-  
-//  // load the service's module
-//  beforeEach(module('unitTestsHelpersModule'));
-//  
-//  beforeEach(angular.mock.module('ngMockE2E'));
-//  
-//  beforeEach(inject(function ($injector) {
-//    $httpBackend = $injector.get('$httpBackend');
-//    $httpBackend.whenGET(/.*/).passThrough();
-//  }));
+describe('Service: unitTestsHelpers', function () {  
   
   beforeEach(function(){
     module('unitTestsHelpersModule');
-    module('ngMockE2E');
-    inject(function(_$http_, _$httpBackend_){
-      $http = _$http_;
-      $httpBackend = _$httpBackend_;
-//      debugger;
-      $httpBackend.whenGET(/.*/).passThrough();
-      $httpBackend.whenPOST(/.*/).passThrough();
-//      $httpBackend.whenGET(/^\/unit-tests\//).passThrough();
-//      $httpBackend.whenPOST(/^\/unit-tests\//).passThrough();
-    });
   });
-  
-  it('should do an xhr', inject(function(){
-    var flag = false;
-//    debugger;
-    
-//    $httpBackend.when(/.*/).passThrough();
-//    $httpBackend.whenGET('/unit-tests/db/state').passThrough();
-    
-//    runs(function(){
-      console.log('running');
-//      debugger;
-      $httpBackend.whenGET('/unit-tests/db/state').passThrough();
-      $httpBackend.whenPOST('/unit-tests/db/state').passThrough();
-      $http.get('/unit-tests/db/state').success(function(){
-        console.log('success');
-        flag = true;
-      }).error(function(){
-        console.log('error');
-        flag = true;
-      });
-//    });
-    
-    waitsFor(function(){
-      return flag;
-    },"Should return true",3000);
-    
-    runs(function(){
-      expect(flag).toBe(true);
-    });
-    
-  }));
 
   it('should do be ready to rock', inject(function (unitTestsHelpers) {
     expect(!!unitTestsHelpers).toBe(true);
@@ -68,72 +15,154 @@ describe('Service: unitTestsHelpers', function () {
     expect(!!unitTestsHelpers.db.state).toBe(true);
   }));
 
-  it('unitTestsHelpers.db.state() - check async connexion', inject(function (unitTestsHelpers) {
-    var valueToVerify = false, flag = false;
+  it('unitTestsHelpers.db.state()', inject(function ($httpBackend,unitTestsHelpers) {
     
-    console.log('0-call',valueToVerify);
-//    runs(function(){
-      unitTestsHelpers.db.state().success(function(result){
-        valueToVerify = result;
-        flag = true;
-        console.log('4-success',valueToVerify);
-      }).error(function(result){
-        flag = true;
-        console.log('4-error',valueToVerify);
-      });
-//    });
-    
-    $httpBackend.whenGET('/unit-tests/db/state').passThrough();
-    $httpBackend.whenPOST('/unit-tests/db/state').passThrough();
-    
-    console.log('1-waitsFor',valueToVerify);
-    waitsFor(function(){
-//      console.log('5-flag',flag);
-      return flag;
-    },'The flag should be true', 3000);
-    
-    console.log('2-runs expects',valueToVerify);
-    runs(function(){
-      console.log('6-runs expects inside',valueToVerify);
-      expect(valueToVerify).not.toBe(false);
+    var that = this;
+    $httpBackend.whenGET('/unit-tests/db/state').respond({
+      "employees":1000,
+      "companies":62,
+      "products":24
     });
-    console.log('3-it ended',valueToVerify);
+
+    unitTestsHelpers.db.state().success(function(result){
+      expect(result).toMatch({
+        "employees":1000,
+        "companies":62,
+        "products":24
+      });
+    }).error(function(error){
+      console.error('error',error);
+      that.fail();
+    });
+    
+    $httpBackend.flush();
     
   }));
 
-  it('async test example', inject(function(unitTestsHelpers){
-    var flag = false, testValue = null;
+  it('unitTestsHelpers.db.fill()', inject(function ($httpBackend,unitTestsHelpers) {
     
-    console.log('0-flag',flag);
-    
-    setTimeout(function(){
-      console.log('3-flag',flag);
-      flag = true;
-      testValue = "hello world";
-      console.log('4-flag',flag);
-    },2000);
-      
-    waitsFor(function(){
-      return flag;
+    var that = this;
+    $httpBackend.whenGET('/unit-tests/db/fill').respond({
+      "before":{
+        "employees":1000,
+        "companies":62,
+        "products":24},
+      "after":{
+        "employees":1000,
+        "companies":62,
+        "products":24
+      },
+      "log":"..."
+    });
+
+    unitTestsHelpers.db.fill().success(function(result){
+      expect(result).toMatch({
+        "before":{
+          "employees":1000,
+          "companies":62,
+          "products":24},
+        "after":{
+          "employees":1000,
+          "companies":62,
+          "products":24
+        },
+        "log":"..."
+      });
+    }).error(function(error){
+      console.error('error',error);
+      that.fail();
     });
     
-    console.log('1-flag',flag);
-    
-    runs(function(){
-      console.log('5-flag',flag);
-      expect(testValue).toBe("hello world");
-    });
-    
-    console.log('2-flag',flag);
+    $httpBackend.flush();
     
   }));
-  
-  it('unitTestsHelpers.db.state(false) - check sync connexion', inject(function (unitTestsHelpers) {
-    var state = unitTestsHelpers.db.state(false);
-    expect(state).toBeDefined();
-    expect(state.employees).toBeDefined();
-    expect(state.companies).toBeDefined();
-    expect(state.products).toBeDefined();
+
+  it('unitTestsHelpers.db.flush()', inject(function ($httpBackend,unitTestsHelpers) {
+    
+    var that = this;
+    $httpBackend.whenGET('/unit-tests/db/flush').respond({
+      "before":{
+        "employees":1000,
+        "companies":62,
+        "products":24},
+      "after":{
+        "employees":0,
+        "companies":0,
+        "products":0
+      },
+      "log":"..."
+    });
+
+    unitTestsHelpers.db.flush().success(function(result){
+      expect(result).toMatch({
+        "before":{
+          "employees":1000,
+          "companies":62,
+          "products":24},
+        "after":{
+          "employees":0,
+          "companies":0,
+          "products":0
+        },
+        "log":"..."
+      });
+    }).error(function(error){
+      console.error('error',error);
+      that.fail();
+    });
+    
+    $httpBackend.flush();
+    
+  }));
+
+  it('unitTestsHelpers.db.reset()', inject(function ($httpBackend,unitTestsHelpers) {
+    
+    var that = this;
+    $httpBackend.whenGET('/unit-tests/db/reset').respond({
+      "before":{
+        "employees":1000,
+        "companies":62,
+        "products":24
+      },
+      "afterFlush":{
+        "employees":0,
+        "companies":0,
+        "products":0
+      },
+      "after":{
+        "employees":1000,
+        "companies":62,
+        "products":24
+      },
+      "log":"..."
+    });
+
+    unitTestsHelpers.db.reset().success(function(result){
+      expect(result).toMatch({
+        "before":{
+          "employees":1000,
+          "companies":62,
+          "products":24
+        },
+        "afterFlush":{
+          "employees":0,
+          "companies":0,
+          "products":0
+        },
+        "after":{
+          "employees":1000,
+          "companies":62,
+          "products":24
+        },
+        "log":"..."
+      });
+    }).error(function(error){
+      console.error('error',error);
+      that.fail();
+    });
+    
+    $httpBackend.flush();
+    
   }));
 
 });
