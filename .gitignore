@@ -20,3 +20,4 @@ WakandaBaseSolution/Contacts/Contacts/*.waSymData
 !WakandaBaseSolution/Contacts/Contacts/WebFolder/.htaccess
 WakandaBaseSolution/Contacts/Contacts/WebFolder/*
 npm-debug.log
+/published-connector/

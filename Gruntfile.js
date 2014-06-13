@@ -54,6 +54,7 @@ module.exports = function(grunt) {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
             dist: 'dist',
+            publishConnectorDir : 'published-connector',
             wakandaApp : wakandaApp
         },
         // Watches files for changes and runs tasks based on the changed files
@@ -67,10 +68,10 @@ module.exports = function(grunt) {
             },
             "angular-wakanda-service-reload": {
                 files: [
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/angular-wakanda-connector.debug.min.js',
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/angular-wakanda-connector.debug.min.js.map',
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/angular-wakanda-connector.js',
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/WAF/*.js'
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/angular-wakanda-connector.debug.min.js',
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/angular-wakanda-connector.debug.min.js.map',
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/angular-wakanda-connector.js',
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/WAF/*.js'
                 ],
                 options: {
                     livereload: true
@@ -78,8 +79,8 @@ module.exports = function(grunt) {
             },
             "angular-wakanda-service-build": {
                 files: [
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/angular-wakanda-connector.js',
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/WAF/*.js'
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/angular-wakanda-connector.js',
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/WAF/*.js'
                 ],
                 tasks: ['wakConnector-build-debug']
             },
@@ -197,7 +198,9 @@ module.exports = function(grunt) {
                         ]
                     }]
             },
-            server: '.tmp'
+            server: '.tmp',
+            publishConnector : '<%= yeoman.publishConnectorDir %>/*',
+            publishConnectorReadMe: '<%= yeoman.publishConnectorDir %>/README.publish.md'
         },
         // Add vendor prefixed styles
         autoprefixer: {
@@ -384,7 +387,24 @@ module.exports = function(grunt) {
                 cwd: '<%= yeoman.app %>/styles',
                 dest: '.tmp/styles/',
                 src: '{,*/}*.css'
-            }
+            },
+            publishConnector: {
+                files: [{
+                        expand: true,
+                        dot: true,
+                        cwd: '<%= yeoman.app %>/scripts/services/angular-wakanda-connector',
+                        dest: '<%= yeoman.publishConnectorDir %>',
+                        src: [
+                            '*',
+                            '**/*',
+                            '!node_modules/**',
+                        ]
+                    }]
+            },
+            publishConnectorReadMe: {
+                src: '<%= yeoman.publishConnectorDir %>/README.publish.md',
+                dest : '<%= yeoman.publishConnectorDir %>/README.md'
+            },
         },
         // Run some tasks in parallel to speed up the build process
         concurrent: {
@@ -533,6 +553,16 @@ module.exports = function(grunt) {
         }
         done();
       });
+    });
+    
+    grunt.registerTask('build-connector',['wakConnector-build','wakConnector-build-debug']);
+    
+    grunt.registerTask('publish-connector',function(){
+      grunt.log.warn('Don\'t forget to build the connector (grunt build-connector) and change its version in the package.json before publishing it.');
+      var connectorPackage = require('./app/scripts/services/angular-wakanda-connector/package.json');
+      grunt.config('publishedConnectorPkg',connectorPackage);
+      grunt.log.write('Publishing version '+connectorPackage.version+' of the connector in folder : '+grunt.config('yeoman.publishConnectorDir'));
+      grunt.task.run(['clean:publishConnector','copy:publishConnector','copy:publishConnectorReadMe','clean:publishConnectorReadMe']);
     });
 
     grunt.registerTask('default', [

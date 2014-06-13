@@ -1,12 +1,12 @@
 module.exports = function(grunt) {
 
   var files = [
-    'extras/Class.js',
-    'WAF/extra-init.js',
-    'WAF/Dates.js',
-    'WAF/Rest.js',
-    'WAF/Data-Provider.js',
-    'angular-wakanda-connector.js'
+    'src/extras/Class.js',
+    'src/WAF/extra-init.js',
+    'src/WAF/Dates.js',
+    'src/WAF/Rest.js',
+    'src/WAF/Data-Provider.js',
+    'src/angular-wakanda-connector.js'
   ];
   
   var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' + '<%= grunt.template.today("yyyy-mm-dd") %> */';
