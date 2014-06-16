@@ -557,7 +557,27 @@ module.exports = function(grunt) {
     
     grunt.registerTask('build-connector',['wakConnector-build','wakConnector-build-debug']);
     
+    grunt.registerTask('publish-connector-help',function(){
+      grunt.log.writeln('1) If it\'s the first time, you need to :');
+      grunt.log.writeln('* git init');
+      grunt.log.writeln('* git checkout url of the connector repo');
+      grunt.log.writeln('2) Then launch : grunt publish-connector');
+      grunt.log.writeln('3) Finally :');
+      grunt.log.writeln('* git commit');
+      grunt.log.writeln('* git tag');
+      grunt.log.writeln('* git push');
+    });
+    
+    grunt.registerTask('publish-connector-init',function(){
+      grunt.file.mkdir(grunt.config('yeoman.publishConnectorDir'));
+      grunt.log.write(grunt.config('yeoman.publishConnectorDir')+' folder created, before publishing the connector into, you need to :');
+      grunt.task.run(['publish-connector-help']);
+    });
+    
     grunt.registerTask('publish-connector',function(){
+      if(grunt.file.exists(grunt.config('yeoman.publishConnectorDir')) === false){
+        grunt.fail.warn('Folder "'+grunt.config('yeoman.publishConnectorDir')+'" doesn\'t exist, please run grunt publish-connector-init before.');
+      }
       grunt.log.warn('Don\'t forget to build the connector (grunt build-connector) and change its version in the package.json before publishing it.');
       var connectorPackage = require('./app/scripts/services/angular-wakanda-connector/package.json');
       grunt.config('publishedConnectorPkg',connectorPackage);

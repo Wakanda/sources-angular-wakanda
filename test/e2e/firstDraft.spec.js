@@ -107,6 +107,105 @@ describe("firstDraft test",function(){
           
         });
         
+        describe("> pagination on ordered collection",function(){
+        
+          it("should go to next page", function(){
+
+            console.log(">>clicking on employees.$nextPage()");
+            ptor.findElement(by.css('[ng-click="employees.$nextPage()"]')).click().then(function(){
+
+              ptor.findElements(by.repeater("employee in employees")).then(function(employees){
+                //test first line
+                expect(getFirstName(employees[0])).toBe('JEWEL');
+                expect(getLastName(employees[0])).toBe('BAGOSO');
+                getSalary(employees[0]).then(function(salary){
+                  expect(e2eHelpers.filters.unCurrency(salary)).toBe(134731);
+                });
+                expect(getEmployer(employees[0])).toBe('Month Business Plane');
+                //test last line
+                expect(getFirstName(employees[9])).toBe('AMADO');
+                expect(getLastName(employees[9])).toBe('BARENE');
+                getSalary(employees[9]).then(function(salary){
+                  expect(e2eHelpers.filters.unCurrency(salary)).toBe(58185);
+                });
+                expect(getEmployer(employees[9])).toBe('Moon Developing Tree');
+              });
+
+            });
+
+          });
+
+          it("should go to previous page (first page)", function(){
+
+            console.log(">>clicking on employees.$prevPage()");
+            ptor.findElement(by.css('[ng-click="employees.$prevPage()"]')).click().then(function(){
+
+              ptor.findElements(by.repeater("employee in employees")).then(function(employees){
+                //test first line
+                expect(getFirstName(employees[0])).toBe('ARLEN');
+                expect(getLastName(employees[0])).toBe('AHLARS');
+                getSalary(employees[0]).then(function(salary){
+                  expect(e2eHelpers.filters.unCurrency(salary)).toBe(33226);
+                });
+                expect(getEmployer(employees[0])).toBe('Network Rocket See');
+                //test last line
+                expect(getFirstName(employees[9])).toBe('CHARITY');
+                expect(getLastName(employees[9])).toBe('BADONE');
+                getSalary(employees[9]).then(function(salary){
+                  expect(e2eHelpers.filters.unCurrency(salary)).toBe(29647);
+                });
+                expect(getEmployer(employees[9])).toBe('Earth Sable Andloging');
+              });
+
+            });
+
+          });
+          
+        });
+        
+        describe("> filtering on ordered collection", function(){
+          
+          var filterBy = "lastName=tr*";
+          
+          //TODO beforeAll or once
+          beforeEach(function(){
+            var input = ptor.findElement(by.css(".filtering input[type=text]"));
+            input.getAttribute('value').then(function(value){
+              if(value !== filterBy){
+                console.log('>> filtering by '+filterBy);
+                input.sendKeys(filterBy,protractor.Key.ENTER);
+              }
+            });
+          });
+          
+          it("collection should contain 2 elements", function(){
+            var list = element.all(by.css('.employees-list li'));
+            expect(list.count()).toBe(2);
+          });
+          
+          it("collection - check elements", function(){
+
+            ptor.findElements(by.repeater("employee in employees")).then(function(employees){
+              //test first line
+              expect(getFirstName(employees[0])).toBe('CHARMAINE');
+              expect(getLastName(employees[0])).toBe('TROPETHO');
+              getSalary(employees[0]).then(function(salary){
+                expect(e2eHelpers.filters.unCurrency(salary)).toBe(82507);
+              });
+              expect(getEmployer(employees[0])).toBe('Earth Sable Andloging');
+              //test last line
+              expect(getFirstName(employees[1])).toBe('LUCIA');
+              expect(getLastName(employees[1])).toBe('TRUCES');
+              getSalary(employees[1]).then(function(salary){
+                expect(e2eHelpers.filters.unCurrency(salary)).toBe(46310);
+              });
+              expect(getEmployer(employees[1])).toBe('Hand Year Papers');
+            });
+              
+          });
+          
+        });
+        
       });
 
     });

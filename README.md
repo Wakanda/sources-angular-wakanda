@@ -1,7 +1,7 @@
 #angular-wakanda-front
 
 If you want to directly use the angular-wakanda-connector in a wakanda project, just download the following file : 
-`app/scripts/services/angular-wakanda-connector/angular-wakanda-connector.min`
+`app/scripts/services/angular-wakanda-connector/angular-wakanda-connector.min.js`
 
 If you want to contribute to the development of the connector, read the following instructions.
 
