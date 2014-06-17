@@ -3,7 +3,7 @@
 angular.module('angularWakandaFrontApp')
         .controller('HeaderCtrl', ['$scope', '$location', function($scope, $location) {
             $scope.links = {
-              'examples' : [
+              'working' : [
                 {href: '/', text: 'Home'},
                 {href: '/about', text: 'About'},
                 {href: '/retrieve-infos', text: 'Retrieve infos'},
@@ -33,5 +33,5 @@ angular.module('angularWakandaFrontApp')
                 $scope.links[linkType].show = !$scope.links[linkType].show;
               }
             };
-            $scope.links.examples.show = true;
+            $scope.links.working.show = true;
           }]);

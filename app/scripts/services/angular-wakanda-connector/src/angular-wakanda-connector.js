@@ -604,13 +604,28 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
         if(!options){
           options = {};
         }
+        //options checking
+        if (typeof options.orderBy !== 'undefined') {
+          console.warn("orderBy can't be change on a $fetch (nested query collection's cached on server side in some way)");
+        }
+        if (typeof options.select !== 'undefined') {
+          console.warn("select can't be change on a $fetch (query collection's cached on server side in some way)");
+        }
         //prepare options
         wakOptions.skip = options.start = typeof options.start === 'undefined' ? (this.$query ? this.$query.start : 0) : options.start;
         wakOptions.top = options.pageSize = typeof options.pageSize === 'undefined' ? (this.$query ? this.$query.pageSize : DEFAULT_PAGESIZE_NESTED_COLLECTIONS) : options.pageSize;
+        //prepare unhandled options @warn
+        if (options.select) {
+          wakOptions.autoExpand = options.select;
+        }
+        if (options.orderBy) {
+          wakOptions.orderby = options.orderBy;
+        }
         //update $fetching ($apply needed)
         rootScopeSafeApply(function() {
           that.$fetching = true;
         });
+        console.log('>$fetch on nestedCollection','options',options);
 //        wakOptions.method = 'subentityset';
 //        wakOptions.forceReload = true;
         wakOptions.onSuccess = function(e){

@@ -4,7 +4,7 @@
   <div>
     <h3>Employees list</h3>
     <ul class="employees-list">
-      <li ng-repeat="employee in employees"><span class="last-name">{{employee.lastName}}</span>, <span class="first-name">{{employee.firstName}}</span> - <span class="salary">{{employee.salary | currency}}</span> - <span class="employer-name">{{employee.employer.name}}</span></li>
+      <li ng-repeat="employee in employees"><span class="last-name">{{employee.lastName}}</span>, <span class="first-name">{{employee.firstName}}</span> - <span class="salary">{{employee.salary | currency}}</span> - <span class="employer-name" title="Select this company" ng-click="selectCompany(employee.employer)">{{employee.employer.name}}</span></li>
     </ul>
     <h4>Infos</h4>
     <ul class="infos">
@@ -35,6 +35,48 @@
     <h4>Filtering</h4>
     <ul class="filtering">
       <li>Type any filter on employees (like <code>lastName=tr*</code>) <input type="text" ng-model="filter" ng-keyup="applyFilter($event.keyCode)"></li>
+    </ul>
+  </div>
+  <div class="company" ng-show="company">
+    <hr>
+    <h3>Nested Company selected : <span class="company-name">{{company.name}}</span> - company.staff :</h3>
+    <p ng-show="!company.staff.$isLoaded()" ng-click="company.staff.$fetch({pageSize:5})" class="load-nested-employees">Load employees of this company (lazy load)</p>
+    <div ng-show="company.staff.$isLoaded()">
+      <ul>
+        <li ng-repeat="employee in company.staff"><span class="last-name">{{employee.lastName}}</span>, <span class="first-name">{{employee.firstName}}</span> - <span class="salary">{{employee.salary | currency}}</span></li>
+      </ul>
+      <h4>Infos</h4>
+      <ul class="infos">
+        <li>company.staff.$query
+          <ul>
+            <li>pageSize : <span class="query-page-size">{{company.staff.$query.pageSize}}</span></li>
+            <li>start : <span class="query-page-start">{{company.staff.$query.start}}</span></li>
+            <li>filter : <span class="query-page-filter">{{company.staff.$query.filter}}</span></li>
+          </ul>
+        </li>
+        <li>company.staff.$totalCount : {{company.staff.$totalCount}}</li>
+      </ul>
+      <h4>Pagination</h4>
+      <ul class="pagination">
+        <li>
+          pagination methods
+          <ul>
+            <li ng-click="company.staff.$prevPage()"><span>&#8592;</span> company.staff.$prevPage()</li>
+            <li ng-click="company.staff.$nextPage()"><span>&#8594;</span> company.staff.$nextPage()</li>
+            <li ng-click="company.staff.$more()"><span>+</span> company.staff.$more()</li>
+          </ul>
+        </li>
+      </ul>
+      <h4>Ordering / Filtering</h4>
+      <p>Can't specify those on a nested collection (at least for the moment) it seems to be because we're on a subentity set that doesn't accept that kind of arguments - though you can order them front-end side :</p>
+      <ul>
+        <li>orderBy : <span ng-click="company.staff.$fetch({orderBy:'lastName asc'})"><code>company.staff.$fetch({orderBy:'lastName asc'})</code></span></li>
+        <li>select : <span ng-click="company.staff.$fetch({select:'employer'})"><code>company.staff.$fetch({select:'employer'})</code></span></li>
+        <li>filter</li>
+      </ul>
+    </div>
+    <ul class="error">
+      <li ng-show="nestedCompanyLoadingError">For the moment can't $fetch collection from a lazy load nested collection (arrays are not init)</li>
     </ul>
   </div>
   <div class="error" ng-if="employees.length === 0">
