@@ -1,7 +1,16 @@
+/**
+ * This test purpose is to test the dbState directive.
+ * It's not meant to be executed at every test run since the code tested
+ * only relies on :
+ * - the directive (which relies on plain REST calls)
+ * - the directive test helper
+ *
+ * Such code won't change like the connector will
+ */
 describe("dbState directive",function(){
   
   var ptor = protractor.getInstance();
-  var dbStateHelper = require('./directives/dbStateHelper');
+  var dbStateHelper = require('./helpers/directives/dbStateHelper');
   var urlToTest = '/#/e2e-tests/db-state';
   
   describe("> "+urlToTest,function(){
@@ -22,7 +31,7 @@ describe("dbState directive",function(){
       });
 
       it("> shoud have an h3 tag",function(){
-        var h3 = element(by.css('#view-e2e-tests-db-state > h3'));
+        var h3 = element(by.css('.view-e2e-tests-db-state > h3'));
         h3.getText().then(function(text){
           expect(text).toBe("E2E Tests - DB State");
         });

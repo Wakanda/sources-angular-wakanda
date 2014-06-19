@@ -20,8 +20,11 @@ angular.module('angularWakandaFrontApp')
               ],
               'e2e-tests' : [
                 {href: '/e2e-tests/main', text: 'Main'},
-                {href: '/e2e-tests/db-state', text: 'DbState'},
-                {href: '/e2e-tests/first-draft', text: 'First draft'}
+                {href: '/e2e-tests/db-state', text: 'DbState (directive alone)'},
+                {href: '/e2e-tests/directory-state', text: 'DirectoryState (directive alone)'},
+                {href: '/e2e-tests/first-draft', text: 'First draft'},
+                {href: '/e2e-tests/directory', text: 'Directory'},
+                {href: '/e2e-tests/directory-stand-alone', text: 'Directory (stand alone)'}
               ]
             };
             $scope.isActive = function(viewLocation) {

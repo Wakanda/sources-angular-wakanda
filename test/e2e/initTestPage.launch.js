@@ -2,5 +2,5 @@
 //and getCurrentUrl wont work inside beforeEach loops if there is no page loaded
 describe("launch",function(){
   var ptor = protractor.getInstance();
-  ptor.get('/#/e2e-tests/db-state');
+  ptor.get('/#/');
 });

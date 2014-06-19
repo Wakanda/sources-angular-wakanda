@@ -18,12 +18,12 @@ module.exports = {
     //checking for unallowed methods
     var METHODS_ALLOWED = ['refresh-full','refresh-empty','init','flush'];
     if(list.length === 0){
-      console.warn("No methods specified to test in test/e2e/unitTestHelpers");
+      console.warn("No methods specified to test in test/e2e/helpers/directives/dbStateHelper");
       return false;
     }
     for(var i=0; i<list.length; i++){
       if(METHODS_ALLOWED.indexOf(list[i]) === -1){
-        console.warn(list[i] + " method not allowed in test/e2e/unitTestHelpers");
+        console.warn(list[i] + " method not allowed in test/e2e/helpers/directives/dbStateHelper");
         return false;
       }
     }

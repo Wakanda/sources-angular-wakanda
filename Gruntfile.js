@@ -114,7 +114,7 @@ module.exports = function(grunt) {
                     host: '<%= yeoman.wakandaApp.host %>',
                     port: '<%= yeoman.wakandaApp.port %>',
                     https: false,
-                    changeOrigin: true,
+                    changeOrigin: false,
                     xforward: false
                 },
                 {

@@ -1,8 +1,8 @@
 describe("firstDraft test",function(){
   
   var ptor = protractor.getInstance();
-  var dbStateHelper = require('./directives/dbStateHelper');
-  var e2eHelpers = require('./e2eHelpers');
+  var dbStateHelper = require('./helpers/directives/dbStateHelper');
+  var e2eHelpers = require('./helpers/e2eHelpers');
   var urlToTest = '/#/e2e-tests/first-draft';
   
   describe("> "+urlToTest,function(){
@@ -32,12 +32,12 @@ describe("firstDraft test",function(){
   
     describe("> check we are on the correct page", function(){
 
-      it("> shoud have a title",function(){
+      it("> should have a title",function(){
         expect(ptor.getTitle()).toBe("angular-wakanda-front");
       });
 
-      it("> shoud have an h3 tag",function(){
-        var h3 = element(by.css('#view-e2e-tests-first-draft > h3'));
+      it("> should have an h3 tag",function(){
+        var h3 = element(by.css('.view-e2e-tests-first-draft > h3'));
         h3.getText().then(function(text){
           expect(text).toBe("E2E Tests - First draft");
         });

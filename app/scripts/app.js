@@ -101,10 +101,23 @@ angular.module('angularWakandaFrontApp', [
                       controller: 'E2E.DbStateCtrl',
                       resolve: routeResolver
                     })
+                    .when('/e2e-tests/directory-state', {
+                      templateUrl: 'views/e2e-tests/directory-state.html',
+                      controller: 'E2E.DirectoryStateCtrl'
+                    })
                     .when('/e2e-tests/first-draft', {
                       templateUrl: 'views/e2e-tests/first-draft.html',
                       controller: 'E2E.FirstDraftCtrl',
                       resolve: routeResolver
+                    })
+                    .when('/e2e-tests/directory', {
+                      templateUrl: 'views/e2e-tests/directory.html',
+                      controller: 'E2E.DirectoryCtrl',
+                      resolve: routeResolver
+                    })
+                    .when('/e2e-tests/directory-stand-alone', {
+                      templateUrl: 'views/e2e-tests/directory.html',
+                      controller: 'E2E.DirectoryCtrl'
                     })
                     .otherwise({
                       redirectTo: '/'

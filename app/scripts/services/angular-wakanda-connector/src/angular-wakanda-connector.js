@@ -1145,12 +1145,90 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
     };
     
     var NgWakEntityAbstract = Class.extend(NgWakEntityAbstractPrototype);
+    
+    /** directory */
+    
+    var directoryLoginByPassword = function(login, password){
+      var deferred, wakOptions = {};
+      //prepare the promise
+      deferred = $q.defer();
+      
+      wakOptions.onSuccess = function(event){
+          deferred.resolve({result : event.result});
+      };
+      wakOptions.onError = function(event){
+        deferred.reject(event);
+      };
+      
+      WAF.directory.loginByPassword(login,password,wakOptions);
+      
+      return deferred.promise;
+    };
+    
+    var directoryCurrentUser = function(){
+      var deferred, wakOptions = {};
+      //prepare the promise
+      deferred = $q.defer();
+      
+      wakOptions.onSuccess = function(event){
+        deferred.resolve({result : event.result});
+      };
+      wakOptions.onError = function(event){
+        deferred.reject(event);
+      };
+      
+      WAF.directory.currentUser(wakOptions);
+      
+      return deferred.promise;
+    };
+    
+    var directoryLogout = function(){
+      var deferred, wakOptions = {};
+      //prepare the promise
+      deferred = $q.defer();
+      
+      wakOptions.onSuccess = function(event){
+        deferred.resolve({result : event.result});
+      };
+      wakOptions.onError = function(event){
+        console.error('>logout',event);
+        deferred.reject(event);
+      };
+      
+      WAF.directory.logout(wakOptions);
+      
+      return deferred.promise;
+    };
+    
+    var directoryCurrentUserBelongsTo = function(groupName){
+      var deferred, wakOptions = {};
+      //prepare the promise
+      deferred = $q.defer();
+      
+      wakOptions.onSuccess = function(event){
+        deferred.resolve({result : event.result});
+      };
+      wakOptions.onError = function(event){
+        deferred.reject(event);
+      };
+      
+      WAF.directory.currentUserBelongsTo(groupName,wakOptions);
+      
+      return deferred.promise;
+    };
 
     /** returned object */
 
     return {
       init: init,
-      getDatastore: getDatastore
+      getDatastore: getDatastore,
+      directory: {
+        $login : directoryLoginByPassword,
+        $loginByPassword : directoryLoginByPassword,
+        $currentUser : directoryCurrentUser,
+        $logout : directoryLogout,
+        $currentUserBelongsTo : directoryCurrentUserBelongsTo
+      }
     };
 
   }]);
