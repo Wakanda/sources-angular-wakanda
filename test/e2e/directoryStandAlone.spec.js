@@ -2,7 +2,6 @@ describe("directoryStandAlone test", function(){
   
   var ptor = protractor.getInstance();
   var directoryStateHelper = require('./helpers/directives/directoryStateHelper');
-  var e2eHelpers = require('./helpers/e2eHelpers');
   var urlToTest = '/#/e2e-tests/directory-stand-alone';
   
   describe("> "+urlToTest,function(){
@@ -29,11 +28,79 @@ describe("directoryStandAlone test", function(){
         });
       });
       
-      describe("> try login LUHEJI, HARRY (correct user)", function(){
+      directoryStateHelper.launch(['logout']);
+      
+      describe("> try login LUHEJI, HARRY (correct user) (still problem when checking all tests)", function(){
+        
+        it("> should successfully login LUHEJI, HARRY",function(){
+        
+          ptor.findElements(by.repeater("employee in employees")).then(function(employees){
+            employees[0].click().then(function(){
+              expect(ptor.findElement(by.css(".logged-in")).isDisplayed()).toBe(true);
+              expect(ptor.findElement(by.css(".logged-in-error")).isDisplayed()).toBe(false);
+              expect(ptor.findElement(by.css(".logged-in .last-name")).getText()).toBe('LUHEJI');
+              expect(ptor.findElement(by.css(".logged-in .first-name")).getText()).toBe('HARRY');
+              ptor.findElement(by.css(".logged-in-error")).getText().then(function(text){
+                console.log('logged-in-error',text);
+              });
+            });
+          });
+        
+        });
+        
+        it("> then it should sucessfully retrieve the current user",function(){
+          
+          ptor.findElement(by.css(".current-user")).click().then(function(){
+            ptor.findElement(by.css(".current-logged-in-user")).getText().then(function(text){
+              var userInfos = JSON.parse(text);
+              expect(userInfos.result).toBeDefined();
+              expect(userInfos.result.userName).toBe('LUHEJI');
+              expect(userInfos.result.fullName).toBeDefined();
+              expect(userInfos.result.ID).toBeDefined();
+            });
+          });
+          
+        });
+        
+        it("> finally check whose groups the user belongs to",function(){
+          
+          ptor.findElement(by.css(".belongs-to-admin")).click().then(function(){
+            ptor.findElement(by.css(".belongs-to-admin .result-belongs-to")).getText().then(function(text){
+              expect(text).toBe("false");
+            });
+          });
+          
+          ptor.findElement(by.css(".belongs-to-employee")).click().then(function(){
+            ptor.findElement(by.css(".belongs-to-employee .result-belongs-to")).getText().then(function(text){
+              expect(text).toBe("true");
+            });
+          });
+          
+          ptor.findElement(by.css(".belongs-to-foo")).click().then(function(){
+            ptor.findElement(by.css(".belongs-to-foo .result-belongs-to")).getText().then(function(text){
+              expect(text).toBe("false");
+            });
+          });
+          
+        });
         
       });
       
       describe("> try login KENOBI, OBI WAN (wrong user)", function(){
+        
+        it("> shouldn't login",function(){
+        
+          ptor.findElements(by.repeater("employee in employees")).then(function(employees){
+            employees[2].click().then(function(){
+              expect(ptor.findElement(by.css(".logged-in")).isDisplayed()).toBe(false);
+              expect(ptor.findElement(by.css(".logged-in-error")).isDisplayed()).toBe(true);
+              ptor.findElement(by.css(".logged-in-error")).getText().then(function(text){
+                console.log('logged-in-error',text);
+              });
+            });
+          });
+        
+        });
         
       });
 

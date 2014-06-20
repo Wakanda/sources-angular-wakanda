@@ -25,9 +25,9 @@
     <div class="logged-in" ng-show="loggedInEmployee">
       <p>Successfull logging for <span class="last-name">{{loggedInEmployee.lastName}}</span>, <span class="first-name">{{loggedInEmployee.firstName}}</span> - <span class="logout" ng-click="logout()"><code>directory.$logout()</code></span> - <span class="current-user" ng-click="currentUser()"><code>directory.$currentUser()</code></span></p>
       <ul>
-        <li ng-click="currentUserBelongsTo('Admin')">Check if <code>directory.$currentUserBelongsTo("Admin")</code> : <span class="belongs-to-admin">{{userBelongsTo.Admin}}</span></li>
-        <li ng-click="currentUserBelongsTo('Employee')">Check if <code>directory.$currentUserBelongsTo("Employee")</code> : <span class="belongs-to-employee">{{userBelongsTo.Employee}}</span></li>
-        <li ng-click="currentUserBelongsTo('Foo')">Check if <code>directory.$currentUserBelongsTo("Foo")</code> : <span class="belongs-to-foo">{{userBelongsTo.Foo}}</span></li>
+        <li ng-click="currentUserBelongsTo('Admin')" class="belongs-to-admin">Check if <code>directory.$currentUserBelongsTo("Admin")</code> : <span class="result-belongs-to">{{userBelongsTo.Admin}}</span></li>
+        <li ng-click="currentUserBelongsTo('Employee')" class="belongs-to-employee">Check if <code>directory.$currentUserBelongsTo("Employee")</code> : <span class="result-belongs-to">{{userBelongsTo.Employee}}</span></li>
+        <li ng-click="currentUserBelongsTo('Foo')" class="belongs-to-foo">Check if <code>directory.$currentUserBelongsTo("Foo")</code> : <span class="result-belongs-to">{{userBelongsTo.Foo}}</span></li>
       </ul>
       <h4>Current user</h4>
       <pre class="current-logged-in-user">{{currentLoggedInUser | json}}</pre>

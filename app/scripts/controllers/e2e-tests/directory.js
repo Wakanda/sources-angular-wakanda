@@ -76,13 +76,13 @@ angular.module('angularWakandaFrontApp')
           }
           else{
             $scope.loggedInEmployee = null;
-            $scope.loggedInError = "Couldn't login with "+employee.lastName+", "+employee.firstName;
+            $scope.loggedInError = "Couldn't login with "+employee.lastName+", "+employee.firstName+" - "+JSON.stringify(result);
           }
           resetBelongsGroupInfo();
         },function(result){
           console.error('login()','result',result);
           $scope.loggedInEmployee = null;
-          $scope.loggedInError = "Couldn't login with "+employee.lastName+", "+employee.firstName;
+          $scope.loggedInError = "Couldn't login with "+employee.lastName+", "+employee.firstName+" - "+JSON.stringify(result);
           resetBelongsGroupInfo();
         });
       };

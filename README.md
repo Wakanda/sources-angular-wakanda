@@ -57,16 +57,17 @@ Once you have all above, to init :
 
 The tests are end to end tests, not unit tests, since we have statefull tests with the db+REST.
 
-* To launch the tests : 
+* Before launching tests : 
 	* your wakanda server (which is described in `wakandaApp.json`) must be running. It exposes handlers that will reset the database.
-	* your node server must be running (you should have done a `grunt serve`)
-	* your node server should be running (the tests on the front are made through it)
-* To launch the tests, just type : `npm run e2e-test` (this will launch the test on your )
-
-You can also launch the e2e tests directly on the Wakanda server (without using the node server launched with `grunt serve`). You may use it some times to confirm, nothing differs (since it's only front-end code, it shouldn't). For that :
-
-* `grunt wakCopy` will copy your sources to your wakanda project webfolder
-* `npm run e2e-test-wak` will run the e2e tests on your wakanda server specified in `wakandaApp.json`
+	* your node server should be running (you should have done a `grunt serve`), the tests on the front are made through it
+* To launch the tests on your node server :
+	* `npm run e2e-test` (default) will run the e2e tests only on the features spec
+	* `npm run e2e-test-tool` will run the e2e tests only on the e2e helpers (assert that the helpers used in test correctly work - not included by default because takes more times and this kind of code doesn't change much, it's not related to the connector)
+	* `npm run e2e-test-all` run all the tests
+* To launch the tests directly on the wakanda server described in `wakandaApp.json` : first run `grunt wakCopy` (will copy your sources from `app` folder to your wakanda project webfolder), then use either one of the following command lines :
+	* `npm run e2e-test` (default)
+	* `npm run e2e-test-tool`
+	* `npm run e2e-test-all`
 
 ---
 
