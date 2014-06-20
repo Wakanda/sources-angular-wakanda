@@ -7,6 +7,7 @@ The versions provided can be unstable, the features may not be finished. I'll tr
 
 ##v0.2.0
 * added directory API support
+* modified a little folder organization of the connector (now sources are in `src` folder)
 * setup e2e test environnement with protractor
 * setup first draft of tests on basic features + tests helpers
 * setup publishing tool
