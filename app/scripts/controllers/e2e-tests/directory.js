@@ -1,14 +1,12 @@
 'use strict';
 
-var ds, directory, employees, test;
+var ds, employees, test;
 
 angular.module('angularWakandaFrontApp')
   .controller('E2E.DirectoryCtrl', ['$scope','$location','wakConnectorService','unitTestsHelpers',function($scope,$location,wakConnectorService,unitTestsHelpers) {
       
       //this controller and its view are used for two routes
       $scope.standAlone = $location.url() !== '/e2e-tests/directory' ? true : false;
-      
-      directory = wakConnectorService.directory;
       
       //only retrieve datastore in non standAlone mode
       if($scope.standAlone === false){
@@ -68,7 +66,7 @@ angular.module('angularWakandaFrontApp')
       };
       
       $scope.login = function(employee){
-        directory.$login(employee.lastName,employee.firstName).then(function(result){
+        wakConnectorService.$login(employee.lastName,employee.firstName).then(function(result){
           console.log('login()','result',result);
           if(result.result === true){
             $scope.loggedInEmployee = employee;
@@ -88,7 +86,7 @@ angular.module('angularWakandaFrontApp')
       };
       
       $scope.currentUserBelongsTo = function(group){
-        directory.$currentUserBelongsTo(group).then(function(result){
+        wakConnectorService.$currentUserBelongsTo(group).then(function(result){
           console.log('currentUserBelongsTo("'+group+'")', 'result',result);
           $scope.userBelongsTo[group] = result.result;
         }, function(result){
@@ -98,7 +96,7 @@ angular.module('angularWakandaFrontApp')
       };
       
       $scope.logout = function(){
-        directory.$logout().then(function(result){
+        wakConnectorService.$logout().then(function(result){
           console.log('logout()','result',result);
           $scope.loggedInEmployee = null;
           resetBelongsGroupInfo();
@@ -108,7 +106,7 @@ angular.module('angularWakandaFrontApp')
       };
       
       $scope.currentUser = function(){
-        directory.$currentUser().then(function(result){
+        wakConnectorService.$currentUser().then(function(result){
           console.log('currentUser()','result',result);
           $scope.currentLoggedInUser = result;
         },function(result){

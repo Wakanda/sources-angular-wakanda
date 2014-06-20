@@ -1148,6 +1148,14 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
     
     /** directory */
     
+    /**
+     * Returns a promise :
+     * - success : in param an object like {result : true} if ok - {result : false} if ko
+     * - error : if the request had a problem
+     * @param {string} login
+     * @param {string} password
+     * @returns {deferred.promise}
+     */
     var directoryLoginByPassword = function(login, password){
       var deferred, wakOptions = {};
       //prepare the promise
@@ -1165,6 +1173,15 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       return deferred.promise;
     };
     
+    
+    /**
+     * Returns a promise :
+     * - success : in param an object like {result : currentUserInfos} if ok
+     * - error : if the request had a problem
+     * @param {string} login
+     * @param {string} password
+     * @returns {deferred.promise}
+     */
     var directoryCurrentUser = function(){
       var deferred, wakOptions = {};
       //prepare the promise
@@ -1182,6 +1199,16 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       return deferred.promise;
     };
     
+    
+    
+    /**
+     * Returns a promise :
+     * - success : in param an object like {result : true} if ok - {result : false} if ko
+     * - error : if the request had a problem
+     * @param {string} login
+     * @param {string} password
+     * @returns {deferred.promise}
+     */
     var directoryLogout = function(){
       var deferred, wakOptions = {};
       //prepare the promise
@@ -1200,6 +1227,15 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
       return deferred.promise;
     };
     
+    
+    /**
+     * Returns a promise :
+     * - success : in param an object like {result : true} if ok - {result : false} if ko
+     * - error : if the request had a problem
+     * @param {string} login
+     * @param {string} password
+     * @returns {deferred.promise}
+     */
     var directoryCurrentUserBelongsTo = function(groupName){
       var deferred, wakOptions = {};
       //prepare the promise
@@ -1222,13 +1258,11 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
     return {
       init: init,
       getDatastore: getDatastore,
-      directory: {
-        $login : directoryLoginByPassword,
-        $loginByPassword : directoryLoginByPassword,
-        $currentUser : directoryCurrentUser,
-        $logout : directoryLogout,
-        $currentUserBelongsTo : directoryCurrentUserBelongsTo
-      }
+      $login : directoryLoginByPassword,
+      $loginByPassword : directoryLoginByPassword,
+      $currentUser : directoryCurrentUser,
+      $logout : directoryLogout,
+      $currentUserBelongsTo : directoryCurrentUserBelongsTo
     };
 
   }]);
