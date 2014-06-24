@@ -1,11 +1,9 @@
 #angular-wakanda-front
 
-If you want to directly use the angular-wakanda-connector in a wakanda project, just download the following file : 
-`app/scripts/services/angular-wakanda-connector/angular-wakanda-connector.min.js`
+If you want to directly use the angular-wakanda connector in a wakanda project, just download the following file : 
+`app/scripts/services/angular-wakanda/angular-wakanda.min.js`
 
 If you want to contribute to the development of the connector, read the following instructions.
-
-
 
 ###Included :
 
@@ -40,7 +38,7 @@ Once you have all above, to init :
 * `npm install` (install the local dependencies)
 * `bower install` (install the frontend dependencies)
 * `grunt initConfig` (duplicate `wakandaApp.default.json` to wakandaApp.json), **then customize your own settings**
-* Go to `app/scripts/services/angular-wakanda-connector` and `npm install` (for this moment, this is necessary for development purposes, more in `app/scripts/services/angular-wakanda-connector/README.md`)
+* Go to `app/scripts/services/angular-wakanda` and `npm install` (for this moment, this is necessary for development purposes, more in `app/scripts/services/angular-wakanda/README.md`)
 
 ###Grunt tasks :
 
@@ -104,5 +102,5 @@ Here are the following modifications made to the original yeoman Gruntfile :
 * a wakandaApp attribute, containing infos about your wakanda app server was added to the yeoman attribute in the grunt config (from `wakandaApp.json` file)
 * for each connect task, a `configureProxies:target` task was added
 * added the wakWebFolder target in clean and copy tasks, to be able to transfer your built project to your wakanda WebFolder, just by doing `grunt wakCopyBuild` (expect to have to add --force, I left this warning because it empties the WebFolder before copying the build)
-* added watch tasks to rebuild the connector into a closured file with sourcemaps (see more in `app/scripts/services/angular-wakanda-connector/README.md`)
+* added watch tasks to rebuild the connector into a closured file with sourcemaps (see more in `app/scripts/services/angular-wakanda/README.md`)
 * disabled jsTest in the watch task (since we use e2e tests)

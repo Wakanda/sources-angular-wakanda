@@ -3,9 +3,9 @@
 var ds, employees, company;
 
 angular.module('angularWakandaFrontApp')
-  .controller('E2E.FirstDraftCtrl', ['$scope','wakConnectorService',function($scope,wakConnectorService) {
+  .controller('E2E.FirstDraftCtrl', ['$scope','$wakanda',function($scope,$wakanda) {
       
-      ds = wakConnectorService.getDatastore();
+      ds = $wakanda.getDatastore();
       
       $scope.employees = [];
             

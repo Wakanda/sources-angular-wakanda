@@ -6,7 +6,7 @@ module.exports = function(grunt) {
     'src/WAF/Dates.js',
     'src/WAF/Rest.js',
     'src/WAF/Data-Provider.js',
-    'src/angular-wakanda-connector.js'
+    'src/angular-wakanda.js'
   ];
   
   var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' + '<%= grunt.template.today("yyyy-mm-dd") %> */';
@@ -24,7 +24,7 @@ module.exports = function(grunt) {
           wrap: true
         },
         files: {
-          'angular-wakanda-connector.min.js': files
+          'angular-wakanda.min.js': files
         }
       },
       debug:{
@@ -61,10 +61,10 @@ module.exports = function(grunt) {
           beautify:true,//better to debug
           wrap: true,
           sourceMap: true,
-          sourceMapName: 'angular-wakanda-connector.debug.min.js.map'
+          sourceMapName: 'angular-wakanda.debug.min.js.map'
         },
         files: {
-          'angular-wakanda-connector.debug.min.js': files
+          'angular-wakanda.debug.min.js': files
         }
       }
     }

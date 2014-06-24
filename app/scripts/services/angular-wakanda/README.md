@@ -1,11 +1,11 @@
-#angular-wakanda-connector
+#angular-wakanda
 
 ###Standalone mode
 
 To use this service in your app, add this script to your page :
 
 
-    <script src="scripts/services/angular-wakanda-connector/angular-wakanda-connector.min.js"></script>
+    <script src="scripts/services/angular-wakanda/angular-wakanda.min.js"></script>
 
 
 ###Debug mode
@@ -13,7 +13,7 @@ To use this service in your app, add this script to your page :
 To use this service in your app, with the debug version, add this script to your page :
 
 
-    <script src="scripts/services/angular-wakanda-connector/angular-wakanda-connector.debug.min.js"></script>
+    <script src="scripts/services/angular-wakanda/angular-wakanda.debug.min.js"></script>
 
 
 ###Development mode

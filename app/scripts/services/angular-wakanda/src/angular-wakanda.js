@@ -1,6 +1,6 @@
-var wakConnectorModule = angular.module('wakConnectorModule', []);
+var wakanda = angular.module('wakanda', []);
 
-wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', function($q, $rootScope, $http) {
+wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScope, $http) {
 
     var ds = null,
         NgWakEntityClasses = {},
@@ -16,7 +16,7 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
      * @returns {$q.promise}
      */
     var init = function(catalog) {
-      console.log('>wakConnectorService init');
+      console.log('>$wakanda init');
       var deferred = $q.defer();
       if (typeof catalog !== "string" || catalog === '*' || catalog === '') {
         catalog = null;
@@ -27,12 +27,12 @@ wakConnectorModule.factory('wakConnectorService', ['$q', '$rootScope', '$http', 
             ds = event.dataStore;
             prepare.wafDatastore(ds);
             prepare.wafDataClasses(ds);
-//            console.log('>wakConnectorService init > success', event, 'ds', ds);
+//            console.log('>$wakanda init > success', event, 'ds', ds);
             deferred.resolve(ds);
           },
           onError: function(event) {
             ds = null;
-            console.error('>wakConnectorService init > error', event);
+            console.error('>$wakanda init > error', event);
             deferred.reject(event);
           },
           catalog: catalog

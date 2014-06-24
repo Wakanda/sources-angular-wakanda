@@ -1,5 +1,5 @@
 /**
- * The angular-wakanda-connector wraps the rest connection to the WakandaDB in an angular service.
+ * The angular-wakanda wraps the rest connection to the WakandaDB in an angular service.
  * 
  * It ships 2 classes from the WAF (Wakanda Framework), unchanged :
  * - Rest.js

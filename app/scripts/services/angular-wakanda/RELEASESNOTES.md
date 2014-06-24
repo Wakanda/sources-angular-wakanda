@@ -1,9 +1,15 @@
-angular-wakanda-connector.js vAlpha - release notes
+angular-wakanda.js vAlpha - release notes
 ===================================================
 
 Understand this module is still under development and the current releases are alpha versions.
 
 The versions provided can be unstable, the features may not be finished. I'll try to keep this document up to date (it may not be completly accurate).
+
+##v0.3.0
+* changed filename from `angular-wakanda-connector.*` to `angular-wakanda.*`
+* changed module name from `wakConnectorModule` to `wakanda`
+* changed service name from `wakConnectorService` to `$wakanda`
+* adapted build and test routines to new names and paths
 
 ##v0.2.0
 * added directory API support

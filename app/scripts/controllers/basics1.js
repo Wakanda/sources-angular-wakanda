@@ -3,9 +3,9 @@
 var ds, comp1;
 
 angular.module('angularWakandaFrontApp')
-  .controller('Basics1Ctrl', ['$scope', 'wakConnectorService', function($scope, wakConnectorService) {
+  .controller('Basics1Ctrl', ['$scope', '$wakanda', function($scope, $wakanda) {
     
-    ds = wakConnectorService.getDatastore();
+    ds = $wakanda.getDatastore();
     
     /** comp1 */
       

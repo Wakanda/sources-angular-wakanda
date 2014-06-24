@@ -3,8 +3,8 @@
 var ds, _, employee;
 
 angular.module('angularWakandaFrontApp')
-        .controller('BugTest2Ctrl', ['$scope','$route','wakConnectorService',function($scope,$route,wakConnectorService) {
-            ds = wakConnectorService.getDatastore();
+        .controller('BugTest2Ctrl', ['$scope','$route','$wakanda',function($scope,$route,$wakanda) {
+            ds = $wakanda.getDatastore();
     
             if($route.current.params.employeeId){
               $scope.companies = ds.Company.$find({pageSize:100});

@@ -68,10 +68,10 @@ module.exports = function(grunt) {
             },
             "angular-wakanda-service-reload": {
                 files: [
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/angular-wakanda-connector.debug.min.js',
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/angular-wakanda-connector.debug.min.js.map',
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/angular-wakanda-connector.js',
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/WAF/*.js'
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda/src/angular-wakanda.debug.min.js',
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda/src/angular-wakanda.debug.min.js.map',
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda/src/angular-wakanda.js',
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda/src/WAF/*.js'
                 ],
                 options: {
                     livereload: true
@@ -79,8 +79,8 @@ module.exports = function(grunt) {
             },
             "angular-wakanda-service-build": {
                 files: [
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/angular-wakanda-connector.js',
-                  '<%= yeoman.app %>/scripts/services/angular-wakanda-connector/src/WAF/*.js'
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda/src/angular-wakanda.js',
+                  '<%= yeoman.app %>/scripts/services/angular-wakanda/src/WAF/*.js'
                 ],
                 tasks: ['wakConnector-build-debug']
             },
@@ -392,7 +392,7 @@ module.exports = function(grunt) {
                 files: [{
                         expand: true,
                         dot: true,
-                        cwd: '<%= yeoman.app %>/scripts/services/angular-wakanda-connector',
+                        cwd: '<%= yeoman.app %>/scripts/services/angular-wakanda',
                         dest: '<%= yeoman.publishConnectorDir %>',
                         src: [
                             '*',
@@ -529,11 +529,11 @@ module.exports = function(grunt) {
         grunt: true,
         args: ['build'],
         opts: {
-            cwd: 'app/scripts/services/angular-wakanda-connector'
+            cwd: 'app/scripts/services/angular-wakanda'
         }
       }, function(err, result, code){
         if(err){
-          grunt.log.error('An error occured building angular-wakanda-connector.min.js',err.message);
+          grunt.log.error('An error occured building angular-wakanda.min.js',err.message);
         }
         done();
       });
@@ -545,11 +545,11 @@ module.exports = function(grunt) {
         grunt: true,
         args: ['build-debug'],
         opts: {
-            cwd: 'app/scripts/services/angular-wakanda-connector'
+            cwd: 'app/scripts/services/angular-wakanda'
         }
       }, function(err, result, code){
         if(err){
-          grunt.log.error('An error occured building angular-wakanda-connector.debug.min.js',err.message);
+          grunt.log.error('An error occured building angular-wakanda.debug.min.js',err.message);
         }
         done();
       });
@@ -579,7 +579,7 @@ module.exports = function(grunt) {
         grunt.fail.warn('Folder "'+grunt.config('yeoman.publishConnectorDir')+'" doesn\'t exist, please run grunt publish-connector-init before.');
       }
       grunt.log.warn('Don\'t forget to build the connector (grunt build-connector) and change its version in the package.json before publishing it.');
-      var connectorPackage = require('./app/scripts/services/angular-wakanda-connector/package.json');
+      var connectorPackage = require('./app/scripts/services/angular-wakanda/package.json');
       grunt.config('publishedConnectorPkg',connectorPackage);
       grunt.log.write('Publishing version '+connectorPackage.version+' of the connector in folder : '+grunt.config('yeoman.publishConnectorDir'));
       grunt.task.run(['clean:publishConnector','copy:publishConnector','copy:publishConnectorReadMe','clean:publishConnectorReadMe']);

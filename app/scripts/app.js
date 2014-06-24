@@ -5,7 +5,7 @@ angular.module('angularWakandaFrontApp', [
   'ngResource',
   'ngSanitize',
   'ngRoute',
-  'wakConnectorModule',
+  'wakanda',
   'unitTestsHelpersModule',
   'rootScopeSafeApplyModule'
 ])
@@ -14,8 +14,8 @@ angular.module('angularWakandaFrontApp', [
             //for the moment, this should fit in your bootstrap (or be adaptable), whatever way you did it
             //see more on README.md
             var routeResolver = {
-              app: ['wakConnectorService', function(wakConnectorService) {
-                  return wakConnectorService.init();
+              app: ['$wakanda', function($wakanda) {
+                  return $wakanda.init();
                 }]
             };
             $routeProvider

@@ -3,9 +3,9 @@
 var ds;
 
 angular.module('angularWakandaFrontApp')
-  .controller('Basics2Ctrl', ['$scope', 'wakConnectorService', function($scope, wakConnectorService) {
+  .controller('Basics2Ctrl', ['$scope', '$wakanda', function($scope, $wakanda) {
     
-    ds = wakConnectorService.getDatastore();
+    ds = $wakanda.getDatastore();
     $scope.companies = [];
     $scope.currentCompany = null;
     

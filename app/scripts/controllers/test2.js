@@ -3,10 +3,10 @@
 var ds, products;
 
 angular.module('angularWakandaFrontApp')
-  .controller('Test2Ctrl', ['$scope','wakConnectorService',function ($scope, wakConnectorService) {
+  .controller('Test2Ctrl', ['$scope','$wakanda',function ($scope, $wakanda) {
     
     //retrieve infos from db
-    ds = wakConnectorService.getDatastore();
+    ds = $wakanda.getDatastore();
     products = $scope.products = ds.Product.$find({});
     products.$promise.then(function(event){
         console.log(event);

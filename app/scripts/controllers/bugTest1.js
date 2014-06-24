@@ -3,8 +3,8 @@
 var ds;
 
 angular.module('angularWakandaFrontApp')
-        .controller('BugTest1Ctrl', ['$scope','wakConnectorService',function($scope,wakConnectorService) {
-            ds = wakConnectorService.getDatastore();
+        .controller('BugTest1Ctrl', ['$scope','$wakanda',function($scope,$wakanda) {
+            ds = $wakanda.getDatastore();
     
             $scope.product = ds.Product.$create({name:'TestforBoolean5',myBoolean: true});
             

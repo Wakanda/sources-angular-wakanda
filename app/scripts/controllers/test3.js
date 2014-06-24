@@ -3,10 +3,10 @@
 var ds, products, employees;
 
 angular.module('angularWakandaFrontApp')
-  .controller('Test3Ctrl', ['$scope','wakConnectorService',function ($scope, wakConnectorService) {
+  .controller('Test3Ctrl', ['$scope','$wakanda',function ($scope, $wakanda) {
     
     //retrieve infos from db
-    ds = wakConnectorService.getDatastore();
+    ds = $wakanda.getDatastore();
     products = $scope.products = ds.Product.$find({
       pageSize:5,
       orderBy : 'name asc'
@@ -24,7 +24,7 @@ angular.module('angularWakandaFrontApp')
     };
     
     //retrieve infos from db
-    ds = wakConnectorService.getDatastore();
+    ds = $wakanda.getDatastore();
     employees = $scope.employees = ds.Employee.$find({
       select : 'firstName, lastName, salary, employer, photo',
       pageSize:5,

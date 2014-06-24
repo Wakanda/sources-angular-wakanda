@@ -3,6 +3,6 @@
 var ds, products, queryResult;
 
 angular.module('angularWakandaFrontApp')
-        .controller('Example1Ctrl', ['$scope', 'wakConnectorService', function($scope, wakConnectorService) {
+        .controller('Example1Ctrl', ['$scope', '$wakanda', function($scope, $wakanda) {
             
           }]);
