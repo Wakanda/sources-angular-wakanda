@@ -350,6 +350,7 @@ module.exports = function(grunt) {
                             'views/**/*.html',
                             'scripts/*.js',
                             'scripts/**/*.js',
+                            'scripts/**/*.{md,map}',
                             '!scripts/**/node_modules/**',
                             'styles/*.css',
                             'styles/**/*.css',

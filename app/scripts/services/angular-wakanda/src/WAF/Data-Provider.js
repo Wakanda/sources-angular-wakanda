@@ -340,6 +340,25 @@ WAF.EntityCache.prototype.makeRoomFor = function(nbEntities)
 
 WAF.EntityCache.prototype.setEntry = function(key, rawEntity, timeStamp, options)
 {
+	
+	function mergeRawEntity(newRawEntity, oldRawEntity)
+	{
+		for (e in oldRawEntity)
+		{
+			var newval = newRawEntity[e]
+			if (newval == null)
+			{
+				newRawEntity[e] = oldRawEntity[e];
+			}
+			else
+			{
+				if (newval.__deferred != null)
+					newRawEntity[e] = oldRawEntity[e];
+			}
+		}
+		return newRawEntity;
+	}
+	
 	var cache = this;
 	var map = cache.entitiesByKey;
 	var elem = map[key];
@@ -350,6 +369,20 @@ WAF.EntityCache.prototype.setEntry = function(key, rawEntity, timeStamp, options
 			cache.clear(Math.round(cache.nbEntries / 3));
 		}
 		cache.nbEntries++;
+	}
+	else
+	{
+		var oldstamp = -1;
+		var newstamp = null;
+		if (rawEntity != null)
+			newstamp = rawEntity.__STAMP;
+		if (elem.rawEntity != null)
+			oldstamp = elem.rawEntity.__STAMP;
+			
+		if (oldstamp === newstamp)
+		{
+			rawEntity = mergeRawEntity(rawEntity, elem.rawEntity);
+		}
 	}
 	
 	var newStamp = cache.getNextStamp();
@@ -2367,6 +2400,49 @@ WAF.EntityCollection.forEach = function(options, userData)
 }
 
 
+WAF.EntityCollection.forEachInCache = function(options, userData)
+{
+	// options.onSuccess : function called for each entity
+	// options.onError : 
+	var entityCollection = this;
+	var priv = entityCollection._private;
+	var resOp = WAF.tools.handleArgs(arguments, 0, { with3funcs: true });
+	userData = resOp.userData;
+	options = resOp.options;
+	var stop = false;
+	var curpagenum = -1;
+	var nbpage = priv.pages.length;
+	var curelem = 0;
+	var nbelem = 0;
+	var curpage = null;
+	var curstart = 0;
+	
+	while (!stop)
+	{
+		if (curelem >= nbelem)
+		{
+			++curpagenum;
+			if (curpagenum >= nbpage)
+				stop = true;
+			else
+			{
+				curpage = priv.pages[curpagenum];
+				nbelem = curpage.length;
+				curelem = 0;
+				curstart = curpage.start;
+			}
+		}
+		else
+			++curelem;
+			
+		if (!stop)
+		{
+			var executed = entityCollection.getEntity(curstart+curelem, options, userData, true);
+		}
+	}
+}
+
+
 WAF.EntityCollection.add = function(entity)
 {
 	if (entity != null)
@@ -3482,7 +3558,10 @@ WAF.Entity.save = function(options, userData)
 							}
 							else
 							{
-								valAtt.setRawValue(val);
+								if (true || valAtt.isTouched()) {
+									valAtt.setRawValue(val);
+								}
+								
 								if (!refreshOnly)
 									valAtt.clearTouched();
 							}
@@ -3521,6 +3600,7 @@ WAF.EntityCollection.prototype.getEntities = WAF.EntityCollection.getEntities;
 WAF.EntityCollection.prototype.callMethod = WAF.EntityCollection.callMethod;
 WAF.EntityCollection.prototype.each = WAF.EntityCollection.forEach;
 WAF.EntityCollection.prototype.forEach = WAF.EntityCollection.forEach;
+WAF.EntityCollection.prototype.forEachInCache = WAF.EntityCollection.forEachInCache;
 WAF.EntityCollection.prototype.add = WAF.EntityCollection.add;
 WAF.EntityCollection.prototype.orderBy = WAF.EntityCollection.orderBy;
 WAF.EntityCollection.prototype.toArray = WAF.EntityCollection.toArray;

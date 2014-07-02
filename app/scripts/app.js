@@ -119,6 +119,11 @@ angular.module('angularWakandaFrontApp', [
                       templateUrl: 'views/e2e-tests/directory.html',
                       controller: 'E2E.DirectoryCtrl'
                     })
+                    .when('/brut/vanilla-ds', {
+                      templateUrl: 'views/brut/vanilla-ds.html',
+                      controller: 'Brut.VanillaDsCtrl',
+                      resolve: routeResolver
+                    })
                     .otherwise({
                       redirectTo: '/'
                     });
