@@ -535,6 +535,12 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 			queryString += (!deja$ ? "$findKey=" : "&$findKey=")+encodeURIComponent(""+this.findKey);
 			deja$ = true;
 		}
+		// $reselect
+		if (this.reselect != null)
+		{
+			queryString += (!deja$ ? "$reselect=" : "&$reselect=")+encodeURIComponent(""+this.reselect);
+			deja$ = true;
+		}
 		if (this.queryPlan)
 		{
 			queryString += (!deja$ ? "$queryplan=true&querypath=true" : "&$queryplan=true&querypath=true")

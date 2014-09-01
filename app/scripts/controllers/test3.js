@@ -6,7 +6,8 @@ angular.module('angularWakandaFrontApp')
   .controller('Test3Ctrl', ['$scope','$wakanda',function ($scope, $wakanda) {
     
     //retrieve infos from db
-    ds = $wakanda.getDatastore();
+//    ds = $wakanda.getDatastore();
+    ds = $wakanda.$ds;
     products = $scope.products = ds.Product.$find({
       pageSize:5,
       orderBy : 'name asc'

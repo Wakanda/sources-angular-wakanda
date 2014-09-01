@@ -39,9 +39,35 @@ angular.module('angularWakandaFrontApp')
         });
       };
       
+      var testLoop = function(){
+        collectionToNgWakEntityCollection(employeeCollection,{start:50,pageSize:10});
+      };
+      
       //call that function
       $scope.finite = function(){
         finiteLoop(employeeResult);
+      };
+      
+      $scope.fetch = function(){
+        employeeResult.getEntities(50,10,{
+          onSuccess:function(e){
+            console.log('e',e);
+            e.result.forEach({
+              onSuccess:function(item){
+                console.log(item.position,item.entity.ID.getValue(),item.entity.firstName.getValue(),item.entity.lastName.getValue(),item.entity.employer.getValue().name.getValue());
+              },
+//              skip:50,
+              first:50,
+              limit:60
+            }
+            );
+          }
+        });
+      };
+      
+      //call that function
+      $scope.test = function(){
+        testLoop();
       };
       
       //init page with this

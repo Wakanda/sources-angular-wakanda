@@ -115,7 +115,8 @@ WAF.tools.optionMatchers = [
 		"withinCollection",
 		"keepOrderBy",
 		"retainPositions",
-		"fromInitialQuery"
+		"fromInitialQuery",
+		"reselect"
 	];
 
 WAF.tools.isOptionParam = function(param)
@@ -1833,6 +1834,7 @@ WAF.EntityCollection.fetchData = function(skip, top, options, userData)
 	request.orderby = options.orderby;
 	request.subOrderby = options.subOrderby;
 	request.keepSelection = options.keepSelection;
+	request.reselect = options.reselect;
 
 	request.handler = function(){
 	        
@@ -2006,82 +2008,117 @@ WAF.EntityCollection.orderBy = function(orderByString, options, userData)
 
 WAF.EntityCollection.getEntities = function(pos, howMany, options, userData)
 {
-	var resOp = WAF.tools.handleArgs(arguments, 2);
-	userData = resOp.userData;
-	options = resOp.options;
-		
 	var entityCollection = this;
 	var priv = entityCollection._private;
-	var lenFromServer = priv.loadedElemsLength;
-	var lenLocal = priv.addedElems.length
-	var dataClass = entityCollection.getDataClass();
 	
-	priv.updateOptions(options);
-
-	var result = [];
-	var newevent = {entityCollection: entityCollection, result: entityCollection, position:pos, howMany: howMany, entities:result };
-	
-	if (pos >= lenFromServer)
+	if (priv.ready)
 	{
-		var subpos = pos - lenFromServer;
-		var realHowMany = howMany;
-		if (realHowMany > (lenLocal-subpos))
-			realHowMany = lenLocal-subpos;
-		if (subpos < lenLocal)
-		{
-			for (var i = subpos; i < (subpos + realHowMany); ++i)
-			{
-				result.push(priv.addedElems[i]);
+		var resOp = WAF.tools.handleArgs(arguments, 2);
+		userData = resOp.userData;
+		options = resOp.options;
+			
+		var lenFromServer = priv.loadedElemsLength;
+		var lenLocal = priv.addedElems.length
+		var dataClass = entityCollection.getDataClass();
+		
+		priv.updateOptions(options);
+	
+		var result = [];
+		var newevent = {entityCollection: entityCollection, result: entityCollection, position:pos, howMany: howMany, entities:result };
+		var errorOccured = null;
+		
+		entityCollection.forEach({
+			first: pos,
+			limit: pos+howMany,
+			onSuccess: function(ev) {
+				result.push(ev.entity);
+			},
+			onError: function(ev) {
+				errorOccured = ev.error;
+			},
+			atTheEnd: function(ev) {
+				if (errorOccured != null)
+				{
+					WAF.callHandler(true, errorOccured, newevent, options, userData);
+				}
+				else
+				{
+					WAF.callHandler(false, null, newevent, options, userData);
+				}
 			}
+		});
+		
+		/*
+		if (pos >= lenFromServer)
+		{
+			var subpos = pos - lenFromServer;
+			var realHowMany = howMany;
+			if (realHowMany > (lenLocal-subpos))
+				realHowMany = lenLocal-subpos;
+			if (subpos < lenLocal)
+			{
+				for (var i = subpos; i < (subpos + realHowMany); ++i)
+				{
+					result.push(priv.addedElems[i]);
+				}
+			}
+			WAF.callHandler(false, null, newevent, options, userData);
 		}
-		WAF.callHandler(false, null, newevent, options, userData);
+		else
+		{
+			var realHowMany = howMany;
+			if ((pos+realHowMany) > (lenFromServer + lenLocal))
+			{
+				realHowMany = (lenFromServer + lenLocal) - pos;
+			}
+			var howManyFromServer = realHowMany;
+			if ((pos+howManyFromServer) > lenFromServer)
+			{
+				howManyFromServer = lenFromServer - pos;
+			}
+			priv.fetchData(pos, howManyFromServer, {
+				onSuccess : function(event) {
+					cache = dataClass.getCache();
+					for (var i = pos; i < (pos + howManyFromServer); ++i)
+					{
+						var key = priv.getKeyByPos(i);
+						var cacheInfo = cache.getCacheInfo(key);
+						if (cacheInfo != null)
+						{
+							var entity = new WAF.Entity(dataClass, cacheInfo.rawEntity);
+							result.push(entity);
+						}
+						else
+						{
+							result.push(null);
+						}
+					}
+					if (howManyFromServer < realHowMany)
+					{
+						var remainHowMany = realHowMany - howManyFromServer;
+						for (var i = 0; i < remainHowMany; ++i)
+						{
+							result.push(priv.addedElems[i]);
+						}
+					}
+					WAF.callHandler(false, null, newevent, options, userData);
+				},
+				onError : function(event) {
+					WAF.callHandler(true, event.error, newevent, options, userData);
+				},
+				addToSet: options.addToSet || null
+			});
+		}
+		
+		*/
 	}
 	else
 	{
-		var realHowMany = howMany;
-		if ((pos+realHowMany) > (lenFromServer + lenLocal))
+		setTimeout(function()
 		{
-			realHowMany = (lenFromServer + lenLocal) - pos;
-		}
-		var howManyFromServer = realHowMany;
-		if ((pos+howManyFromServer) > lenFromServer)
-		{
-			howManyFromServer = lenFromServer - pos;
-		}
-		priv.fetchData(pos, howManyFromServer, {
-			onSuccess : function(event) {
-				cache = dataClass.getCache();
-				for (var i = pos; i < (pos + howManyFromServer); ++i)
-				{
-					var key = priv.getKeyByPos(i);
-					var cacheInfo = cache.getCacheInfo(key);
-					if (cacheInfo != null)
-					{
-						var entity = new WAF.Entity(dataClass, cacheInfo.rawEntity);
-						result.push(entity);
-					}
-					else
-					{
-						result.push(null);
-					}
-				}
-				if (howManyFromServer < realHowMany)
-				{
-					var remainHowMany = realHowMany - howManyFromServer;
-					for (var i = 0; i < remainHowMany; ++i)
-					{
-						result.push(priv.addedElems[i]);
-					}
-				}
-				WAF.callHandler(false, null, newevent, options, userData);
-			},
-			onError : function(event) {
-				WAF.callHandler(true, event.error, newevent, options, userData);
-			},
-			addToSet: options.addToSet || null
-		});
+			entityCollection.getEntities(pos, howMany, options, userData);
+		}, 100);
 	}
-	
 }
 
 WAF.EntityCollection.getEntity = function(pos, options, userData, doNotFetch)
@@ -2113,6 +2150,7 @@ WAF.EntityCollection.getEntity = function(pos, options, userData, doNotFetch)
 		
 	if (pos >= lenToCheck )
 	{
+		executed = true;
 		var newevent = {entityCollection: entityCollection, result: entityCollection, position:pos};
 		var subpos = pos - priv.loadedElemsLength;
 		if (subpos < priv.addedElems.length)
@@ -2417,6 +2455,9 @@ WAF.EntityCollection.forEachInCache = function(options, userData)
 	var curpage = null;
 	var curstart = 0;
 	
+	var absolutestart = options.first || 0;
+	var absoluteend = options.limit || entityCollection.length;
+	
 	while (!stop)
 	{
 		if (curelem >= nbelem)
@@ -2437,7 +2478,14 @@ WAF.EntityCollection.forEachInCache = function(options, userData)
 			
 		if (!stop)
 		{
-			var executed = entityCollection.getEntity(curstart+curelem, options, userData, true);
+			var pos = curstart+curelem;
+			if (pos >= absolutestart)
+			{
+				if (pos < absoluteend)
+					entityCollection.getEntity(pos, options, userData, true);
+				else
+					stop = true;
+			}
 		}
 	}
 }
@@ -2994,10 +3042,14 @@ WAF.EntityAttributeRelated.setValue = function(relatedEntity)
 	this.touched = true;
 	this.owner.touch();
 	this.dataURI = null;
-	if (relatedEntity == null)
+	if (relatedEntity == null) {
 		this.relKey = null;
-	else
+		this.value = null;
+    } else {
 		this.relKey = relatedEntity.getKey();
+        //TODO : update/add entityCollection rawEntity to new Entity 
+        this.value = relatedEntity.getDataClass().getCache().getCacheInfo(relatedEntity.getKey()).rawEntity;
+    }
 }
 
 
