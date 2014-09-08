@@ -569,6 +569,8 @@ module.exports = function(grunt) {
       grunt.log.writeln('* git push');
     });
     
+    //this task publish-connector is only to use when you're asked to share only the connector's part of the project (but also with all the building routines), it will simply make a copy/paste of the files without the node_modules
+    //when you publish to bower please use the other way - in app/scripts/services/angular-wakanda just run grunt publish versionNumber
     grunt.registerTask('publish-connector-init',function(){
       grunt.file.mkdir(grunt.config('yeoman.publishConnectorDir'));
       grunt.log.write(grunt.config('yeoman.publishConnectorDir')+' folder created, before publishing the connector into, you need to :');

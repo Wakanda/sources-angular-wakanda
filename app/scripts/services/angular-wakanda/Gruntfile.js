@@ -73,4 +73,24 @@ module.exports = function(grunt) {
   grunt.registerTask('build', ['uglify:prod']);
   grunt.registerTask('build-debug', ['uglify:debug']);
   
+  //simply call (the following command with your specified version) example : grunt publish 0.5.2
+  grunt.registerTask('publish-bowerFile',function(target){
+    var bowerJson = grunt.file.readJSON('bower.publish.json');
+    var version = target;
+    var toJson = JSON.stringify(bowerJson,null,'  ');
+    toJson = toJson.replace('<%=version%>',version);
+    grunt.file.write('publish/bower.json',toJson);
+  });
+  
+  grunt.registerTask('publish',function(target){
+    if(target === null){
+      grunt.fail.warn("Must specify version number");
+    }
+    var version = target;
+    grunt.file.copy('angular-wakanda.min.js','publish/angular-wakanda.min.js');
+    grunt.file.copy('README.publish.md','publish/README.md');
+    grunt.file.copy('RELEASESNOTES.md','publish/RELEASESNOTES.md');
+    grunt.task.run('publish-bowerFile:'+target);
+  });
+  
 };

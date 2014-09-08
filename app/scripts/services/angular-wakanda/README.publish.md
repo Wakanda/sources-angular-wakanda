@@ -1,28 +1,52 @@
-#angular-wakanda
+# bower-angular-wakanda
 
-###Standalone mode
+This repo is for distribution on `bower`. The source for this module is currently
+in the [NG-Wakanda-Pack repo](https://github.com/AMorgaut/NG-Wakanda-Pack/).
+Please file [issues](https://github.com/AMorgaut/NG-Wakanda-Pack/issues) and [pull requests](https://github.com/AMorgaut/NG-Wakanda-Pack/pulls) against that repo.
 
-To use this service in your app, add this script to your page :
+## Warning
 
+**Angular-Wakanda is not ready for prodution**
 
-    <script src="scripts/services/angular-wakanda/angular-wakanda.min.js"></script>
+Fell free to test it for some upcoming project but be aware that it is still incomplete and its API potentially subject to change.
 
+## Install
 
-###Debug mode
+Install with [bower](http://bower.io):
 
-To use this service in your app, with the debug version, add this script to your page :
+```shell
+bower install angular-wakanda
+```
 
+Add a `<script>` tags to your `index.html`:
 
-    <script src="scripts/services/angular-wakanda/angular-wakanda.debug.min.js"></script>
+```html
+<script src="/bower_components/angular/angular.min.js"></script>
+<script src="/bower_components/angular-wakanda/angular-wakanda.min.js"></script>
+```
 
+Add `wakanda` as a dependency for your app:
 
-###Development mode
+```javascript
+angular.module('myApp', ['wakanda']);
+```
 
-Run `npm install`, it will install the modules needed to build the minified version of the service.
-Then simply run `grunt build` or `grunt build-debug` (if you want the version with sourcemaps)
+And finally use the `$wakanda` injected service:
 
-Watch/reload tasks on the `grunt serve` of the main Gruntfile.js were added, they will automatically rebuild then reload the min file.
+```javascript
+$wakanda.init().then(function (ds) {
 
-###Want to contribute ?
+	$scope.contacts = ds.Contact.$find();
 
-This repository only contains the wakanda connector. Just check out this repo [URL] where you will find the full tools, sources, unit and e2e tests to contribute
+});
+```
+
+## Documentation
+
+[Tutorial](http://ng-wakanda-pack.us.wak-apps.com/) 
+& [Documentation](https://github.com/AMorgaut/NG-Wakanda-Pack/blob/master/API-DOC.md) 
+are curently available in the [NG-Wakanda-Pack](https://github.com/AMorgaut/NG-Wakanda-Pack/).
+
+## License
+
+This connector use the Wakanda Framework data provider and share its dual (GPL/Commercial) [Wakanda License](http://wakanda.org/license)
