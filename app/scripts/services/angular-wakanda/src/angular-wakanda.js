@@ -1008,6 +1008,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       return result;
     };
 
+    //@todo identify the correct key field (not ID by default)
     var $$findOne = function(id,options){
       options = typeof options === 'undefined' ? {} : options;
       options.filter = 'ID = '+id;

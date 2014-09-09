@@ -594,6 +594,8 @@ WAF.DataStore.funcCaller = function(methodref, from, params, options)
 			request.resource = dataClass.getName();
             request.filter = options.queryString;
 		}
+		request.savedQueryString = entityCollection._private.savedQuery;
+		request.savedOrderby = entityCollection._private.savedOrderby;		
 		entityCollection._private.updateOptions(options);
 	}
 	else if (methodref.applyTo == "general")
@@ -2013,6 +2015,8 @@ WAF.EntityCollection.getEntities = function(pos, howMany, options, userData)
 	
 	if (priv.ready)
 	{
+		if (pos + howMany > entityCollection.length)
+			howMany = entityCollection.length - pos;
 		var resOp = WAF.tools.handleArgs(arguments, 2);
 		userData = resOp.userData;
 		options = resOp.options;
@@ -3044,11 +3048,13 @@ WAF.EntityAttributeRelated.setValue = function(relatedEntity)
 	this.dataURI = null;
 	if (relatedEntity == null) {
 		this.relKey = null;
-		this.value = null;
+		//this.value = null;
     } else {
 		this.relKey = relatedEntity.getKey();
+		/*
         //TODO : update/add entityCollection rawEntity to new Entity 
         this.value = relatedEntity.getDataClass().getCache().getCacheInfo(relatedEntity.getKey()).rawEntity;
+        */
     }
 }
 
