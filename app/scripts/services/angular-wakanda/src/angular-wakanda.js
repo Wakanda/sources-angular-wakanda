@@ -552,6 +552,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               }
               else if(typeof entity[key] !== 'undefined'){
                 ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
+                if(attributes[key].type === "date" && ngWakEntityNestedObject[key] !== null && ngWakEntityNestedObject[key] instanceof Date === false){
+                  ngWakEntityNestedObject[key] = new Date(ngWakEntityNestedObject[key]);
+                }
               }
             }
           }
