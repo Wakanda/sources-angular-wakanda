@@ -519,6 +519,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               }
               else if(typeof entity[key] !== 'undefined'){
                 ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
+                if(attributes[key].type === "date" && ngWakEntityNestedObject[key] !== null && ngWakEntityNestedObject[key] instanceof Date === false){
+                  ngWakEntityNestedObject[key] = new Date(ngWakEntityNestedObject[key]);
+                }
               }
             }
           }
@@ -984,6 +987,13 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     /** Code organization, heritage, objects used (todo : split this into multiple files which should be insject by dependency injection OR module) */
     
     var NgWakEntityAbstractPrototype = {
+      init: function(){
+        Object.defineProperty(this, "$_entity", {
+          enumerable: false,
+          configurable: false,
+          writable: true
+        });
+      },
       $save : function(){
         console.group('$save');
         var deferred, wakOptions = {}, that = this;
@@ -1254,8 +1264,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     };
 
     /** returned object */
-
-    return {
+    
+    var $wakandaResult = {
       init: init,
       getDatastore: getDatastore,
       $login : directoryLoginByPassword,
@@ -1264,5 +1274,11 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       $logout : directoryLogout,
       $currentUserBelongsTo : directoryCurrentUserBelongsTo
     };
+    
+    Object.defineProperty($wakandaResult,'$ds',{
+      get:getDatastore
+    });
+    
+    return $wakandaResult;
 
   }]);

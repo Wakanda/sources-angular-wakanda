@@ -3,6 +3,7 @@ dist
 .tmp
 .sass-cache
 app/bower_components
+app/scripts/services/angular-wakanda/publish
 /nbproject/private/
 /nbproject
 wakandaApp.json

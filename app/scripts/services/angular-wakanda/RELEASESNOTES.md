@@ -5,6 +5,12 @@ Understand this module is still under development and the current releases are a
 
 The versions provided can be unstable, the features may not be finished. I'll try to keep this document up to date (it may not be completly accurate).
 
+##v0.3.1
+* fix date attribute bug (now always a Date object)
+* `$wakanda.$ds` as an attribute (alias of `.getDatastore()`)
+* private `$_entity` not enumerable anymore
+* upgraded to last version of `Data-Provider.js` and `Rest.js`
+
 ##v0.3.0
 * changed filename from `angular-wakanda-connector.*` to `angular-wakanda.*`
 * changed module name from `wakConnectorModule` to `wakanda`
