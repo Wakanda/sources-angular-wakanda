@@ -14,6 +14,8 @@ module.exports = function(grunt) {
 //  require('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-concat-sourcemap');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-clean');
   
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -67,6 +69,21 @@ module.exports = function(grunt) {
           'angular-wakanda.debug.min.js': files
         }
       }
+    },
+    copy:{
+      publishBower:{
+        files:[
+          {expand: true, src: ['src/**'], dest: 'publish/'},
+          {src: ['README.publish.md'], dest: 'publish/README.md'},
+          {src: ['RELEASESNOTES.md'], dest: 'publish/RELEASESNOTES.md'},
+          {src: ['angular-wakanda.debug.min.js'], dest: 'publish/angular-wakanda.debug.min.js'},
+          {src: ['angular-wakanda.debug.min.js.map'], dest: 'publish/angular-wakanda.debug.min.js.map'},
+          {src: ['angular-wakanda.min.js'], dest: 'publish/angular-wakanda.min.js'}//most important !!!
+        ]
+      }
+    },
+    clean:{
+      publishBower:['publish/**']
     }
   });
   
@@ -84,12 +101,10 @@ module.exports = function(grunt) {
   
   grunt.registerTask('publish',function(target){
     if(target === null){
-      grunt.fail.warn("Must specify version number");
+      grunt.fail.warn("Must specify version number such as 0.3.2 for example");
     }
-    var version = target;
-    grunt.file.copy('angular-wakanda.min.js','publish/angular-wakanda.min.js');
-    grunt.file.copy('README.publish.md','publish/README.md');
-    grunt.file.copy('RELEASESNOTES.md','publish/RELEASESNOTES.md');
+    grunt.task.run('clean:publishBower');
+    grunt.task.run('copy:publishBower');
     grunt.task.run('publish-bowerFile:'+target);
   });
   

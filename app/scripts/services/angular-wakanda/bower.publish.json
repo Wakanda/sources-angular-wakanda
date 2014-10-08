@@ -6,6 +6,6 @@
   "homepage": "http://ng-wakanda-pack.us.wak-apps.com/",
   "main": "./angular-wakanda.min.js",
   "dependencies": {
-    "angular": "1.2.6"
+    "angular": "~1.2"
   }
 }

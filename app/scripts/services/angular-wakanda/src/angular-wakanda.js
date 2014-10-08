@@ -133,7 +133,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             dataClassMethods = [],
             collectionMethods = [],
             entityMethods = [],
-            attributes;
+            attributes,
+            attributeName;
 
         for(methodName in dataClass._private.dataClassMethodRefs){
           if(dataClass._private.dataClassMethodRefs.hasOwnProperty(methodName)){
@@ -182,6 +183,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         dataClass.$name = dataClass._private.className;
         
         dataClass.$collectionName = dataClass._private.collectionName;
+        
+        for(attributeName in attributes){
+          if(attributes[attributeName].identifying === true){
+            dataClass.$_identifyingAttr = attributes[attributeName];
+          }
+        }
         
       },
       wafDataClassCreateNgWakEntityClasses : function(dataClass){
@@ -399,6 +406,10 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           //update promise
           result.$promise = promise;
         } else {
+          //case it's a unique entity and the pointer is missing
+          if(typeof result.$_entity === "undefined" && typeof data.$_entity !== "undefined"){
+            result.$_entity =data.$_entity;
+          }
           helpers.shallowClearAndCopy(data, result);
           result.$promise = promise;
         }
@@ -462,6 +473,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     var $$create = function(pojo){
       var dataClassName = this._private.className,
           ngWakEntity;
+      pojo = typeof pojo === "undefined" ? {} : pojo;
       ngWakEntity = new NgWakEntityClasses[dataClassName]();
       reccursiveFillNgWakEntityFromEntity(pojo, ngWakEntity, this);
       return ngWakEntity;
@@ -532,7 +544,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       //init the values - same way as above : set the values on the NgWakEntity instance from entity whatever entity is (a pojo or a WAF.Entity)
       for(key in attributes){
         if(typeof entity[key] !== 'undefined'){
-          if(attributes[key].kind === "storage" || attributes[key].kind === "calculated"){
+          if(attributes[key].kind === "storage" || attributes[key].kind === "calculated" || attributes[key].kind === "alias"){
             if(attributes[key].type === "image"){
               ngWakEntityNestedObject[key] = {};
               tmpDeferredInfos = isEntityWafEntity ? entity[key].getValue() : entity[key];
@@ -889,7 +901,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         totalCount = DEFAULT_PAGESIZE_NESTED_COLLECTIONS;//as we don't know the total (we'll retrieve it at this call)
       }
       //prevent asking for non existant pages
-      //@todo throw some kind of warning ?
       if(start >= totalCount){
         deferred = new $q.defer();
         deferred.resolve({
@@ -906,7 +917,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     };
     
     var $$prevPage = function(){
-      var start, pageSize, deferred;
+      var start, pageSize, deferred, noMore;
       if(typeof this.$query !== 'undefined'){
         start = this.$query.start - this.$query.pageSize;
         pageSize = this.$query.pageSize;
@@ -918,20 +929,19 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         return deferred.promise;
       }
       //prevent asking for non existant pages
-      //@todo throw some kind of warning ?
       if(start < 0){
-        deferred = new $q.defer();
-        deferred.resolve({
-          noMore : true
-        });
-        return deferred.promise;
+        noMore = true;
+        start = 0;
       }
-      else{
-        return this.$fetch({
-          'start' : start,
-          'pageSize' : pageSize
-        });
-      }
+      return this.$fetch({
+        'start' : start,
+        'pageSize' : pageSize
+      }).then(function(e){
+        if(noMore === true){
+          e.noMore = true;
+        }
+        return e;
+      });
     };
 
     var $$add = function(){
@@ -1014,7 +1024,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     //@todo identify the correct key field (not ID by default)
     var $$findOne = function(id,options){
       options = typeof options === 'undefined' ? {} : options;
-      options.filter = 'ID = '+id;
+      options.filter = this.$_identifyingAttr.name+' = '+id;
       options.onlyOne = true;
       return this.$find(options);
     };
