@@ -7,7 +7,7 @@ If you want to contribute to the development of the connector, read the followin
 
 ###Included :
 
-* An angular application, scaffolded with yeoman angular generator in order to follow the yeoman+grunt+bower workflow. You can launch it on a server with `grunt serve` (see bellow).
+* An angular application, scaffolded with yeoman angular generator (v0.7.1) in order to follow the yeoman+grunt+bower workflow. You can launch it on a server with `grunt serve` (see bellow).
 * A wakanda solution on which the tests are based is included in `WakandaBaseSolution/Contacts`, launch it with Wakanda Server before `grunt serve` (see bellow).
 
 

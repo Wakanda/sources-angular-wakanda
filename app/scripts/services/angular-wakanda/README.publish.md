@@ -1,28 +1,68 @@
-#angular-wakanda
+# bower-angular-wakanda
 
-###Standalone mode
+-> [![image](http://www.wakanda.org/sites/default/files/medias/angular-wakanda.png =150x)](http://www.wakanda.org/angular-wakanda/) <-
 
-To use this service in your app, add this script to your page :
-
-
-    <script src="scripts/services/angular-wakanda/angular-wakanda.min.js"></script>
+[![MIT Licensed](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](#license)
 
 
-###Debug mode
+*Wakanda® and 4D® are registered trademarks of 4D SAS in France and/or other countries. All other names mentioned may be trademarks or registered trademarks of their respective owners.*
 
-To use this service in your app, with the debug version, add this script to your page :
+This repo is for distribution on [Bower](http://bower.io/). The source for this module is currently
+in the [NG-Wakanda-Pack](https://github.com/AMorgaut/NG-Wakanda-Pack/)  repository.
+Please file [issues](https://github.com/AMorgaut/NG-Wakanda-Pack/issues) and [pull requests](https://github.com/AMorgaut/NG-Wakanda-Pack/pulls) against that repo.
 
 
-    <script src="scripts/services/angular-wakanda/angular-wakanda.debug.min.js"></script>
+## EXPERIMENTAL
 
+THIS IS AN ALPHA RELEASE, AND ACTIVE DEVELOPMENT IS ONGOING. THE ANGULAR-WAKANDA CONNECTOR IS UNSTABLE AND NOT FINAL AND SHOULD NOT BE USED IN PRODUCTION (WHATEVER THAT MEANS FOR YOU).
 
-###Development mode
+*Fell free to test it for some upcoming project but be aware that it is still incomplete and its API is potentially subject to change.*
 
-Run `npm install`, it will install the modules needed to build the minified version of the service.
-Then simply run `grunt build` or `grunt build-debug` (if you want the version with sourcemaps)
+## Install
 
-Watch/reload tasks on the `grunt serve` of the main Gruntfile.js were added, they will automatically rebuild then reload the min file.
+Install with [bower](http://bower.io):
 
-###Want to contribute ?
+```shell
+bower install angular-wakanda
+```
 
-This repository only contains the wakanda connector. Just check out this repo [URL] where you will find the full tools, sources, unit and e2e tests to contribute
+Add a `<script>` tags to your `index.html`:
+
+```html
+<script src="/bower_components/angular/angular.min.js"></script>
+<script src="/bower_components/angular-wakanda/angular-wakanda.min.js"></script>
+```
+
+Add `wakanda` as a dependency for your app:
+
+```javascript
+angular.module('myApp', ['wakanda']);
+```
+
+And finally use the `$wakanda` injected service:
+
+```javascript
+$wakanda.init().then(function (ds) {
+
+	$scope.contacts = ds.Contact.$find();
+
+});
+```
+
+## Documentation
+
+[Tutorial](http://ng-wakanda-pack.us.wak-apps.com/) 
+& [Documentation](https://github.com/AMorgaut/NG-Wakanda-Pack/blob/master/API-DOC.md) 
+are curently available in the [NG-Wakanda-Pack](https://github.com/AMorgaut/NG-Wakanda-Pack/).
+
+## License 
+
+*The MIT License*
+
+Copyright (c) 2014 4D S.A.S.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

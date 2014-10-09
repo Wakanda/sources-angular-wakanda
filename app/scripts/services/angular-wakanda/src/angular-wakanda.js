@@ -4,7 +4,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 
     var ds = null,
         NgWakEntityClasses = {},
-        DEFAULT_PAGESIZE_NESTED_COLLECTIONS = 40;
+        DEFAULT_PAGESIZE_NESTED_COLLECTIONS = 40,
+        DEFAULT_CACHE_SIZE = 300,
+        DEFAULT_CACHE_DEEP = 3;
 
     /** connexion part */
 
@@ -120,6 +122,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 //            console.group('DataClass[%s]', dataStore[dataClassName]._private.className, dataStore[dataClassName]);
             prepare.wafDataClassAddMetas(dataStore[dataClassName]);
             prepare.wafDataClassCreateNgWakEntityClasses(dataStore[dataClassName]);
+            prepare.wafDataClassCreateRefCache(dataStore[dataClassName]);
 //            console.groupEnd();
           }
         }
@@ -130,7 +133,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             dataClassMethods = [],
             collectionMethods = [],
             entityMethods = [],
-            attributes;
+            attributes,
+            attributeName;
 
         for(methodName in dataClass._private.dataClassMethodRefs){
           if(dataClass._private.dataClassMethodRefs.hasOwnProperty(methodName)){
@@ -180,12 +184,21 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         
         dataClass.$collectionName = dataClass._private.collectionName;
         
+        for(attributeName in attributes){
+          if(attributes[attributeName].identifying === true){
+            dataClass.$_identifyingAttr = attributes[attributeName];
+          }
+        }
+        
       },
       wafDataClassCreateNgWakEntityClasses : function(dataClass){
         var proto;
         proto = prepareHelpers.createUserDefinedEntityMethods(dataClass);
         NgWakEntityClasses[dataClass._private.className] = NgWakEntityAbstract.extend(proto);
         ds[dataClass._private.className].$Entity = NgWakEntityClasses[dataClass._private.className].prototype;
+      },
+      wafDataClassCreateRefCache : function(dataClass){
+        dataClass.$refCache = new NgWakEntityCache();
       }
     };
     
@@ -291,6 +304,33 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       }
     };
 
+    //@temporary study
+    var collectionToNgWakEntityCollection = window.collectionToNgWakEntityCollection = function(wafEntityCollection,options){
+      options = typeof options === 'undefined' ? {} : options;
+      var result = typeof options.result === 'undefined' ? [] : options.result;
+      var start = typeof options.start === 'undefined' ? 0 : options.start;
+      var pageSize = typeof options.pageSize === 'undefined' ? DEFAULT_PAGESIZE_NESTED_COLLECTIONS : options.pageSize;
+      var currentDataClass = wafEntityCollection.getDataClass();
+      wafEntityCollection.forEachInCache({
+        onSuccess: function(item){
+          console.log(item);
+        },
+        first: start,
+//        skip: start,
+        limit: start+pageSize
+      });
+      var reccursiveCollectionToNgWakEntityCollection = function(wafEntityCollection){
+        
+      };
+    };
+    
+    //@temporary study
+    var entityToNgWakEntity = function(wafEntity){
+      var currentDataClass = wafEntity.getDataClass();
+      var attributes = currentDataClass.$attr();
+      var wakEntity = new NgWakEntityClasses[currentDataClass.$name]();
+    };
+
     /** event transformation part */
 
     var transform = {
@@ -366,6 +406,10 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           //update promise
           result.$promise = promise;
         } else {
+          //case it's a unique entity and the pointer is missing
+          if(typeof result.$_entity === "undefined" && typeof data.$_entity !== "undefined"){
+            result.$_entity =data.$_entity;
+          }
           helpers.shallowClearAndCopy(data, result);
           result.$promise = promise;
         }
@@ -429,6 +473,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     var $$create = function(pojo){
       var dataClassName = this._private.className,
           ngWakEntity;
+      pojo = typeof pojo === "undefined" ? {} : pojo;
       ngWakEntity = new NgWakEntityClasses[dataClassName]();
       reccursiveFillNgWakEntityFromEntity(pojo, ngWakEntity, this);
       return ngWakEntity;
@@ -499,7 +544,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       //init the values - same way as above : set the values on the NgWakEntity instance from entity whatever entity is (a pojo or a WAF.Entity)
       for(key in attributes){
         if(typeof entity[key] !== 'undefined'){
-          if(attributes[key].kind === "storage" || attributes[key].kind === "calculated"){
+          if(attributes[key].kind === "storage" || attributes[key].kind === "calculated" || attributes[key].kind === "alias"){
             if(attributes[key].type === "image"){
               ngWakEntityNestedObject[key] = {};
               tmpDeferredInfos = isEntityWafEntity ? entity[key].getValue() : entity[key];
@@ -856,7 +901,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         totalCount = DEFAULT_PAGESIZE_NESTED_COLLECTIONS;//as we don't know the total (we'll retrieve it at this call)
       }
       //prevent asking for non existant pages
-      //@todo throw some kind of warning ?
       if(start >= totalCount){
         deferred = new $q.defer();
         deferred.resolve({
@@ -873,7 +917,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     };
     
     var $$prevPage = function(){
-      var start, pageSize, deferred;
+      var start, pageSize, deferred, noMore;
       if(typeof this.$query !== 'undefined'){
         start = this.$query.start - this.$query.pageSize;
         pageSize = this.$query.pageSize;
@@ -885,20 +929,19 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         return deferred.promise;
       }
       //prevent asking for non existant pages
-      //@todo throw some kind of warning ?
       if(start < 0){
-        deferred = new $q.defer();
-        deferred.resolve({
-          noMore : true
-        });
-        return deferred.promise;
+        noMore = true;
+        start = 0;
       }
-      else{
-        return this.$fetch({
-          'start' : start,
-          'pageSize' : pageSize
-        });
-      }
+      return this.$fetch({
+        'start' : start,
+        'pageSize' : pageSize
+      }).then(function(e){
+        if(noMore === true){
+          e.noMore = true;
+        }
+        return e;
+      });
     };
 
     var $$add = function(){
@@ -932,9 +975,10 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       if (typeof options.pageSize !== "undefined") {// !!! no pageSize on toArray
         wakOptions.pageSize = options.pageSize;
       }
-      if (typeof options.pages) {
-        wakOptions.pages = options.pages;
-      }
+      //@todo must remain private
+//      if (typeof options.pages) {
+//        wakOptions.pages = options.pages;
+//      }
       //prepare the returned object
       onlyOne = !!options.onlyOne;
       if(onlyOne){
@@ -977,9 +1021,10 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       return result;
     };
 
+    //@todo identify the correct key field (not ID by default)
     var $$findOne = function(id,options){
       options = typeof options === 'undefined' ? {} : options;
-      options.filter = 'ID = '+id;
+      options.filter = this.$_identifyingAttr.name+' = '+id;
       options.onlyOne = true;
       return this.$find(options);
     };
@@ -1077,6 +1122,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             }
           }
         }
+        pojo.__KEY = pojo.$_entity.getKey();
+        pojo.__STAMP = pojo.$_entity.getStamp();
 //        console.log("$syncEntityToPojo (should it be public ?)");
       },
       /**
@@ -1156,6 +1203,52 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     
     var NgWakEntityAbstract = Class.extend(NgWakEntityAbstractPrototype);
     
+    /** cache @warning work in progress
+     * tried to matche as much of the API of the DataProvider's original cache I could 
+     * while sticking with the specs of the angular-wakanda connector
+     */
+    
+    /**
+     * 
+     * @param {Object} options
+     * @returns {NgWakEntityCache}
+     */
+    var NgWakEntityCache = function(options){
+      
+      options = typeof options === 'undefined' ? {} : options;
+      
+      this.maxEntities = options.maxEntities || DEFAULT_CACHE_SIZE;
+      this.deep = options.deep || DEFAULT_CACHE_DEEP;
+      this.infos = {};
+      this.nbEntries = 0;
+      
+    };
+    
+    NgWakEntityCache.prototype.setSize = function(size){
+      if (size === null || size < DEFAULT_CACHE_SIZE){
+        size = DEFAULT_CACHE_SIZE;
+      }
+      this.maxEntities = size;
+    };
+    
+    NgWakEntityCache.prototype.setDeep = function(deep){
+      this.deep = deep;
+    };
+    
+    NgWakEntityCache.prototype.getCacheInfo = function(key){
+      return this.infos[key] || null;
+    };
+    
+    NgWakEntityCache.prototype.replaceCachedEntity = function(key, entity){
+      var cachedEntity = this.getCacheInfo(key);
+      if(cachedEntity !== null && entity.__STAMP > cachedEntity.__STAMP){
+        //update reference @todo related entities
+        cachedEntity = entity;
+      }
+    };
+    
+    /** end cache */
+    
     /** directory */
     
     /**
@@ -1188,8 +1281,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      * Returns a promise :
      * - success : in param an object like {result : currentUserInfos} if ok
      * - error : if the request had a problem
-     * @param {string} login
-     * @param {string} password
      * @returns {deferred.promise}
      */
     var directoryCurrentUser = function(){
@@ -1215,8 +1306,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      * Returns a promise :
      * - success : in param an object like {result : true} if ok - {result : false} if ko
      * - error : if the request had a problem
-     * @param {string} login
-     * @param {string} password
      * @returns {deferred.promise}
      */
     var directoryLogout = function(){
@@ -1242,8 +1331,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      * Returns a promise :
      * - success : in param an object like {result : true} if ok - {result : false} if ko
      * - error : if the request had a problem
-     * @param {string} login
-     * @param {string} password
+     * @param {String} groupName
      * @returns {deferred.promise}
      */
     var directoryCurrentUserBelongsTo = function(groupName){

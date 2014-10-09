@@ -25,6 +25,10 @@ angular.module('angularWakandaFrontApp')
                 {href: '/e2e-tests/first-draft', text: 'First draft'},
                 {href: '/e2e-tests/directory', text: 'Directory'},
                 {href: '/e2e-tests/directory-stand-alone', text: 'Directory (stand alone)'}
+              ],
+              'brut' : [
+                {href: '/brut/vanilla-ds', text: 'vanillaDs'},
+                {href: '/brut/vanilla-ds2', text: 'vanillaDs2'}
               ]
             };
             $scope.isActive = function(viewLocation) {

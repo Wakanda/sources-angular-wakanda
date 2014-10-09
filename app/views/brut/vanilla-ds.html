@@ -1,0 +1,11 @@
+<div class="view-brut-vanilla-ds" ng-cloak>
+  <h3>Brut - Vanilla ds</h3>
+  <div db-state init-async="false" init-collapsed="true" change-callback="init()"></div>
+  <p>This controller does executes "vanilla" DataProvider coded methods (not via the connector), the purpose is for testing behaviors between the Dataprovider and the Connector</p>
+  <p>Open your console.</p>
+  <ol>
+    <li ng-click="finite()">finite() - loop on loaded elements</li>
+    <li ng-click="fetch()">fetch() (fetches 10 entities starting at 50) - <code>employeeResult.getEntities(50,10);</code></li>
+    <li ng-click="test()">test()</li>
+  </ol>
+</div>
