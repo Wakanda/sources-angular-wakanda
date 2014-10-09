@@ -1,5 +1,7 @@
 # bower-angular-wakanda
 
+-> [![image](http://www.wakanda.org/sites/default/files/medias/angular-wakanda.png =150x)](http://www.wakanda.org/angular-wakanda/) <-
+
 [![MIT Licensed](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](#license)
 
 
