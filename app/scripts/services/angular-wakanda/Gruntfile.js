@@ -83,7 +83,16 @@ module.exports = function(grunt) {
       }
     },
     clean:{
-      publishBower:['publish/**']
+      publishBower:{
+        files : [{
+          dot:false,
+          src:[
+            'publish/*',
+            'publish/src/*',
+            '!publish/.git*'
+          ]
+        }]
+      }
     }
   });
   
