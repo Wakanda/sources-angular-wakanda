@@ -104,3 +104,19 @@ Here are the following modifications made to the original yeoman Gruntfile :
 * added the wakWebFolder target in clean and copy tasks, to be able to transfer your built project to your wakanda WebFolder, just by doing `grunt wakCopyBuild` (expect to have to add --force, I left this warning because it empties the WebFolder before copying the build)
 * added watch tasks to rebuild the connector into a closured file with sourcemaps (see more in `app/scripts/services/angular-wakanda/README.md`)
 * disabled jsTest in the watch task (since we use e2e tests)
+
+---
+###Bower
+
+The connector can be installed via `bower install angular-wakanda` . As a Wakanda developer of the connector, you may have to update the repo where is hosted the source code from where bower grabs it.
+
+Follow those steps :
+* `cd app/scripts/services/angular-wakanda`
+* `git clone https://github.com/Wakanda/bower-angular-wakanda.git`
+* rename the `bower-angular-wakanda` folder to `publish` (this is a convention)
+* once you have connected the repo, you'll be able to commit, push and tag versions
+* make sure you have the correct verson in your package.json (still up to you - though it's used in the header of the script)
+* `grunt build` - will build the angular files
+* `grunt publish:0.3.2` (where 0.3.2 is the version number). Will copy necessary files to `publish` folder
+* `cd publish`
+* then commit, tag and push your version
