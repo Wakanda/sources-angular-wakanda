@@ -1,5 +1,7 @@
 #angular-wakanda-front
 
+![ angular-wakanda ](http://www.wakanda.org/sites/default/files/medias/128.png)
+
 If you want to directly use the angular-wakanda connector in a wakanda project, just download the following file : 
 `app/scripts/services/angular-wakanda/angular-wakanda.min.js`
 
@@ -110,13 +112,18 @@ Here are the following modifications made to the original yeoman Gruntfile :
 
 The connector can be installed via `bower install angular-wakanda` . As a Wakanda developer of the connector, you may have to update the repo where is hosted the source code from where bower grabs it.
 
-Follow those steps :
+1) Init the local bower repo
+
 * `cd app/scripts/services/angular-wakanda`
 * `git clone https://github.com/Wakanda/bower-angular-wakanda.git`
-* rename the `bower-angular-wakanda` folder to `publish` (this is a convention)
-* once you have connected the repo, you'll be able to commit, push and tag versions
-* make sure you have the correct verson in your package.json (still up to you - though it's used in the header of the script)
-* `grunt build` - will build the angular files
-* `grunt publish:0.3.2` (where 0.3.2 is the version number). Will copy necessary files to `publish` folder
+* `mv bower-angular-wakanda publish` (rename the `bower-angular-wakanda` folder to `publish`)
+
+2) Now you will be able to publish the connector
+
+* `cd app/scripts/services/angular-wakanda`
+* Check the version in the `package.json` file (this will be the version for bower as well as for the tag you'll have to make)
+* `grunt build` - will build `angular-wakanda.min.js`
+* `grunt build-debug` (for `angular-wakanda.debug.js` - though they should be up to date if you were working on it)
+* `grunt publish` - will copy necessary files into `publish` folder
 * `cd publish`
-* then commit, tag and push your version
+* commit/tag/push

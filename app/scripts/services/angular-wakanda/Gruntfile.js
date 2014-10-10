@@ -11,7 +11,6 @@ module.exports = function(grunt) {
   
   var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' + '<%= grunt.template.today("yyyy-mm-dd") %> */';
 
-//  require('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-concat-sourcemap');
   grunt.loadNpmTasks('grunt-contrib-copy');
@@ -78,7 +77,10 @@ module.exports = function(grunt) {
           {src: ['RELEASESNOTES.md'], dest: 'publish/RELEASESNOTES.md'},
           {src: ['angular-wakanda.debug.min.js'], dest: 'publish/angular-wakanda.debug.min.js'},
           {src: ['angular-wakanda.debug.min.js.map'], dest: 'publish/angular-wakanda.debug.min.js.map'},
-          {src: ['angular-wakanda.min.js'], dest: 'publish/angular-wakanda.min.js'}//most important !!!
+          {src: ['angular-wakanda.debug.min.js.map'], dest: 'publish/angular-wakanda.debug.min.js.map'},
+          {src: ['angular-wakanda.min.js'], dest: 'publish/angular-wakanda.min.js'},//most important !!!
+          {src: ['package.json'], dest: 'publish/package.json'},
+          {src: ['Gruntfile.js'], dest: 'publish/Gruntfile.js'}
         ]
       }
     },
@@ -99,7 +101,7 @@ module.exports = function(grunt) {
   grunt.registerTask('build', ['uglify:prod']);
   grunt.registerTask('build-debug', ['uglify:debug']);
   
-  //simply call (the following command with your specified version) example : grunt publish 0.5.2
+  //simply call (the following command with your specified version) example : grunt publish:0.5.2
   grunt.registerTask('publish-bowerFile',function(target){
     var bowerJson = grunt.file.readJSON('bower.publish.json');
     var version = target;
@@ -108,13 +110,13 @@ module.exports = function(grunt) {
     grunt.file.write('publish/bower.json',toJson);
   });
   
-  grunt.registerTask('publish',function(target){
-    if(target === null){
-      grunt.fail.warn("Must specify version number such as 0.3.2 for example");
-    }
+  //just call grunt publish (will publish the angular connector in publish folder, ready to go for bower with the version number set in the package.json)
+  grunt.registerTask('publish',function(){
+    var version = grunt.config.get('pkg').version;
+    grunt.log.write("Publishing version "+version);
     grunt.task.run('clean:publishBower');
     grunt.task.run('copy:publishBower');
-    grunt.task.run('publish-bowerFile:'+target);
+    grunt.task.run('publish-bowerFile:'+version);
   });
   
 };
