@@ -7,9 +7,8 @@
 
 *Wakanda® and 4D® are registered trademarks of 4D SAS in France and/or other countries. All other names mentioned may be trademarks or registered trademarks of their respective owners.*
 
-This repo is for distribution on [Bower](http://bower.io/). The source for this module is currently
-in the [NG-Wakanda-Pack](https://github.com/AMorgaut/NG-Wakanda-Pack/)  repository.
-Please file [issues](https://github.com/AMorgaut/NG-Wakanda-Pack/issues) and [pull requests](https://github.com/AMorgaut/NG-Wakanda-Pack/pulls) against that repo.
+This repo is for distribution on [Bower](http://bower.io/). You can check out demos
+in the [NG-Wakanda-Pack](https://github.com/Wakanda/NG-Wakanda-Pack/) repository.
 
 
 ## EXPERIMENTAL
@@ -26,7 +25,7 @@ Install with [bower](http://bower.io):
 bower install angular-wakanda
 ```
 
-Add a `<script>` tags to your `index.html`:
+Add a `<script>` tag to your `index.html`:
 
 ```html
 <script src="/bower_components/angular/angular.min.js"></script>
@@ -49,11 +48,12 @@ $wakanda.init().then(function (ds) {
 });
 ```
 
-## Documentation
+## Resources
 
-[Tutorial](http://ng-wakanda-pack.us.wak-apps.com/) 
-& [Documentation](https://github.com/AMorgaut/NG-Wakanda-Pack/blob/master/API-DOC.md) 
-are curently available in the [NG-Wakanda-Pack](https://github.com/AMorgaut/NG-Wakanda-Pack/).
+* [Tutorial](https://wakanda.github.io/NG-Wakanda-Pack)
+* [Documentation](http://doc.wakanda.org/Wakanda/help/Title/en/page4419.html)
+* [Home page](http://www.wakanda.org/angular-wakanda/)
+* [Bug tracker](http://beetle.wakanda.org/)
 
 ## License 
 
