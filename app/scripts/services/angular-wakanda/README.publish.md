@@ -54,6 +54,7 @@ $wakanda.init().then(function (ds) {
 * [Documentation](http://doc.wakanda.org/Wakanda/help/Title/en/page4419.html)
 * [Home page](http://www.wakanda.org/angular-wakanda/)
 * [Bug tracker](http://beetle.wakanda.org/)
+* [Yeoman generator](https://www.npmjs.org/package/generator-angular-wakanda)
 
 ## License 
 
