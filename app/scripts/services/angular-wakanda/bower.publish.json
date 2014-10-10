@@ -1,10 +1,20 @@
 {
   "name": "angular-wakanda",
   "version": "<%=version%>",
-  "keywords": ["angular", "angular.js", "angularjs", "wakanda", "wakandadb", "nosql", "ssjs"],
-  "description": "Provides a full proxy of WakandaDB NoSQL DataModels with its relationships & methods in Angular",
-  "homepage": "http://ng-wakanda-pack.us.wak-apps.com/",
+  "keywords": [
+    "angular",
+    "angular.js",
+    "angularjs",
+    "wakanda",
+    "wakandadb",
+    "nosql",
+    "ssjs"
+  ],
+  "description": "[Experimental] Provides a full proxy of WakandaDB NoSQL DataModels with its relationships & methods in Angular",
+  "homepage": "http://www.wakanda.org/angular-wakanda/",
   "main": "./angular-wakanda.min.js",
+  "license": "MIT",
+  "ignore": [],
   "dependencies": {
     "angular": "~1.2"
   }
