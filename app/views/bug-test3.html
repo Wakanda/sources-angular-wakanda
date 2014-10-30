@@ -1,0 +1,11 @@
+<div class="view-bug-test3" ng-cloak>
+  <h3>Bug Test 3</h3>
+  <div db-state init-collapsed="true" change-callback="display()"></div>
+  <button ng-click="launchSaveCollection()">launchSaveCollection</button>
+  <ul>
+    <li ng-repeat="employee in employees">{{employee.ID}} - {{employee.firstName}} {{employee.lastName}}</li>
+  </ul>
+  <ul>
+    <li ng-repeat="company in companies">{{company.ID}} - {{company.name}}</li>
+  </ul>
+</div>
