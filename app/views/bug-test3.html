@@ -2,10 +2,16 @@
   <h3>Bug Test 3</h3>
   <div db-state init-collapsed="true" change-callback="display()"></div>
   <button ng-click="launchSaveCollection()">launchSaveCollection</button>
+  <p>Employees</p>
   <ul>
-    <li ng-repeat="employee in employees">{{employee.ID}} - {{employee.firstName}} {{employee.lastName}}</li>
+    <li ng-repeat="employee in employees">ID : {{employee.ID}} - {{employee.firstName}} {{employee.lastName}} - company : {{employee.employer.name}}</li>
   </ul>
+  <p>Companies</p>
   <ul>
-    <li ng-repeat="company in companies">{{company.ID}} - {{company.name}}</li>
+    <li ng-repeat="company in companies">{{company.ID}} - {{company.name}}
+      <ul>
+        <li ng-repeat="employee in company.staff">{{employee.ID}} - {{employee.firstName}} {{employee.lastName}}</li>
+      </ul>
+    </li>
   </ul>
 </div>
