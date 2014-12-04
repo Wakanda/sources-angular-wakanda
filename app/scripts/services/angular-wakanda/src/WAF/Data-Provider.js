@@ -3300,9 +3300,16 @@ WAF.EntityAttributeRelated.setValue = function(relatedEntity)
 	this.dataURI = null;
 	if (relatedEntity == null) {
 		this.relKey = null;
-    } else {
-		this.relKey = relatedEntity.getKey();
-    }
+	} else {
+		if(relatedEntity instanceof WAF.Entity) {
+			this.relKey = relatedEntity.getKey();
+		} else {
+			if(this.relKey !== relatedEntity) {
+				this.relEntity = null;
+				this.relKey = relatedEntity;
+			}
+		}
+	}
 }
 
 
@@ -3562,6 +3569,9 @@ WAF.Entity = function(dataClass, rawData, options)
 	this.isTouched = WAF.Entity.isTouched;
 	this.save = WAF.Entity.save;
 	this.remove = WAF.Entity.remove;
+	this.lock = WAF.Entity.lock;
+	this.unlock = WAF.Entity.unlock;
+	this._dolock = WAF.Entity._dolock;
 	this.serverRefresh = WAF.Entity.serverRefresh;
 	
 	var isnew = false;
@@ -3722,6 +3732,57 @@ WAF.Entity.serverRefresh = function(options, userData)
 	
 }
 
+
+WAF.Entity.lock = function(options, userdata)
+{
+	this._dolock(true, options || null, userdata || null);
+}
+
+WAF.Entity.unlock = function(options, userdata)
+{
+	this._dolock(false, options || null, userdata || null);
+}
+
+WAF.Entity._dolock = function(mustlock, options, userdata)
+{
+	var entity = this;
+	var resOp = WAF.tools.handleArgs(arguments, 1);
+	userData = resOp.userData;
+	options = resOp.options;
+	var dataClass = entity.getDataClass();
+	var dataClassName = dataClass.getName();
+	var key = entity.getKey();
+	
+	var request = new WAF.core.restConnect.restRequest(true);
+	
+	request.resource = dataClassName+"("+key+")";
+	request.mustlock = mustlock;	
+	
+	request.handler = function()
+	{
+		if (request.http_request.readyState != 4) {
+            return;
+        }
+		
+		var lockresult = false;
+		var error = false;
+		var err = null;
+		var result = WAF.getRequestResult(request);
+		if (result.__ERROR != null)
+		{
+			error = true;
+			err = result.__ERROR;
+		}
+		else
+		{
+			lockresult = result.result;
+		}
+		
+		var event = {entity:entity, result:lockresult};
+		WAF.callHandler(error, err, event, options, userData);
+	}
+	 var errorFlag = request.go();
+}
 
 WAF.Entity.remove = function(options, userData)
 {

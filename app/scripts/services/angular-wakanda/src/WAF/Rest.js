@@ -523,6 +523,12 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 			queryString += (!deja$ ? "$metadata=" : "&$metadata=") + this.metadata;
 			deja$ = true;
 		}
+		// $lock
+		if (this.mustlock != null)
+		{
+			queryString += (!deja$ ? "$lock=" : "&$lock=") + this.mustlock;
+			deja$ = true;
+		}
 		// $distinct
 		if (this.distinct)
 		{
