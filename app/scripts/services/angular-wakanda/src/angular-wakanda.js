@@ -119,7 +119,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 //        console.group('prepare.wafDataClasses()', dataStore);
         for (dataClassName in dataStore) {
           if (dataStore.hasOwnProperty(dataClassName) && dataClassName !== "_private" && /^\$.*/.test(dataClassName) === false) {            
-//            console.group('DataClass[%s]', dataStore[dataClassName]._private.className, dataStore[dataClassName]);
+//            console.group('DataClass[%s]', dataStore[dataClassName].getName(), dataStore[dataClassName]);
             prepare.wafDataClassAddMetas(dataStore[dataClassName]);
             prepare.wafDataClassCreateNgWakEntityClasses(dataStore[dataClassName]);
             prepare.wafDataClassCreateRefCache(dataStore[dataClassName]);
@@ -180,7 +180,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           return entityMethods;
         };
         
-        dataClass.$name = dataClass._private.className;
+        dataClass.$name = dataClass.getName();
         
         dataClass.$collectionName = dataClass._private.collectionName;
         
@@ -194,8 +194,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       wafDataClassCreateNgWakEntityClasses : function(dataClass){
         var proto;
         proto = prepareHelpers.createUserDefinedEntityMethods(dataClass);
-        NgWakEntityClasses[dataClass._private.className] = NgWakEntityAbstract.extend(proto);
-        ds[dataClass._private.className].$Entity = NgWakEntityClasses[dataClass._private.className].prototype;
+        NgWakEntityClasses[dataClass.getName()] = NgWakEntityAbstract.extend(proto);
+        ds[dataClass.getName()].$Entity = NgWakEntityClasses[dataClass.getName()].prototype;
       },
       wafDataClassCreateRefCache : function(dataClass){
         dataClass.$refCache = new NgWakEntityCache();
@@ -471,7 +471,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      * @returns {NgWakEntity}
      */
     var $$create = function(pojo){
-      var dataClassName = this._private.className,
+      var dataClassName = this.getName(),
           ngWakEntity;
       pojo = typeof pojo === "undefined" ? {} : pojo;
       ngWakEntity = new NgWakEntityClasses[dataClassName]();
