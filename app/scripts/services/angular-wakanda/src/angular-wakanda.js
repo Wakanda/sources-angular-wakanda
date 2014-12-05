@@ -129,28 +129,24 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 //        console.groupEnd();
       },
       wafDataClassAddMetas : function(dataClass){
-        var methodName,
+        var methodInfo,
             dataClassMethods = [],
             collectionMethods = [],
             entityMethods = [],
             attributes,
             attributeName;
-
-        for(methodName in dataClass._private.dataClassMethodRefs){
-          if(dataClass._private.dataClassMethodRefs.hasOwnProperty(methodName)){
-            dataClassMethods.push(methodName);
-          }
-        }
     
-        for(methodName in dataClass._private.entityCollectionMethodRefs){
-          if(dataClass._private.entityCollectionMethodRefs.hasOwnProperty(methodName)){
-            collectionMethods.push(methodName);
-          }
-        }
-    
-        for(methodName in dataClass._private.entityMethodRefs){
-          if(dataClass._private.entityMethodRefs.hasOwnProperty(methodName)){
-            entityMethods.push(methodName);
+        for(methodInfo in dataClass.getMethodList()){
+          switch(methodInfo.applyTo){
+            case "entity" :
+              entityMethods.push(methodInfo.name);
+              break;
+            case "entityCollection" :
+              collectionMethods.push(methodInfo.name);
+              break;
+            case "dataClass" :
+              dataClassMethods.push(methodInfo.name);
+              break;
           }
         }
         
