@@ -121,6 +121,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           if (dataStore.hasOwnProperty(dataClassName) && dataClassName !== "_private" && /^\$.*/.test(dataClassName) === false) {            
 //            console.group('DataClass[%s]', dataStore[dataClassName].getName(), dataStore[dataClassName]);
             prepare.wafDataClassAddMetas(dataStore[dataClassName]);
+            prepare.wafDataClassAddDataClassMethods(dataStore[dataClassName]);
             prepare.wafDataClassCreateNgWakEntityClasses(dataStore[dataClassName]);
             prepare.wafDataClassCreateRefCache(dataStore[dataClassName]);
 //            console.groupEnd();
@@ -136,7 +137,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             attributes,
             attributeName;
     
-        dataClass.getMethodList().forEach(function(methodInfo){
+        angular.forEach(dataClass.getMethodList(),function(methodInfo){
           switch(methodInfo.applyTo){
             case "entity" :
               entityMethods.push(methodInfo.name);
@@ -187,6 +188,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         }
         
       },
+      wafDataClassAddDataClassMethods : function(dataClass) {
+        prepareHelpers.createUserDefinedDataClassMethods(dataClass);
+      },
       wafDataClassCreateNgWakEntityClasses : function(dataClass){
         var proto;
         proto = prepareHelpers.createUserDefinedEntityMethods(dataClass);
@@ -229,6 +233,32 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
         }
         return proto;
+      },
+      createUserDefinedDataClassMethods: function(dataClass) {
+        angular.forEach(dataClass.$dataClassMethods(),function(methodName){
+          dataClass[methodName] = function(){
+            var defer = $q.defer();
+            dataClass.callMethod({
+              method: methodName,
+              onSuccess: function(event){
+                defer.resolve(event);
+              },
+              onError: function(error){
+                console.error('userDataClassMethods.onError','error', error);
+                defer.reject(error);
+              },
+              arguments : arguments.length > 0 ? Array.prototype.slice.call(arguments,0) : []
+            });
+            return defer.promise;
+          };
+          dataClass[methodName+'Sync'] = function(){
+            return dataClass.callMethod({
+              method: methodName,
+              sync: true,
+              arguments : arguments.length > 0 ? Array.prototype.slice.call(arguments,0) : []
+            });
+          };
+        });
       },
       wakandaUserDefinedMethodToPromisableMethods : function(proto, methodName, method){
 
