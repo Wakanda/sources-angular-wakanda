@@ -136,7 +136,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             attributes,
             attributeName;
     
-        for(methodInfo in dataClass.getMethodList()){
+        dataClass.getMethodList().forEach(function(methodInfo){
           switch(methodInfo.applyTo){
             case "entity" :
               entityMethods.push(methodInfo.name);
@@ -148,7 +148,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               dataClassMethods.push(methodInfo.name);
               break;
           }
-        }
+        });
         
         attributes = dataClass._private.attributesByName;
         
@@ -178,7 +178,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         
         dataClass.$name = dataClass.getName();
         
-        dataClass.$collectionName = dataClass._private.collectionName;
+        dataClass.$collectionName = dataClass.getCollectionName();
         
         for(attributeName in attributes){
           if(attributes[attributeName].identifying === true){
