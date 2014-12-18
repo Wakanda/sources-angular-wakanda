@@ -5,6 +5,9 @@ Understand this module is still under development and the current releases are a
 
 The versions provided can be unstable, the features may not be finished. I'll try to keep this document up to date (it may not be completly accurate).
 
+##v0.4.1
+* remove logs on prod build - merge PR from @paulsouche
+
 ##v0.4.0
 * switched dataClass methods to async by default (if you use some, they now return a promise on which you can attach `.then()`). If you want to keep the previous behavior, you can call the synchronuous version with the sufix "Sync".
 

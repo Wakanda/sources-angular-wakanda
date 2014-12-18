@@ -8,21 +8,24 @@ module.exports = function(grunt) {
     'src/WAF/Data-Provider.js',
     'src/angular-wakanda.js'
   ];
-  
+
   var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' + '<%= grunt.template.today("yyyy-mm-dd") %> */';
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-concat-sourcemap');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
-  
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     uglify:{
       prod:{
         options:{
           banner: banner,
-          wrap: true
+          wrap: true,
+          compress: {
+            drop_console: true
+          }
         },
         files: {
           'angular-wakanda.min.js': files
@@ -97,10 +100,10 @@ module.exports = function(grunt) {
       }
     }
   });
-  
+
   grunt.registerTask('build', ['uglify:prod']);
   grunt.registerTask('build-debug', ['uglify:debug']);
-  
+
   //simply call (the following command with your specified version) example : grunt publish:0.5.2
   grunt.registerTask('publish-bowerFile',function(target){
     var bowerJson = grunt.file.readJSON('bower.publish.json');
@@ -109,7 +112,7 @@ module.exports = function(grunt) {
     toJson = toJson.replace('<%=version%>',version);
     grunt.file.write('publish/bower.json',toJson);
   });
-  
+
   //just call grunt publish (will publish the angular connector in publish folder, ready to go for bower with the version number set in the package.json)
   grunt.registerTask('publish',function(){
     var version = grunt.config.get('pkg').version;
@@ -118,5 +121,5 @@ module.exports = function(grunt) {
     grunt.task.run('copy:publishBower');
     grunt.task.run('publish-bowerFile:'+version);
   });
-  
+
 };
