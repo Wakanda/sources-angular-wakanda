@@ -5,6 +5,9 @@ Understand this module is still under development and the current releases are a
 
 The versions provided can be unstable, the features may not be finished. I'll try to keep this document up to date (it may not be completly accurate).
 
+##v0.4.2
+* fixes https://github.com/Wakanda/bower-angular-wakanda/issues/3 (pointer returned by $find is now the same as the one passed in its callback, so that it could be correctly used in promise chaining)
+
 ##v0.4.1
 * remove logs on prod build - merge PR from @paulsouche
 

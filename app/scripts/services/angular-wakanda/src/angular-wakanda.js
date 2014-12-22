@@ -1031,6 +1031,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
 //          console.log('onSuccess', 'processedEvent', event, result.$_collection ? result.$_collection : result.$_entity);
           result.$fetching = false;
+          event.result = result;
           deferred.resolve(event);
         });
       };
