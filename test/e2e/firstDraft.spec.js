@@ -1,6 +1,5 @@
 describe("firstDraft test",function(){
   
-  var ptor = protractor.getInstance();
   var dbStateHelper = require('./helpers/directives/dbStateHelper');
   var e2eHelpers = require('./helpers/e2eHelpers');
   var urlToTest = '/#/e2e-tests/first-draft';
@@ -25,7 +24,7 @@ describe("firstDraft test",function(){
       if(browser.getCurrentUrl().then(function(url){
         if(url.indexOf(urlToTest) === -1){
           console.log('Jump to '+urlToTest);
-          ptor.get(urlToTest);
+          browser.get(urlToTest);
         }
       }));
     });
@@ -33,7 +32,7 @@ describe("firstDraft test",function(){
     describe("> check we are on the correct page", function(){
 
       it("> should have a title",function(){
-        expect(ptor.getTitle()).toBe("angular-wakanda-front");
+        expect(browser.getTitle()).toBe("angular-wakanda-front");
       });
 
       it("> should have an h3 tag",function(){
@@ -55,7 +54,7 @@ describe("firstDraft test",function(){
       });
       
       it("> check first and last employee of the first raw page",function(){
-        ptor.findElements(by.repeater("employee in employees")).then(function(employees){
+        browser.findElements(by.repeater("employee in employees")).then(function(employees){
           //test first line
           expect(getFirstName(employees[0])).toBe('HARRY');
           expect(getLastName(employees[0])).toBe('LUHEJI');
@@ -77,13 +76,13 @@ describe("firstDraft test",function(){
         
         it("employees should be correctly ordered", function(){
         
-          ptor.findElements(by.css("ul.ordering select option")).then(function(options){
+          browser.findElements(by.css("ul.ordering select option")).then(function(options){
             options.map(function(item){
               item.getText().then(function(text){
                 if(text === "lastName asc"){
                   console.log(">>clicking on select option",text);
                   item.click().then(function(){
-                    ptor.findElements(by.repeater("employee in employees")).then(function(employees){
+                    browser.findElements(by.repeater("employee in employees")).then(function(employees){
                       //test first line
                       expect(getFirstName(employees[0])).toBe('ARLEN');
                       expect(getLastName(employees[0])).toBe('AHLARS');
@@ -112,9 +111,9 @@ describe("firstDraft test",function(){
           it("should go to next page", function(){
 
             console.log(">>clicking on employees.$nextPage()");
-            ptor.findElement(by.css('[ng-click="employees.$nextPage()"]')).click().then(function(){
+            browser.findElement(by.css('[ng-click="employees.$nextPage()"]')).click().then(function(){
 
-              ptor.findElements(by.repeater("employee in employees")).then(function(employees){
+              browser.findElements(by.repeater("employee in employees")).then(function(employees){
                 //test first line
                 expect(getFirstName(employees[0])).toBe('JEWEL');
                 expect(getLastName(employees[0])).toBe('BAGOSO');
@@ -138,9 +137,9 @@ describe("firstDraft test",function(){
           it("should go to previous page (first page)", function(){
 
             console.log(">>clicking on employees.$prevPage()");
-            ptor.findElement(by.css('[ng-click="employees.$prevPage()"]')).click().then(function(){
+            browser.findElement(by.css('[ng-click="employees.$prevPage()"]')).click().then(function(){
 
-              ptor.findElements(by.repeater("employee in employees")).then(function(employees){
+              browser.findElements(by.repeater("employee in employees")).then(function(employees){
                 //test first line
                 expect(getFirstName(employees[0])).toBe('ARLEN');
                 expect(getLastName(employees[0])).toBe('AHLARS');
@@ -169,7 +168,7 @@ describe("firstDraft test",function(){
           
           //TODO beforeAll or once
           beforeEach(function(){
-            var input = ptor.findElement(by.css(".filtering input[type=text]"));
+            var input = browser.findElement(by.css(".filtering input[type=text]"));
             input.getAttribute('value').then(function(value){
               if(value !== filterBy){
                 console.log('>> filtering by '+filterBy);
@@ -185,7 +184,7 @@ describe("firstDraft test",function(){
           
           it("collection - check elements", function(){
 
-            ptor.findElements(by.repeater("employee in employees")).then(function(employees){
+            browser.findElements(by.repeater("employee in employees")).then(function(employees){
               //test first line
               expect(getFirstName(employees[0])).toBe('CHARMAINE');
               expect(getLastName(employees[0])).toBe('TROPETHO');

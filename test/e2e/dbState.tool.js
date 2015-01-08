@@ -9,7 +9,6 @@
  */
 describe("dbState directive",function(){
   
-  var ptor = protractor.getInstance();
   var dbStateHelper = require('./helpers/directives/dbStateHelper');
   var urlToTest = '/#/e2e-tests/db-state';
   
@@ -19,7 +18,7 @@ describe("dbState directive",function(){
       if(browser.getCurrentUrl().then(function(url){
         if(url.indexOf(urlToTest) === -1){
           console.log('Jump to '+urlToTest);
-          ptor.get(urlToTest);
+          browser.get(urlToTest);
         }
       }));
     });
@@ -27,7 +26,7 @@ describe("dbState directive",function(){
     describe("> check we are on the correct page", function(){
 
       it("> shoud have a title",function(){
-        expect(ptor.getTitle()).toBe("angular-wakanda-front");
+        expect(browser.getTitle()).toBe("angular-wakanda-front");
       });
 
       it("> shoud have an h3 tag",function(){

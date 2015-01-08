@@ -5,8 +5,6 @@ module.exports = {
   
   launch : function(list, start){
     
-    var ptor = protractor.getInstance();
-    
     start = typeof start === 'undefined' ? 0 : start;
     
     //checking for unallowed methods
@@ -24,7 +22,7 @@ module.exports = {
     
     beforeEach(function(){
       //display if not displayed
-      ptor.findElement(by.css('h3#directory-state-title+div')).then(function(div){
+      browser.findElement(by.css('h3#directory-state-title+div')).then(function(div){
         div.isDisplayed().then(function(displayed){
           if(displayed === false){
             element(by.id('directory-state-title')).click();
