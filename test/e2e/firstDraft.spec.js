@@ -80,7 +80,6 @@ describe("firstDraft test",function(){
             options.map(function(item){
               item.getText().then(function(text){
                 if(text === "lastName asc"){
-                  console.log(">>clicking on select option",text);
                   item.click().then(function(){
                     browser.findElements(by.repeater("employee in employees")).then(function(employees){
                       //test first line
@@ -110,7 +109,6 @@ describe("firstDraft test",function(){
         
           it("should go to next page", function(){
 
-            console.log(">>clicking on employees.$nextPage()");
             browser.findElement(by.css('[ng-click="employees.$nextPage()"]')).click().then(function(){
 
               browser.findElements(by.repeater("employee in employees")).then(function(employees){
@@ -136,7 +134,6 @@ describe("firstDraft test",function(){
 
           it("should go to previous page (first page)", function(){
 
-            console.log(">>clicking on employees.$prevPage()");
             browser.findElement(by.css('[ng-click="employees.$prevPage()"]')).click().then(function(){
 
               browser.findElements(by.repeater("employee in employees")).then(function(employees){
@@ -171,7 +168,6 @@ describe("firstDraft test",function(){
             var input = browser.findElement(by.css(".filtering input[type=text]"));
             input.getAttribute('value').then(function(value){
               if(value !== filterBy){
-                console.log('>> filtering by '+filterBy);
                 input.sendKeys(filterBy,protractor.Key.ENTER);
               }
             });

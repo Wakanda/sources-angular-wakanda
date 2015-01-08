@@ -39,9 +39,9 @@ describe("directoryStandAlone test", function(){
               expect(browser.findElement(by.css(".logged-in-error")).isDisplayed()).toBe(false);
               expect(browser.findElement(by.css(".logged-in .last-name")).getText()).toBe('LUHEJI');
               expect(browser.findElement(by.css(".logged-in .first-name")).getText()).toBe('HARRY');
-              browser.findElement(by.css(".logged-in-error")).getText().then(function(text){
-                console.log('logged-in-error',text);
-              });
+//              browser.findElement(by.css(".logged-in-error")).getText().then(function(text){
+//                console.log('logged-in-error',text);
+//              });
             });
           });
         
@@ -93,9 +93,9 @@ describe("directoryStandAlone test", function(){
             employees[2].click().then(function(){
               expect(browser.findElement(by.css(".logged-in")).isDisplayed()).toBe(false);
               expect(browser.findElement(by.css(".logged-in-error")).isDisplayed()).toBe(true);
-              browser.findElement(by.css(".logged-in-error")).getText().then(function(text){
-                console.log('logged-in-error',text);
-              });
+//              browser.findElement(by.css(".logged-in-error")).getText().then(function(text){
+//                console.log('logged-in-error',text);
+//              });
             });
           });
         
