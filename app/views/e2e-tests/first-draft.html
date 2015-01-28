@@ -4,7 +4,12 @@
   <div>
     <h3>Employees list</h3>
     <ul class="employees-list">
-      <li ng-repeat="employee in employees"><span class="last-name">{{employee.lastName}}</span>, <span class="first-name">{{employee.firstName}}</span> - <span class="salary">{{employee.salary | currency}}</span> - <span class="employer-name" title="Select this company" ng-click="selectCompany(employee.employer)">{{employee.employer.name}}</span></li>
+      <li ng-repeat="employee in employees"><span class="last-name">
+        {{employee.lastName}}</span>, <span class="first-name">{{employee.firstName}}</span>
+        - <span class="salary">{{employee.salary | currency}}</span>
+        - <span class="employer-name" title="Select this company" ng-click="selectCompany(employee.employer)">{{employee.employer.name}}</span>
+        - <span class="edit-employee" title="Edit employee" ng-click="editEmployee(employee)">edit employee</span>
+      </li>
     </ul>
     <h4>Infos</h4>
     <ul class="infos">
@@ -37,6 +42,19 @@
     <ul class="filtering">
       <li>Type any filter on employees (like <code>lastName=tr*</code>) <input type="text" ng-model="filter" ng-keyup="applyFilter($event.keyCode)"></li>
     </ul>
+    <h4>Manipulating data</h4>
+    <h5>Employee</h5>
+    <form id="form-data-manipulation">
+      <div class="form-group">
+        <label for="input-employee-first-name">First Name</label>
+        <input class="form-control" id="input-employee-first-name" placeholder="First name" ng-model="currentEmployee.firstName">
+      </div>
+      <div class="form-group">
+        <label for="input-employee-last-name">Last name</label>
+        <input class="form-control" id="input-employee-last-name" placeholder="Last name" ng-model="currentEmployee.lastName">
+      </div>
+      <button type="submit" class="btn btn-default" ng-click="saveEmployeeEdits()" ng-show="currentEmployee" id="save-employee">Save</button>
+    </form>
   </div>
   <div class="company" ng-show="company">
     <hr>

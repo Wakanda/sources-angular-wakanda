@@ -45,6 +45,17 @@ angular.module('angularWakandaFrontApp')
         }
       };
       
+      $scope.editEmployee = function(employee){
+        window.scrollTo(0,document.body.clientHeight);
+        $scope.currentEmployee = employee;
+      };
+      
+      $scope.saveEmployeeEdits = function(){
+        $scope.currentEmployee.$save().then(function(){
+          $scope.currentEmployee = null;
+        });
+      };
+      
       $scope.selectCompany = function(myCompany){
         console.log(myCompany,myCompany.staff, typeof myCompany.staff);
         if(typeof myCompany.staff === 'undefined'){
