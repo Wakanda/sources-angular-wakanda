@@ -4,8 +4,8 @@
   <div>
     <h3>Employees list</h3>
     <ul class="employees-list">
-      <li ng-repeat="employee in employees"><span class="last-name">
-        {{employee.lastName}}</span>, <span class="first-name">{{employee.firstName}}</span>
+      <li ng-repeat="employee in employees">
+        <span class="last-name">{{employee.lastName}}</span>, <span class="first-name">{{employee.firstName}}</span>
         - <span class="salary">{{employee.salary | currency}}</span>
         - <span class="employer-name" title="Select this company" ng-click="selectCompany(employee.employer)">{{employee.employer.name}}</span>
         - <span class="edit-employee" title="Edit employee" ng-click="editEmployee(employee)">edit employee</span>
@@ -53,7 +53,7 @@
         <label for="input-employee-last-name">Last name</label>
         <input class="form-control" id="input-employee-last-name" placeholder="Last name" ng-model="currentEmployee.lastName">
       </div>
-      <button type="submit" class="btn btn-default" ng-click="saveEmployeeEdits()" ng-show="currentEmployee" id="save-employee">Save</button>
+      <button type="submit" class="btn btn-default" ng-click="saveEmployeeEdits()" ng-show="currentEmployee.firstName && currentEmployee.lastName" id="save-employee">Save</button>
     </form>
   </div>
   <div class="company" ng-show="company">

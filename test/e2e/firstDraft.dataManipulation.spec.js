@@ -1,4 +1,4 @@
-describe("firstDraft test",function(){
+describe("firstDraft test - data manipulation",function(){
   
   var dbStateHelper = require('./helpers/directives/dbStateHelper');
   var e2eHelpers = require('./helpers/e2eHelpers');
@@ -72,133 +72,40 @@ describe("firstDraft test",function(){
         });
       });
       
-      describe("> orderBy lastName asc",function(){
+      describe("> click on the first employee - and modify it", function(){
         
-        it("employees should be correctly ordered", function(){
-        
-          browser.findElements(by.css("ul.ordering select option")).then(function(options){
-            options.map(function(item){
-              item.getText().then(function(text){
-                if(text === "lastName asc"){
-                  item.click().then(function(){
-                    browser.findElements(by.repeater("employee in employees")).then(function(employees){
-                      //test first line
-                      expect(getFirstName(employees[0])).toBe('ARLEN');
-                      expect(getLastName(employees[0])).toBe('AHLARS');
-                      getSalary(employees[0]).then(function(salary){
-                        expect(e2eHelpers.filters.unCurrency(salary)).toBe(33226);
-                      });
-                      expect(getEmployer(employees[0])).toBe('Network Rocket See');
-                      //test last line
-                      expect(getFirstName(employees[9])).toBe('CHARITY');
-                      expect(getLastName(employees[9])).toBe('BADONE');
-                      getSalary(employees[9]).then(function(salary){
-                        expect(e2eHelpers.filters.unCurrency(salary)).toBe(29647);
-                      });
-                      expect(getEmployer(employees[9])).toBe('Earth Sable Andloging');
-                    });
-                  });
-                }
-              });
-            });
-          });
+        beforeEach(function(){
+          
+          element.all(by.repeater("employee in employees")).first().element(by.css('.edit-employee')).click();
+          browser.driver.sleep(10);
+          browser.waitForAngular();
+          element(by.model("currentEmployee.firstName")).sendKeys('toto');
+          element(by.model("currentEmployee.lastName")).sendKeys('toto');
+          element(by.id("save-employee")).click();
+          browser.driver.sleep(10);
+          browser.waitForAngular();
           
         });
         
-        describe("> pagination on ordered collection",function(){
-        
-          it("should go to next page", function(){
-
-            browser.findElement(by.css('[ng-click="employees.$nextPage()"]')).click().then(function(){
-
-              browser.findElements(by.repeater("employee in employees")).then(function(employees){
-                //test first line
-                expect(getFirstName(employees[0])).toBe('JEWEL');
-                expect(getLastName(employees[0])).toBe('BAGOSO');
-                getSalary(employees[0]).then(function(salary){
-                  expect(e2eHelpers.filters.unCurrency(salary)).toBe(134731);
-                });
-                expect(getEmployer(employees[0])).toBe('Month Business Plane');
-                //test last line
-                expect(getFirstName(employees[9])).toBe('AMADO');
-                expect(getLastName(employees[9])).toBe('BARENE');
-                getSalary(employees[9]).then(function(salary){
-                  expect(e2eHelpers.filters.unCurrency(salary)).toBe(58185);
-                });
-                expect(getEmployer(employees[9])).toBe('Moon Developing Tree');
-              });
-
-            });
-
-          });
-
-          it("should go to previous page (first page)", function(){
-
-            browser.findElement(by.css('[ng-click="employees.$prevPage()"]')).click().then(function(){
-
-              browser.findElements(by.repeater("employee in employees")).then(function(employees){
-                //test first line
-                expect(getFirstName(employees[0])).toBe('ARLEN');
-                expect(getLastName(employees[0])).toBe('AHLARS');
-                getSalary(employees[0]).then(function(salary){
-                  expect(e2eHelpers.filters.unCurrency(salary)).toBe(33226);
-                });
-                expect(getEmployer(employees[0])).toBe('Network Rocket See');
-                //test last line
-                expect(getFirstName(employees[9])).toBe('CHARITY');
-                expect(getLastName(employees[9])).toBe('BADONE');
-                getSalary(employees[9]).then(function(salary){
-                  expect(e2eHelpers.filters.unCurrency(salary)).toBe(29647);
-                });
-                expect(getEmployer(employees[9])).toBe('Earth Sable Andloging');
-              });
-
-            });
-
-          });
+        describe('> reload the page (to check persistance)',function(){
           
-        });
-        
-        describe("> filtering on ordered collection", function(){
-          
-          var filterBy = "lastName=tr*";
-          
-          //TODO beforeAll or once
           beforeEach(function(){
-            var input = browser.findElement(by.css(".filtering input[type=text]"));
-            input.getAttribute('value').then(function(value){
-              if(value !== filterBy){
-                input.sendKeys(filterBy,protractor.Key.ENTER);
-              }
-            });
+            
+            browser.get(urlToTest);
+            
           });
-          
-          it("collection should contain 2 elements", function(){
-            var list = element.all(by.css('.employees-list li'));
-            expect(list.count()).toBe(2);
-          });
-          
-          it("collection - check elements", function(){
 
-            browser.findElements(by.repeater("employee in employees")).then(function(employees){
-              //test first line
-              expect(getFirstName(employees[0])).toBe('CHARMAINE');
-              expect(getLastName(employees[0])).toBe('TROPETHO');
-              getSalary(employees[0]).then(function(salary){
-                expect(e2eHelpers.filters.unCurrency(salary)).toBe(82507);
-              });
-              expect(getEmployer(employees[0])).toBe('Earth Sable Andloging');
-              //test last line
-              expect(getFirstName(employees[1])).toBe('LUCIA');
-              expect(getLastName(employees[1])).toBe('TRUCES');
-              getSalary(employees[1]).then(function(salary){
-                expect(e2eHelpers.filters.unCurrency(salary)).toBe(46310);
-              });
-              expect(getEmployer(employees[1])).toBe('Hand Year Papers');
+          it('> modifications should have been takien in account',function(){
+            
+            element.all(by.repeater("employee in employees")).first().element(by.css('.first-name')).getText().then(function(value){
+              expect(value).toBe('HARRYtoto');
             });
-              
+            element.all(by.repeater("employee in employees")).first().element(by.css('.last-name')).getText().then(function(value){
+              expect(value).toBe('LUHEJItoto');
+            });
+            
           });
-          
+
         });
         
       });
