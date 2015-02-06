@@ -17,7 +17,8 @@ angular.module('angularWakandaFrontApp')
                 {href: '/bug-test2', text: 'Bug Test2'},
                 {href: '/bug-test3', text: 'Bug Test3'},
                 {href: '/basics1', text: 'Basics1'},
-                {href: '/basics2', text: 'Basics2'}
+                {href: '/basics2', text: 'Basics2'},
+                {href: '/collection.find', text: 'Collection $find'}
               ],
               'e2e-tests' : [
                 {href: '/e2e-tests/main', text: 'Main'},

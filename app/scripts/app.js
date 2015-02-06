@@ -134,6 +134,11 @@ angular.module('angularWakandaFrontApp', [
                       controller: 'Brut.VanillaDs2Ctrl',
                       resolve: routeResolver
                     })
+                    .when('/collection.find', {
+                      templateUrl: 'views/collection.find.html',
+                      controller: 'CollectionFindCtrl',
+                      resolve: routeResolver
+                    })
                     .otherwise({
                       redirectTo: '/'
                     });
