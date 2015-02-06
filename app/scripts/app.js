@@ -134,6 +134,11 @@ angular.module('angularWakandaFrontApp', [
                       controller: 'Brut.VanillaDs2Ctrl',
                       resolve: routeResolver
                     })
+                    .when('/test4', {
+                      templateUrl: 'views/test4.html',
+                      controller: 'Test4Ctrl',
+                      resolve: routeResolver
+                    })
                     .otherwise({
                       redirectTo: '/'
                     });

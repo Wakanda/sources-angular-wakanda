@@ -1,0 +1,16 @@
+<div class="view-test4" ng-cloak>
+  <h3>Test 4</h3>
+  <div db-state init-async="false" init-collapsed="true" change-callback="init()"></div>
+  <p>Test related entities assignement</p>
+  <h4>Employees ( {{employees.$totalCount}} ) <span ng-click="employees.$prevPage()">&#8592;</span> <span ng-click="employees.$nextPage()">&#8594;</span></h4>
+  <ul>
+    <li ng-repeat="employee in employees">{{employee.firstName}} {{employee.lastName}} - {{employee.employer.name}}</li>
+  </ul>
+  <div>
+    <button ng-click="addEmployee1()">addEmployee1()</button>
+    <button ng-click="addEmployee2()">addEmployee2()</button>
+    <button ng-click="updateEmployee1()">updateEmployee1()</button>
+    <button ng-click="addEmployeeAndCompany1()">addEmployeeAndCompany1()</button>
+    <button ng-click="addEmployeeAndCompany2()">addEmployeeAndCompany2()</button>
+  </div>
+</div>
