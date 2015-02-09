@@ -1,9 +1,11 @@
 <p>This is the collection.find view. <strong>This is only a mock for the moment</strong></p>
-<p>Employee list1 <code>employees1</code> - total : {{employees1.$totalCount}} <span ng-click="employees1.$prevPage()">&lt;</span> <span ng-click="employees1.$nextPage()">&gt;</span></p>
+<p>Employee list1 <code>employees1 = $wakanda.$ds.Employee.$find({filter:"{{filterEmployees1}}"})</code> - total : {{employees1.$totalCount}} <span ng-click="employees1.$prevPage()">&leftarrow;</span> <span ng-click="employees1.$nextPage()">&rightarrow;</span></p>
+<p>Filter on : <input type="text" ng-model="filterEmployees1" ng-keyup="$event.keyCode === 13 ? launchFindEmployees1() : null" style="width: 300px;"/> <button ng-click="launchFindEmployees1()">GO</button></p>
 <ul>
-  <li ng-repeat="employee in employees1">{{employee.firstName}} {{employee.lastName}}</li>
+  <li ng-repeat="employee in employees1">{{employee.firstName}} {{employee.lastName}} ${{employee.salary|number}} - {{employee.employer.name}} - <span ng-click="callEntityMethod(employee)">{{employee.message || "call entity method"}}</span></li>
 </ul>
-<p>Employee list2 <code>employees2</code> -> <code>employees1.$find()</code> - total : {{employees2.$totalCount}} <span ng-click="employees1.$prevPage()">&lt;</span> <span ng-click="employees2.$nextPage()">&gt;</span></p>
-<ul>
-  <li ng-repeat="employee in employees2">{{employee.firstName}} {{employee.lastName}}</li>
+<p>Employee list2 <code>employees2 = employees1.$find({filter:"{{filterEmployees2}}"})</code> - total : {{employees2.$totalCount}} <span ng-click="employees2.$prevPage()">&leftarrow;</span> <span ng-click="employees2.$nextPage()">&rightarrow;</span></p>
+<p>Filter on : <input type="text" ng-model="filterEmployees2" ng-keyup="$event.keyCode === 13 ? launchFindEmployees2() : null" style="width: 300px;"/> <button ng-click="launchFindEmployees2()">GO</button></p>
+<ul> 
+  <li ng-repeat="employee in employees2">{{employee.firstName}} {{employee.lastName}} ${{employee.salary|number}}  - {{employee.employer.name}} - <span ng-click="callEntityMethod(employee)">{{employee.message || "call entity method"}}</span></li>
 </ul>
