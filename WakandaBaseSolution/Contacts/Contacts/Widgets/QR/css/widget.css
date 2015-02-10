@@ -1,0 +1,11 @@
+.waf-widget.waf-qr {
+	 background-color: transparent;
+	 background-image:url("data:image/svg+xml;base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMSAxIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48bGluZWFyR3JhZGllbnQgaWQ9IndhZi1pZS1ncmFkaWVudCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHgyPSIxMDAlIiB5Mj0iMCI+PHN0b3Agc3RvcC1jb2xvcj0iIzdmN2Y3ZiIgb2Zmc2V0PSIwJSIgc3RvcC1vcGFjaXR5PSIxIiAvPjxzdG9wIHN0b3AtY29sb3I9IiNjY2NjY2MiIG9mZnNldD0iMTAwJSIgc3RvcC1vcGFjaXR5PSIxIiAvPjwvbGluZWFyR3JhZGllbnQ+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCN3YWYtaWUtZ3JhZGllbnQpIiAvPjwvc3ZnPg==");
+	 background-image:-webkit-gradient(linear,0% 0%, 100% 0%,color-stop(0, rgb(127,127,127)),color-stop(1, rgb(204,204,204)));
+	 background-image:-webkit-linear-gradient(left, rgb(127,127,127) 0%,rgb(204,204,204) 100%);
+	 background-image:-moz-linear-gradient(left, rgb(127,127,127) 0%,rgb(204,204,204) 100%);
+	 background-image:-ms-linear-gradient(left, rgb(127,127,127) 0%,rgb(204,204,204) 100%);
+	 background-image:-o-linear-gradient(left, rgb(127,127,127) 0%,rgb(204,204,204) 100%);
+	 background-image:linear-gradient(left, rgb(127,127,127) 0%,rgb(204,204,204) 100%);
+	 background-repeat: no-repeat;
+}
