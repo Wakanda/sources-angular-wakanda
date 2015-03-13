@@ -37,7 +37,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             console.error('>$wakanda init > error', event);
             deferred.reject(event);
           },
-          catalog: catalog
+          catalog: catalog,
+          cacheRef: true
         });
       }
       else {
@@ -1377,6 +1378,10 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       
       return deferred.promise;
     };
+
+    //todo remove
+    window.WAF = WAF;
+    //end todo remove
 
     /** returned object */
     
