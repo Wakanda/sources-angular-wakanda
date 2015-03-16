@@ -1066,6 +1066,26 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           configurable: false,
           writable: true
         });
+        //@todo this will be an other getter / setter (for the moment, it points to $_entity)
+        Object.defineProperty(this, "$_tempUUID", {
+          enumerable: false,
+          configurable: false,
+          get: function(){
+            return this.$_entity.$_tempUUID;
+          },
+          set: function(newValue){
+            return this.$_entity.$_tempUUID = newValue;
+          }
+        });
+      },
+      $key : function(){
+        return this.$_entity.getKey();
+      },
+      $stamp : function(){
+        return this.$_entity.getStamp();
+      },
+      $isNew : function(){
+        return this.$_entity.isNew();
       },
       $save : function(){
         console.group('$save');
@@ -1231,8 +1251,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     
     var NgWakEntityAbstract = Class.extend(NgWakEntityAbstractPrototype);
     
-    /** cache @warning work in progress
-     * tried to matche as much of the API of the DataProvider's original cache I could 
+    /**
+     * Caching NgWakEntities by key or UUIDs (for the client side created ones without keys)
+     * 
+     * For the moment no cache size management
+     * 
+     * Tried to matche as much of the API of the DataProvider's original cache I could 
      * while sticking with the specs of the angular-wakanda connector
      */
     
@@ -1246,33 +1270,57 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       options = typeof options === 'undefined' ? {} : options;
       
       this.maxEntities = options.maxEntities || DEFAULT_CACHE_SIZE;
-      this.deep = options.deep || DEFAULT_CACHE_DEEP;
-      this.infos = {};
+      this.entitiesByKey = {};
       this.nbEntries = 0;
       
     };
     
+    /**
+     * A simple way to generate UUIDs - http://stackoverflow.com/a/2117523/2733488
+     */
+    NgWakEntityCache.prototype.generateUUID = function(){
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+          return v.toString(16);
+      });
+    };
+    
     NgWakEntityCache.prototype.setSize = function(size){
-      if (size === null || size < DEFAULT_CACHE_SIZE){
+      if (typeof size !== 'number' || size < DEFAULT_CACHE_SIZE){
         size = DEFAULT_CACHE_SIZE;
       }
       this.maxEntities = size;
     };
     
-    NgWakEntityCache.prototype.setDeep = function(deep){
-      this.deep = deep;
-    };
-    
     NgWakEntityCache.prototype.getCacheInfo = function(key){
-      return this.infos[key] || null;
+      return this.entitiesByKey[key] || null;
     };
     
-    NgWakEntityCache.prototype.replaceCachedEntity = function(key, entity){
-      var cachedEntity = this.getCacheInfo(key);
-      if(cachedEntity !== null && entity.__STAMP > cachedEntity.__STAMP){
-        //update reference @todo related entities
-        cachedEntity = entity;
+    NgWakEntityCache.prototype.setEntry = function(ngWakEntity){
+      var cacheInfo = null;
+      var key = ngWakEntity.$key();
+      var uuid = ngWakEntity.$_tempUUID;
+      //it has a key -> it's already in the db serverside
+      if(key !== null){
+        this.entitiesByKey[key] = ngWakEntity;
+        //remove the entry under the uuid if it was present
+        if(typeof uuid !== 'undefined'){
+          delete this.entitiesByKey[uuid];
+          ngWakEntity.$_tempUUID = null;
+        }
+        this.nbEntries++;
       }
+      //it doesn't have a key, it's not yet saved in the db server side
+      else{
+        uuid = this.generateUUID();
+        ngWakEntity.$_tempUUID = uuid;
+        this.entitiesByKey[uuid] = ngWakEntity;
+        this.nbEntries++;
+      }
+    };
+    
+    NgWakEntityCache.prototype.removeCachedEntity = function(key){
+      
     };
     
     /** end cache */
