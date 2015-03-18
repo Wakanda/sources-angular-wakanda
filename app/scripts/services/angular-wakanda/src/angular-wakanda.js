@@ -499,9 +499,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      */
     var $$create = function(pojo){
       var dataClassName = this.getName(),
-          ngWakEntity;
+          ngWakEntity,
+          wafEntity;
       pojo = typeof pojo === "undefined" ? {} : pojo;
-      ngWakEntity = new NgWakEntityClasses[dataClassName]();
+      wafEntity = new WAF.Entity(this, pojo);
+      ngWakEntity = this.$refCache.getCachedNgWakEntity(wafEntity);
+      //now browse wafEntity to make sure it's cached AND its children are also cached
       reccursiveFillNgWakEntityFromEntity(pojo, ngWakEntity, this);
       return ngWakEntity;
     };
@@ -1060,7 +1063,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     /** Code organization, heritage, objects used (todo : split this into multiple files which should be insject by dependency injection OR module) */
     
     var NgWakEntityAbstractPrototype = {
-      init: function(){
+      init: function(wafEntity){
         Object.defineProperty(this, "$_entity", {
           enumerable: false,
           configurable: false,
@@ -1077,6 +1080,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             return this.$_entity.$_tempUUID = newValue;
           }
         });
+        this.$_entity = wafEntity;
       },
       $key : function(){
         return this.$_entity.getKey();
@@ -1323,6 +1327,24 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       
     };
     
+    NgWakEntityCache.prototype.getCachedNgWakEntity = function(wafEntity){
+      var ngWakEntity;
+      if(wafEntity.isNew() && this.entitiesByKey[wafEntity.$_tempUUID]){
+        return this.entitiesByKey[wafEntity.$_tempUUID];
+      }
+      else if(this.entitiesByKey[wafEntity.getKey()]){
+        //trasverse relatedEntity and relatedEntities attributes - to update them
+        return this.entitiesByKey[wafEntity.getKey()];
+      }
+      //manage : new WAF.Entity, new WAF.Entity from server, 
+      else{
+        ngWakEntity = new NgWakEntityClasses[wafEntity.getDataClass().getName()](wafEntity);
+        //trasverse relatedEntity and relatedEntities attributes
+        this.setEntry(ngWakEntity);
+        return ngWakEntity;
+      }
+    };
+    
     /** end cache */
     
     /** directory */
@@ -1429,6 +1451,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 
     //todo remove
     window.WAF = WAF;
+    window.transform = transform;
     //end todo remove
 
     /** returned object */
