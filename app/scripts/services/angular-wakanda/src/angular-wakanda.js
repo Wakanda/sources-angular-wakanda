@@ -188,6 +188,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
         }
         
+        dataClass.$_relatedAttributes = dataClass.getAttributes().filter(function(attr){
+          if(attr.kind === 'relatedEntity' || attr.kind === 'relatedEntities'){
+            return attr;
+          }
+        });
+        
       },
       wafDataClassAddDataClassMethods : function(dataClass) {
         prepareHelpers.createUserDefinedDataClassMethods(dataClass);
@@ -361,6 +367,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     /** event transformation part */
 
     var transform = {
+      wafToNgWak: function(wafEntity, ngWakEntity){
+        
+      },
       /**
        * Transforms the WAF.Event event and adds a result attribute with the NgWakEntityCollection of the event
        * 
@@ -505,7 +514,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       wafEntity = new WAF.Entity(this, pojo);
       ngWakEntity = this.$refCache.getCachedNgWakEntity(wafEntity);
       //now browse wafEntity to make sure it's cached AND its children are also cached
-      reccursiveFillNgWakEntityFromEntity(pojo, ngWakEntity, this);
+//      reccursiveFillNgWakEntityFromEntity(pojo, ngWakEntity, this);
       return ngWakEntity;
     };
     
@@ -1064,10 +1073,11 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     
     var NgWakEntityAbstractPrototype = {
       init: function(wafEntity){
+        this.$_entity = wafEntity;
         Object.defineProperty(this, "$_entity", {
           enumerable: false,
           configurable: false,
-          writable: true
+          writable: false
         });
         //@todo this will be an other getter / setter (for the moment, it points to $_entity)
         Object.defineProperty(this, "$_tempUUID", {
@@ -1080,7 +1090,38 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             return this.$_entity.$_tempUUID = newValue;
           }
         });
-        this.$_entity = wafEntity;
+        wafEntity.getDataClass().getAttributes().forEach(function(attr){
+          if(attr.kind === 'storage'){
+            Object.defineProperty(this, attr.name, {
+              enumerable: true,
+              configurable: true,
+              get: function(){
+                return this.$_entity[attr.name].getValue();
+              },
+              set: function(newValue){
+                rootScopeSafeApply(function(){
+                  this.$_entity[attr.name].setValue(newValue);
+                }.bind(this));
+              }
+            });
+          }
+          if(attr.kind === 'relatedEntity'){
+            Object.defineProperty(this, attr.name, {
+              enumerable: true,
+              configurable: true,
+              get: function(){
+                if(this.$_entity[attr.name] && this.$_entity[attr.name].relEntity && typeof this.$_entity[attr.name].relEntity.getKey() !== 'undefined'){
+                  return ds[this.$_entity[attr.name].relEntity.getDataClass().getName()].$refCache.getCachedNgWakEntity(this.$_entity[attr.name].relEntity);
+                }
+              },
+              set: function(ngWakEntity){
+                rootScopeSafeApply(function(){
+                  this.$_entity[attr.name].setValue(ngWakEntity.$_entity);
+                }.bind(this));
+              }
+            });
+          }
+        }.bind(this));
       },
       $key : function(){
         return this.$_entity.getKey();
@@ -1340,6 +1381,14 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       else{
         ngWakEntity = new NgWakEntityClasses[wafEntity.getDataClass().getName()](wafEntity);
         //trasverse relatedEntity and relatedEntities attributes
+        if(wafEntity.getDataClass().$_relatedAttributes && wafEntity.getDataClass().$_relatedAttributes.length > 0){
+          wafEntity.getDataClass().$_relatedAttributes.forEach(function(attr){
+            console.log(attr,wafEntity[attr.name]);
+            if(attr.kind === 'relatedEntity' && wafEntity[attr.name] && wafEntity[attr.name].relEntity){
+              var nestedEntity = ds[wafEntity[attr.name].relEntity.getDataClass().getName()].$refCache.getCachedNgWakEntity(wafEntity[attr.name].relEntity);
+            }
+          }.bind(this));
+        }
         this.setEntry(ngWakEntity);
         return ngWakEntity;
       }

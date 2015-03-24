@@ -108,5 +108,5 @@ angular.module('angularWakandaFrontApp')
       });
     };
     
-//    $scope.init();
+    $scope.init();
   });
