@@ -1,6 +1,7 @@
 node_modules
 dist
 .tmp
+*.swp
 .sass-cache
 app/bower_components
 app/scripts/services/angular-wakanda/publish
@@ -23,3 +24,6 @@ WakandaBaseSolution/Contacts/Contacts/*.waSymData
 WakandaBaseSolution/Contacts/Contacts/WebFolder/*
 npm-debug.log
 /published-connector/
+WakandaBaseSolution/Contacts/Contacts Solution/Directory.WakTDef
+app/scripts/services/angular-wakanda/angular-wakanda.debug.min.js
+app/scripts/services/angular-wakanda/angular-wakanda.debug.min.js.map
