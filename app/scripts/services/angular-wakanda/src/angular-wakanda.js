@@ -470,6 +470,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       },
       addFrameworkMethodsToRootCollection: function(result){
         result.$fetch = $$fetch;
+        result.$find = $$find.bind(result.$_collection);
         result.$add = $$add;
         result.$more = $$more;
         result.$nextPage = $$nextPage;
@@ -479,6 +480,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       },
       addFrameworkMethodsToNestedCollection : function(result){
         result.$fetch = $fetchOnNestedCollection;
+        result.$find = $$find.bind(result.$_collection);
         result.$more = $$more;
         result.$nextPage = $$nextPage;
         result.$prevPage = $$prevPage;
