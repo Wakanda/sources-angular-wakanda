@@ -337,30 +337,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       }
     };
 
-    //@temporary study
-    var collectionToNgWakEntityCollection = window.collectionToNgWakEntityCollection = function(wafEntityCollection,options){
-      options = typeof options === 'undefined' ? {} : options;
-      var result = typeof options.result === 'undefined' ? [] : options.result;
-      var start = typeof options.start === 'undefined' ? 0 : options.start;
-      var pageSize = typeof options.pageSize === 'undefined' ? DEFAULT_PAGESIZE_NESTED_COLLECTIONS : options.pageSize;
-      var currentDataClass = wafEntityCollection.getDataClass();
-      wafEntityCollection.forEachInCache({
-        onSuccess: function(item){
-          console.log(item);
-        },
-        first: start,
-//        skip: start,
-        limit: start+pageSize
-      });
-    };
-    
-    //@temporary study
-    var entityToNgWakEntity = function(wafEntity){
-      var currentDataClass = wafEntity.getDataClass();
-      var attributes = currentDataClass.$attr();
-      var wakEntity = new NgWakEntityClasses[currentDataClass.$name]();
-    };
-
     /** event transformation part */
 
     var transform = {
@@ -389,50 +365,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         transform.addFrameworkMethodsToRootCollection(ngWakEntityCollection);
         //add user defined methods for only on the root collection
         transform.addUserDefinedMethodsToCollection(ngWakEntityCollection,true);//@todo @warn refactor for any level / sublevel of collection
-      },
-      /**
-       * Transforms the WAF.Event event and adds a result attribute with the NgWakEntityCollection of the event
-       * 
-       * @param {WAF.Event} event
-       * @param {Boolean} onlyOne
-       * @returns {WAF.Event}
-       */
-      queryEventToNgWakEntityCollection : function(event, onlyOne){
-        var rawEntities,
-            parsedXhrResponse,
-//            userDefinedEntityCollectionMethods,
-            result;
-        parsedXhrResponse = JSON.parse(event.XHR.response);
-        rawEntities = parsedXhrResponse.__ENTITIES;
-//        console.log('rawEntities',rawEntities);
-        result = transform.jsonResponseToNgWakEntityCollection(event.result.getDataClass(), rawEntities);
-        if(onlyOne !== true){
-          result.$_collection = event.result;
-        }
-        else{
-          if(result.length === 1){
-            result = result[0];
-          }
-          else{
-            result = null;
-          }
-        }
-        event.result = result;
-//        console.log('after transform.queryEventToNgWakEntityCollection','event',event);
-        return event;
-      },
-      /**
-       * 
-       * @param {WAF.DataClass} dataClass
-       * @param {Object} xhrResponse
-       * @returns {Object}
-       */
-      jsonResponseToNgWakEntityCollection : function(dataClass,xhrResponse){
-        var ngWakEntityCollection = [];
-        xhrResponse.map(function(pojo){
-          ngWakEntityCollection.push(dataClass.$create(pojo));
-        });
-        return ngWakEntityCollection;
       },
       fetchEventToNgWakEntityCollection : function(event) {
         var result = [],
@@ -507,144 +439,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       pojo = typeof pojo === "undefined" ? {} : pojo;
       wafEntity = new WAF.Entity(this, pojo);
       ngWakEntity = this.$refCache.getCachedNgWakEntity(wafEntity);
-      //now browse wafEntity to make sure it's cached AND its children are also cached
-//      reccursiveFillNgWakEntityFromEntity(pojo, ngWakEntity, this);
       return ngWakEntity;
-    };
-    
-    /**
-     * Fills ngWakEntityNestedObject with entity (deep mode)
-     * Param entity can as well be an Object or a WAF.Entity
-     * 
-     * @param {Object | WAF.Entity} entity
-     * @param {NgWakEntity} ngWakEntityNestedObject
-     * @param {WAF.DataClass} currentDataClass
-     * @returns {undefined}
-     */
-    var reccursiveFillNgWakEntityFromEntity = function(entity, ngWakEntityNestedObject, currentDataClass){
-      var key, defferedKey,
-          attributes = currentDataClass.$attr(),
-          isEntityWafEntity = entity instanceof WAF.Entity,
-          tmpDeferredInfos,
-          imageDeferredAttributesMapping = { //use this hash to change the name of the attributes from the json into the NgWakEntity (not declared attribute will kep same name)
-            'uri' : 'src'
-          };
-  
-      //if no data or entity, do nothing - @todo check
-      if(entity === null || typeof entity === 'undefined'){
-        return;
-      }
-      //attach $_entity pointer (which is an instance of WAF.Entity) from the param entity whatever it is (a pojo or a WAF.Entity) but not on null or empty entities
-      else if(isEntityWafEntity === false){
-        //if this is a deferred, keep a private reference and add a $fetch method - withour creating the $_entity
-        if(entity.__deferred){
-          //case from direct XHR
-          ngWakEntityNestedObject.$_deferred = {
-            uri : entity.__deferred.uri,
-            dataClass : currentDataClass
-          };
-        }
-        else if(entity.value && entity.value.__deferred){
-          //case from getValue (via DataProvider)
-          ngWakEntityNestedObject.$_deferred = {
-            uri : entity.value.__deferred.uri,
-            dataClass : currentDataClass
-          };
-        }
-        else{
-          //only create the $_entity when data is passed
-          ngWakEntityNestedObject.$_entity = new WAF.Entity(currentDataClass, entity);
-        }
-      }
-      else{
-        ngWakEntityNestedObject.$_entity = entity;
-      }
-
-      // set __KEY and __STAMP on the NgWakEntity whatever entity is (a pojo or a WAF.Entity), but only if present (dont set it on null or empty entities)
-      if(isEntityWafEntity){
-        ngWakEntityNestedObject.__KEY = entity.getKey();
-        ngWakEntityNestedObject.__STAMP = entity.getStamp();
-      }
-      else{
-        if(typeof entity.__KEY !== 'undefined'){
-          ngWakEntityNestedObject.__KEY = entity.__KEY;
-        }
-        if(typeof entity.__STAMP !== 'undefined'){
-          ngWakEntityNestedObject.__STAMP = entity.__STAMP;
-        }
-      }
-      
-      //init the values - same way as above : set the values on the NgWakEntity instance from entity whatever entity is (a pojo or a WAF.Entity)
-      for(key in attributes){
-        if(typeof entity[key] !== 'undefined'){
-          if(attributes[key].kind === "storage" || attributes[key].kind === "calculated" || attributes[key].kind === "alias"){
-            if(attributes[key].type === "image"){
-              ngWakEntityNestedObject[key] = {};
-              tmpDeferredInfos = isEntityWafEntity ? entity[key].getValue() : entity[key];
-              if(tmpDeferredInfos && tmpDeferredInfos.__deferred){
-                for (defferedKey in tmpDeferredInfos.__deferred){
-                  ngWakEntityNestedObject[key][imageDeferredAttributesMapping[defferedKey] ? imageDeferredAttributesMapping[defferedKey] : defferedKey] = tmpDeferredInfos.__deferred[defferedKey];
-                }
-              }
-              else{
-                ngWakEntityNestedObject[key][imageDeferredAttributesMapping['uri']] = null;
-              }
-              ngWakEntityNestedObject[key].$upload = $$upload;
-            }
-            else{
-              if(isEntityWafEntity){
-                ngWakEntityNestedObject[key] = entity[key].getValue();
-              }
-              else if(typeof entity[key] !== 'undefined'){
-                ngWakEntityNestedObject[key] = isEntityWafEntity ? entity[key].getValue() : entity[key];
-                if(attributes[key].type === "date" && ngWakEntityNestedObject[key] !== null && ngWakEntityNestedObject[key] instanceof Date === false){
-                  ngWakEntityNestedObject[key] = new Date(ngWakEntityNestedObject[key]);
-                }
-              }
-            }
-          }
-          else if (attributes[key].kind === "relatedEntities") {
-            if(entity[key].__ENTITIES){
-              ngWakEntityNestedObject[key] = transform.jsonResponseToNgWakEntityCollection(attributes[key].getRelatedClass(),entity[key].__ENTITIES);
-              transform.addFrameworkMethodsToNestedCollection(ngWakEntityNestedObject[key]);
-            }
-            else if(entity[key].__deferred){
-              ngWakEntityNestedObject[key] = [];
-              ngWakEntityNestedObject[key].$_deferred = {
-                uri : entity[key].__deferred.uri,
-                dataClass : attributes[key].getRelatedClass(),
-                attr : key
-              };
-              transform.addFrameworkMethodsToNestedCollection(ngWakEntityNestedObject[key]);
-            }
-            //@todo @warn - this part is for the setValue on collection, reactivate it when getting back to it - see also $fetchOnNestedCollection method
-            if(ngWakEntityNestedObject[key]){
-              ngWakEntityNestedObject[key].$_collection = ngWakEntityNestedObject.$_entity[key];
-            }
-//            console.log('ngWakEntityNestedObject.$_entity[key]',ngWakEntityNestedObject.$_entity[key]);
-//            ngWakEntityNestedObject[key].$_collection = ngWakEntityNestedObject.$_entity[key].relEntityCollection;
-//            ngWakEntityNestedObject[key].$_parent = ngWakEntityNestedObject.$_entity;
-//            console.log('ngWakEntityNestedObject.$_entity',ngWakEntityNestedObject.$_entity,'ngWakEntityNestedObject.$_entity.staff',ngWakEntityNestedObject.$_entity.staff);
-            //end of the @todo @warn part
-            //@todo whatever add collection methods - may not be possible - done before
-          }
-          else if (attributes[key].kind === "relatedEntity") {
-            //console.log('relatedEntity',key,entity,entity[key]);
-            //@warn the error is here .relEntity doesn't exist
-            //debugger;
-            ngWakEntityNestedObject[key] = new NgWakEntityClasses[(isEntityWafEntity && entity[key].relEntity) ? entity[key].relEntity.getDataClass().$name : ds[currentDataClass.$name].$attr(key).type]();
-            if(isEntityWafEntity && entity[key].relEntity !== null){
-              reccursiveFillNgWakEntityFromEntity(entity[key].relEntity,ngWakEntityNestedObject[key],entity[key].relEntity.getDataClass());
-            }
-            else{
-//              if(entity[key].getValue) console.warn('deferred1',key,entity[key].value,entity[key].getRawValue());
-//              if(entity[key].__deferred) console.warn('deferred2',key,entity[key].__deferred);
-//              console.log(key,entity[key],ngWakEntityNestedObject[key],ds[ds[currentDataClass.$name].$attr(key).type]);
-              reccursiveFillNgWakEntityFromEntity(entity[key],ngWakEntityNestedObject[key],ds[ds[currentDataClass.$name].$attr(key).type]);
-            }
-          }
-        }
-      }
     };
     
     var $$upload = function(file){
@@ -1031,14 +826,10 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 //      console.log('RESULT',result);
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
-//          console.log('onSuccess', 'originalEvent', event);
-//          transform.queryEventToNgWakEntityCollection(event, onlyOne);
           transform.wafEntityCollectionToNgWakEntityCollection(result, event.result, wakOptions);
-//          transform.asyncResult(event.result, result, deferred.promise);
           if(onlyOne === false){
             updateQueryInfos(result, result.$_collection._private.pageSize, 0, query);
           }
-//          console.log('onSuccess', 'processedEvent', event, result.$_collection ? result.$_collection : result.$_entity);
           result.$fetching = false;
           event.result = result;
           deferred.resolve(event);
