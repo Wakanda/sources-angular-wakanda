@@ -340,15 +340,22 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     /** event transformation part */
 
     var transform = {
-      wafEntityCollectionToNgWakEntityCollection: function(ngWakEntityCollection, wafEntityCollection, options){
+      wafEntityCollectionToNgWakEntityCollection: function(ngWakEntityCollection, wafEntityCollection, wakOptions){
         
-        options = typeof options === 'undefined' ? {} : options;
+        wakOptions = typeof wakOptions === 'undefined' ? {} : wakOptions;
+        mode = (typeof mode === "undefined" || mode === "replace") ? "replace" : mode;
         var currentDataClass = wafEntityCollection.getDataClass();
-        var start = typeof options.start === 'undefined' ? 0 : options.start;
-        var pageSize = typeof options.pageSize === 'undefined' ? DEFAULT_PAGESIZE_NESTED_COLLECTIONS : options.pageSize;
+        var start = typeof wakOptions.start === 'undefined' ? 0 : wakOptions.start;
+        var pageSize = typeof wakOptions.pageSize === 'undefined' ? DEFAULT_PAGESIZE_NESTED_COLLECTIONS : wakOptions.pageSize;
         
-        //adding pointer
-        ngWakEntityCollection.$_collection = wafEntityCollection;
+        //adding pointer if not present + methods
+        if(typeof ngWakEntityCollection.$_collection === 'undefined'){
+          ngWakEntityCollection.$_collection = wafEntityCollection;
+          //update framework collection methods
+          transform.addFrameworkMethodsToRootCollection(ngWakEntityCollection);
+          //add user defined methods for only on the root collection
+          transform.addUserDefinedMethodsToCollection(ngWakEntityCollection,true);//@todo @warn refactor for any level / sublevel of collection
+        }
         
         //populate collection
         wafEntityCollection.forEachInCache({
@@ -360,11 +367,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
   //        skip: start,
           limit: start+pageSize
         });
-        
-        //update framework collection methods
-        transform.addFrameworkMethodsToRootCollection(ngWakEntityCollection);
-        //add user defined methods for only on the root collection
-        transform.addUserDefinedMethodsToCollection(ngWakEntityCollection,true);//@todo @warn refactor for any level / sublevel of collection
       },
       fetchEventToNgWakEntityCollection : function(event) {
         var result = [],
@@ -574,6 +576,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     };
 
     /**
+     * @todo make a $fetchOnNestedCollection wrapping this one
+     * 
      * Applied to arrays of pojos representing collections
      * 
      * @param {Object} options
@@ -609,24 +613,21 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       });
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
-//          console.log('onSuccess', 'originalEvent', event);
-          transform.fetchEventToNgWakEntityCollection(event);
           if(mode === 'replace'){
             that.length = 0;
-            for(var i=0; i<event.result.length; i++){
-              that[i] = event.result[i];
+            for(var i=0; i<event.entities.length; i++){
+              that[i] = event.result.getDataClass().$refCache.getCachedNgWakEntity(event.entities[i]);
             }
           }
           else if(mode === 'append'){
-            for(var i=0; i<event.result.length; i++){
-//              console.log(event.result[i]);
-              that.push(event.result[i]);
+            for(var i=0; i<event.entities.length; i++){
+              that.push( event.result.getDataClass().$refCache.getCachedNgWakEntity(event.entities[i]) );
             }
           }
           updateQueryInfos(that, options.pageSize || that.$_collection._private.pageSize, skip);
 //          console.log('onSuccess', 'processedEvent', event);
           that.$fetching = false;
-          deferred.resolve(event);
+          deferred.resolve(event);//@warn what is passing on the resolve ?
         });
       };
       wakOptions.onError = function(event) {
@@ -832,7 +833,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
           result.$fetching = false;
           event.result = result;
-          deferred.resolve(event);
+          deferred.resolve(event);//@warn what is passing on resolve ?
         });
       };
       wakOptions.onError = function(event) {
@@ -1010,6 +1011,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 //        console.log("$syncEntityToPojo (should it be public ?)");
       },
       /**
+       * @todo in the getCachedEntity routine, create fake entities using their key for related entities even if they're not autoExpanded
+       * 
        * If entity not loaded, fetched is from the server with the $_deferred.uri
        * If entity is loaded, executes a serverRefresh
        * 
