@@ -879,21 +879,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
         });
         wafEntity.getDataClass().getAttributes().forEach(function(attr){
-          if(attr.kind === 'storage'){
-            Object.defineProperty(this, attr.name, {
-              enumerable: true,
-              configurable: true,
-              get: function(){
-                return this.$_entity[attr.name].getValue();
-              },
-              set: function(newValue){
-                rootScopeSafeApply(function(){
-                  this.$_entity[attr.name].setValue(newValue);
-                }.bind(this));
-              }
-            });
-          }
-          else if(attr.kind === 'relatedEntity'){
+          if(attr.kind === 'relatedEntity'){
             Object.defineProperty(this, attr.name, {
               enumerable: true,
               configurable: true,
@@ -911,6 +897,31 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
           else if(attr.kind === 'relatedEntities'){
             
+          }
+          else if(attr.kind === 'calculated' || attr.kind === 'alias'){
+            //no setters on those kind of attributes (in breaks the save if they are changed
+            Object.defineProperty(this, attr.name, {
+              enumerable: true,
+              configurable: true,
+              get: function(){
+                return this.$_entity[attr.name].getValue();
+              }
+            });
+          }
+          //@warn specific case for object ?
+          else{
+            Object.defineProperty(this, attr.name, {
+              enumerable: true,
+              configurable: true,
+              get: function(){
+                return this.$_entity[attr.name].getValue();
+              },
+              set: function(newValue){
+                rootScopeSafeApply(function(){
+                  this.$_entity[attr.name].setValue(newValue);
+                }.bind(this));
+              }
+            });
           }
         }.bind(this));
       },
