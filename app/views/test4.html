@@ -62,5 +62,17 @@ companies[2] === companies[1]
 
 //objects in refCache can be accessed (only via key -> new objects created on frontend WON'T be in until save)
 ds.Employee.getRefCache().getCacheInfo(2962).entity.employer.relEntity === ds.Company.getRefCache().getCacheInfo(182).entity
+
+------------
+
+var wakCollection;
+ds.Employee.query('',{
+      autoExpand: 'employer',
+      onSuccess:function(e){
+        console.log('e',e);
+        wakCollection = transform.wafEntityCollectionToNgWakEntityCollection(e.result);
+        console.log('wakCollection',wakCollection);
+      }
+    });
   </pre>
 </div>

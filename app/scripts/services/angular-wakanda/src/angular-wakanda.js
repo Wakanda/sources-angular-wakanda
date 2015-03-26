@@ -352,9 +352,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 //        skip: start,
         limit: start+pageSize
       });
-      var reccursiveCollectionToNgWakEntityCollection = function(wafEntityCollection){
-        
-      };
     };
     
     //@temporary study
@@ -367,8 +364,31 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     /** event transformation part */
 
     var transform = {
-      wafToNgWak: function(wafEntity, ngWakEntity){
+      wafEntityCollectionToNgWakEntityCollection: function(ngWakEntityCollection, wafEntityCollection, options){
         
+        options = typeof options === 'undefined' ? {} : options;
+        var currentDataClass = wafEntityCollection.getDataClass();
+        var start = typeof options.start === 'undefined' ? 0 : options.start;
+        var pageSize = typeof options.pageSize === 'undefined' ? DEFAULT_PAGESIZE_NESTED_COLLECTIONS : options.pageSize;
+        
+        //adding pointer
+        ngWakEntityCollection.$_collection = wafEntityCollection;
+        
+        //populate collection
+        wafEntityCollection.forEachInCache({
+          onSuccess: function(item){
+            console.log(item);
+            ngWakEntityCollection.push(currentDataClass.$refCache.getCachedNgWakEntity(item.entity));
+          },
+          first: start,
+  //        skip: start,
+          limit: start+pageSize
+        });
+        
+        //update framework collection methods
+        transform.addFrameworkMethodsToRootCollection(ngWakEntityCollection);
+        //add user defined methods for only on the root collection
+        transform.addUserDefinedMethodsToCollection(ngWakEntityCollection,true);//@todo @warn refactor for any level / sublevel of collection
       },
       /**
        * Transforms the WAF.Event event and adds a result attribute with the NgWakEntityCollection of the event
@@ -423,32 +443,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         });
 //        console.log('transformFetchEvent','result',result);
         event.result = result;
-      },
-      asyncResult : function(data, result, promise){
-        //@todo change the collection part (it erase the previous added methods)
-        var userDefinedEntityCollectionMethods;
-        if (data instanceof Array) {
-          //update values
-          result.length = 0;
-          angular.forEach(data, function(item) {
-            result.push(item);
-          });
-          //update $_collection pointer
-          result.$_collection = data.$_collection;
-          //update framework collection methods
-          transform.addFrameworkMethodsToRootCollection(result);
-          //add user defined methods for only on the root collection
-          transform.addUserDefinedMethodsToCollection(result,true);
-          //update promise
-          result.$promise = promise;
-        } else {
-          //case it's a unique entity and the pointer is missing
-          if(typeof result.$_entity === "undefined" && typeof data.$_entity !== "undefined"){
-            result.$_entity =data.$_entity;
-          }
-          helpers.shallowClearAndCopy(data, result);
-          result.$promise = promise;
-        }
       },
       addUserDefinedMethodsToCollection: function(result, root){
         var userDefinedEntityCollectionMethods,
@@ -1021,6 +1015,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       //prepare the returned object
       onlyOne = !!options.onlyOne;
       if(onlyOne){
+        throw new Error('Temporary regression');
         result = new NgWakEntityClasses[this.$name]();
       }
       else{
@@ -1037,8 +1032,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
 //          console.log('onSuccess', 'originalEvent', event);
-          transform.queryEventToNgWakEntityCollection(event, onlyOne);
-          transform.asyncResult(event.result, result, deferred.promise);
+//          transform.queryEventToNgWakEntityCollection(event, onlyOne);
+          transform.wafEntityCollectionToNgWakEntityCollection(result, event.result, wakOptions);
+//          transform.asyncResult(event.result, result, deferred.promise);
           if(onlyOne === false){
             updateQueryInfos(result, result.$_collection._private.pageSize, 0, query);
           }
@@ -1061,8 +1057,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       return result;
     };
 
-    //@todo identify the correct key field (not ID by default)
     var $$findOne = function(id,options){
+      //@todo check with the regression on $find using only one (need to return temporary NgWakEntity, then async populate it)
       options = typeof options === 'undefined' ? {} : options;
       options.filter = this.$_identifyingAttr.name+' = '+id;
       options.onlyOne = true;
@@ -1105,7 +1101,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               }
             });
           }
-          if(attr.kind === 'relatedEntity'){
+          else if(attr.kind === 'relatedEntity'){
             Object.defineProperty(this, attr.name, {
               enumerable: true,
               configurable: true,
@@ -1120,6 +1116,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                 }.bind(this));
               }
             });
+          }
+          else if(attr.kind === 'relatedEntities'){
+            
           }
         }.bind(this));
       },
