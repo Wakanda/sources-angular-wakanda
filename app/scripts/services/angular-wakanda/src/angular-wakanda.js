@@ -389,6 +389,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         result.$totalCount = result.$_collection.length;
         result.$toJSON = $$toJSON;
       },
+      //@todo adapt / wrap some of the method bellow for nested collections (since their management changed)
       addFrameworkMethodsToNestedCollection : function(result){
         result.$fetch = $fetchOnNestedCollection;
         result.$more = $$more;
@@ -447,6 +448,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       resultSet.$query.start      = start;
     };
     
+    //@todo the method bellow will change (nested collections management)
     //@todo change the pageSize to the collection length
     var $fetchOnNestedCollection = function(options, mode){
       //@todo take mode param in account for pagination / also $query
@@ -488,12 +490,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           that.$fetching = true;
         });
         console.log('>$fetch on nestedCollection','options',options);
-//        wakOptions.method = 'subentityset';
-//        wakOptions.forceReload = true;
         wakOptions.onSuccess = function(e){
           console.log('$fetchOnNestedCollection > onSuccess','e',e);
           rootScopeSafeApply(function(){
-//            console.group('$fetchOnNestedCollection > onSuccess','e',e);
             if(mode === 'replace'){
               that.length = 0;
             }
@@ -511,7 +510,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               first : wakOptions.skip,
               limit : wakOptions.skip + wakOptions.top
             });
-//            console.groupEnd();
             //remove the deferred pointer to show that the collection has been loaded anyway
             delete that.$_deferred;
             updateCollectionQueryInfos(that, options.pageSize, options.start);
@@ -533,6 +531,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       return deferred.promise;
     };
     
+    //@todo the method bellow will change (nested collections management)
     $$isLoadedOnNestedCollection = function(){
       if(this.$_deferred){
         return false;
