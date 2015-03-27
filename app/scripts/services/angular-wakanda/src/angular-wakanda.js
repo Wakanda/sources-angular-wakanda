@@ -29,7 +29,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             ds = event.dataStore;
             prepare.wafDatastore(ds);
             prepare.wafDataClasses(ds);
-//            console.log('>$wakanda init > success', event, 'ds', ds);
             deferred.resolve(ds);
           },
           onError: function(event) {
@@ -117,18 +116,14 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         //hint test for $* and _* properties when looping through arguments
         
         //loop through the dataClasses of the dataStore
-//        console.group('prepare.wafDataClasses()', dataStore);
         for (dataClassName in dataStore) {
           if (dataStore.hasOwnProperty(dataClassName) && dataClassName !== "_private" && /^\$.*/.test(dataClassName) === false) {            
-//            console.group('DataClass[%s]', dataStore[dataClassName].getName(), dataStore[dataClassName]);
             prepare.wafDataClassAddMetas(dataStore[dataClassName]);
             prepare.wafDataClassAddDataClassMethods(dataStore[dataClassName]);
             prepare.wafDataClassCreateNgWakEntityClasses(dataStore[dataClassName]);
             prepare.wafDataClassCreateRefCache(dataStore[dataClassName]);
-//            console.groupEnd();
           }
         }
-//        console.groupEnd();
       },
       wafDataClassAddMetas : function(dataClass){
         var methodInfo,
@@ -296,7 +291,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           var that = this;
           wakOptions.onSuccess = function(event) {
             rootScopeSafeApply(function() {
-//              console.log('userMethods.onSuccess', 'event', event);
               deferred.resolve(event);
             });
           };
@@ -349,7 +343,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             ngWakEntityCollection.push(currentDataClass.$refCache.getCachedNgWakEntity(item.entity));
           },
           first: start,
-  //        skip: start,
           limit: start+pageSize
         });
       },
@@ -553,7 +546,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     /**
      * @todo make a $fetchOnNestedCollection wrapping this one
      * 
-     * Applied to arrays of pojos representing collections
+     * Applied to arrays of NgWakEntities
      * 
      * @param {Object} options
      * @param {String} mode
@@ -564,7 +557,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       mode = (typeof mode === "undefined" || mode === "replace") ? "replace" : mode;
       //input check
       if (!options) {
-        options = {};
+        options = {};//@todo refresh collection when no param passed
       }
       if (typeof options.orderBy !== 'undefined') {
         throw new Error("orderBy can't be change on a $fetch (query collection's cached on server side)");
@@ -578,7 +571,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       if (options.params) {
         wakOptions.params = options.params;
       }
-//      console.log(wakOptions);
       //prepare the promise
       deferred = $q.defer();
       var that = this;
@@ -600,9 +592,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             }
           }
           updateQueryInfos(that, options.pageSize || that.$_collection._private.pageSize, skip);
-//          console.log('onSuccess', 'processedEvent', event);
           that.$fetching = false;
-          deferred.resolve(event);//@warn what is passing on the resolve ?
+          deferred.resolve(event);//@todo @warn what is passing on the resolve ?
         });
       };
       wakOptions.onError = function(event) {
@@ -779,10 +770,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       if (typeof options.pageSize !== "undefined") {// !!! no pageSize on toArray
         wakOptions.pageSize = options.pageSize;
       }
-      //@todo must remain private
-//      if (typeof options.pages) {
-//        wakOptions.pages = options.pages;
-//      }
       //prepare the returned object
       onlyOne = !!options.onlyOne;
       if(onlyOne){
@@ -799,7 +786,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       rootScopeSafeApply(function() {
         result.$fetching = true;
       });
-//      console.log('RESULT',result);
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
           transform.wafEntityCollectionToNgWakEntityCollection(result, event.result, wakOptions);
@@ -808,7 +794,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
           result.$fetching = false;
           event.result = result;
-          deferred.resolve(event);//@warn what is passing on resolve ?
+          deferred.resolve(event);//@todo @warn what is passing on resolve ?
         });
       };
       wakOptions.onError = function(event) {
@@ -825,7 +811,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     };
 
     var $$findOne = function(id,options){
-      //@todo check with the regression on $find using only one (need to return temporary NgWakEntity, then async populate it)
+      //@todo @warn check with the regression on $find using only one (need to return temporary NgWakEntity, then async populate it)
+      console.warn('temporary regression on $findOne');
       options = typeof options === 'undefined' ? {} : options;
       options.filter = this.$_identifyingAttr.name+' = '+id;
       options.onlyOne = true;
@@ -878,7 +865,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             });
           }
           else if(attr.kind === 'relatedEntities'){
-            
+            //@todo relatedEntities - caching
           }
           else if(attr.kind === 'calculated' || attr.kind === 'alias'){
             //no setters on those kind of attributes (in breaks the save if they are changed) - @todo make a temp setter that overrides the getter, using a temp private value such as $_tempValue (to be specified)
@@ -890,7 +877,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               }
             });
           }
-          //@warn specific case for object ?
+          //@warn specific case for object ? @warn check date types
           else{
             Object.defineProperty(this, attr.name, {
               enumerable: true,
@@ -961,7 +948,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       /**
        * @todo in the getCachedEntity routine, create fake entities using their key for related entities even if they're not autoExpanded
        * 
-       * If entity not loaded, fetched is from the server with the $_deferred.uri
+       * If entity not loaded, fetched is from the server with the $_deferred.uri @deprecated
        * If entity is loaded, executes a serverRefresh
        * 
        * Both ways, makes sure your entity is up to date
@@ -1023,6 +1010,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         }
         return deferred.promise;
       },
+      //@todo check for regression according to changes
       $isLoaded : function(){
         if(this.$_entity){
           return true;
