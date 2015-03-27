@@ -353,16 +353,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           limit: start+pageSize
         });
       },
-      fetchEventToNgWakEntityCollection : function(event) {
-        var result = [],
-            dataClass = event.result._private.dataClass;
-//        console.log('transform.fetchEventToNgWakEntityCollection',event);
-        event.entities.forEach(function(entity,index){
-          result.push(dataClass.$create(entity));
-        });
-//        console.log('transformFetchEvent','result',result);
-        event.result = result;
-      },
       addUserDefinedMethodsToCollection: function(result, root){
         var userDefinedEntityCollectionMethods,
                 dataClass = null;
