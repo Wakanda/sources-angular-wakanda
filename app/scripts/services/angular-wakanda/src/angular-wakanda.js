@@ -346,7 +346,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         //populate collection
         wafEntityCollection.forEachInCache({
           onSuccess: function(item){
-            console.log(item);
             ngWakEntityCollection.push(currentDataClass.$refCache.getCachedNgWakEntity(item.entity));
           },
           first: start,
@@ -892,7 +891,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             
           }
           else if(attr.kind === 'calculated' || attr.kind === 'alias'){
-            //no setters on those kind of attributes (in breaks the save if they are changed
+            //no setters on those kind of attributes (in breaks the save if they are changed) - @todo make a temp setter that overrides the getter, using a temp private value such as $_tempValue (to be specified)
             Object.defineProperty(this, attr.name, {
               enumerable: true,
               configurable: true,
@@ -1135,9 +1134,15 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         //trasverse relatedEntity and relatedEntities attributes
         if(wafEntity.getDataClass().$_relatedAttributes && wafEntity.getDataClass().$_relatedAttributes.length > 0){
           wafEntity.getDataClass().$_relatedAttributes.forEach(function(attr){
-            console.log(attr,wafEntity[attr.name]);
-            if(attr.kind === 'relatedEntity' && wafEntity[attr.name] && wafEntity[attr.name].relEntity){
-              var nestedEntity = ds[wafEntity[attr.name].relEntity.getDataClass().getName()].$refCache.getCachedNgWakEntity(wafEntity[attr.name].relEntity);
+            if(attr.kind === 'relatedEntity'){
+              var nestedEntity;
+              if(wafEntity[attr.name] && wafEntity[attr.name].relEntity){
+                nestedEntity = ds[wafEntity[attr.name].relEntity.getDataClass().getName()].$refCache.getCachedNgWakEntity(wafEntity[attr.name].relEntity);
+              }
+              else if(wafEntity[attr.name] && wafEntity[attr.name].relKey){
+                nestedEntity = ds[wafEntity[attr.name].att.getRelatedClass().getName()].$refCache.getCacheInfo(wafEntity[attr.name].relKey);
+              }
+              return nestedEntity;
             }
           }.bind(this));
         }
