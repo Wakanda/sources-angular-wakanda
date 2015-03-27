@@ -1134,6 +1134,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               }
               return nestedEntity;
             }
+            else if(attr.kind === 'relatedEntities'){
+              console.warn('getCachedNgWakEntity not on relatedEntities',attr.name,wafEntity[attr.name]);
+            }
           }.bind(this));
         }
         this.setEntry(ngWakEntity);
