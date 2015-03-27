@@ -3,9 +3,28 @@
   <div db-state init-async="false" init-collapsed="true" change-callback="init()"></div>
   <p>Test related entities assignement</p>
   <h4>Employees ( {{employees.$totalCount}} ) <span ng-click="employees.$prevPage()">&#8592;</span> <span ng-click="employees.$nextPage()">&#8594;</span></h4>
-  <ul>
-    <li ng-repeat="employee in employees">{{employee.firstName}} {{employee.lastName}} - {{employee.employer.name}}</li>
-  </ul>
+  <table>
+    <thead>
+      <tr>
+        <td>firstName</td>
+        <td>lastname</td>
+        <td>employer.name</td>
+        <td>employerName</td>
+        <td>salary</td>
+        <td>salaryProcessed</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="employee in employees">
+        <td>{{employee.firstName}}</td>
+        <td>{{employee.lastName}}</td>
+        <td>{{employee.employer.name}}</td>
+        <td>{{employee.employerName}}</td>
+        <td>{{employee.salary}}</td>
+        <td>{{employee.salaryProcessed}}</td>
+      </tr>
+    </tbody>
+  </table>
   <div>
     <button ng-click="addEmployee1()">addEmployee1()</button>
     <button ng-click="addEmployee2()">addEmployee2()</button>

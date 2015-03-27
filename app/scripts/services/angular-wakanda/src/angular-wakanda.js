@@ -887,6 +887,13 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                 if(this.$_entity[attr.name] && this.$_entity[attr.name].relEntity && typeof this.$_entity[attr.name].relEntity.getKey() !== 'undefined'){
                   return ds[this.$_entity[attr.name].relEntity.getDataClass().getName()].$refCache.getCachedNgWakEntity(this.$_entity[attr.name].relEntity);
                 }
+                else if(this.$_entity[attr.name] && this.$_entity[attr.name].relEntity === null && typeof this.$_entity[attr.name].relKey !== 'undefined'){
+                  var cachedEntity = ds[this.$_entity[attr.name].att.getRelatedClass().getName()].$refCache.getCacheInfo(this.$_entity[attr.name].relKey);
+                  if(cachedEntity){
+                    return cachedEntity;
+                  }
+                  //@todo could do lazy loading in else case
+                }
               },
               set: function(ngWakEntity){
                 rootScopeSafeApply(function(){
@@ -937,13 +944,11 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       $save : function(){
         console.group('$save');
         var deferred, wakOptions = {}, that = this;
-        this.$syncPojoToEntity();
         //prepare the promise
         deferred = $q.defer();
         wakOptions.onSuccess = function(event) {
           rootScopeSafeApply(function() {
             console.log('save.onSuccess', 'event', event);
-            that.$syncEntityToPojo();//once the entity is save resync the result of the server with the pojo
             deferred.resolve(event);
           });
         };
