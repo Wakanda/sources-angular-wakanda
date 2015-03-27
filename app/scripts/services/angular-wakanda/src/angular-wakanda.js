@@ -911,6 +911,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         wakOptions.onSuccess = function(event) {
           rootScopeSafeApply(function() {
             console.log('save.onSuccess', 'event', event);
+            that.$_entity.getDataClass().$refCache.setEntry(that);//updates the entry in the refCache (without the uuid)
             deferred.resolve(event);
           });
         };
@@ -1076,13 +1077,16 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       var uuid = ngWakEntity.$_tempUUID;
       //it has a key -> it's already in the db serverside
       if(key !== null){
-        this.entitiesByKey[key] = ngWakEntity;
         //remove the entry under the uuid if it was present
         if(typeof uuid !== 'undefined'){
           delete this.entitiesByKey[uuid];
           ngWakEntity.$_tempUUID = null;
+          this.nbEntries--;
         }
-        this.nbEntries++;
+        if(!this.entitiesByKey[key]){
+          this.nbEntries++;
+        }
+        this.entitiesByKey[key] = ngWakEntity;//whatever, update the ref in the cache
       }
       //it doesn't have a key, it's not yet saved in the db server side
       else{
