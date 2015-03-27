@@ -189,6 +189,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
         });
         
+        dataClass.$_processedAttributes = dataClass.getAttributes().filter(function(attr){
+          if(attr.kind === 'calculated' || attr.kind === 'alias'){
+            return attr;
+          }
+        });
+        
       },
       wafDataClassAddDataClassMethods : function(dataClass) {
         prepareHelpers.createUserDefinedDataClassMethods(dataClass);
@@ -391,6 +397,16 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         result.$toJSON = $$toJSON;
         result.$isLoaded = $$isLoadedOnNestedCollection;
         result.$totalCount = null;
+      },
+      cleanNgWakEntityAfterSave: function(ngWakEntity){
+        var processedAttributes = ngWakEntity.$_entity.getDataClass().$_processedAttributes;
+        if(processedAttributes.length > 0){
+          processedAttributes.forEach(function(attr){
+            if(typeof ngWakEntity.$_entity[attr.name].$_tempValue !== 'undefined'){
+              delete ngWakEntity.$_entity[attr.name].$_tempValue;
+            }
+          });
+        }
       }
     };
 
@@ -854,7 +870,13 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                   if(cachedEntity){
                     return cachedEntity;
                   }
-                  //@todo could do lazy loading in else case
+                  else{
+                    //@todo create and cache a blank entity on the fly (to be filled later) ?
+                  }
+                }
+                //case where 'this' is new and doesn't have a relatedEntity yet
+                else{
+                  //@todo create and cache a blank entity on the fly (to be filled later) ?
                 }
               },
               set: function(ngWakEntity){
@@ -868,12 +890,23 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             //@todo relatedEntities - caching
           }
           else if(attr.kind === 'calculated' || attr.kind === 'alias'){
-            //no setters on those kind of attributes (in breaks the save if they are changed) - @todo make a temp setter that overrides the getter, using a temp private value such as $_tempValue (to be specified)
+            //no setters on those kind of attributes (in breaks the save if they are changed)
+            //so there is an override that doesn't do any setValue but only sets a $_tempValue that won't be saved (and will be removed on $save)
             Object.defineProperty(this, attr.name, {
               enumerable: true,
               configurable: true,
               get: function(){
-                return this.$_entity[attr.name].getValue();
+                if(typeof this.$_entity[attr.name].$_tempValue !== 'undefined'){
+                  return this.$_entity[attr.name].$_tempValue;//this is cleaned up on $save by transform.cleanNgWakEntityAfterSave()
+                }
+                else{
+                  return this.$_entity[attr.name].getValue();
+                }
+              },
+              set: function(newValue){
+                rootScopeSafeApply(function(){
+                  this.$_entity[attr.name].$_tempValue = newValue;
+                }.bind(this));
               }
             });
           }
@@ -911,6 +944,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         wakOptions.onSuccess = function(event) {
           rootScopeSafeApply(function() {
             console.log('save.onSuccess', 'event', event);
+            transform.cleanNgWakEntityAfterSave(that);//remove $_tempValue on processed attributes
             that.$_entity.getDataClass().$refCache.setEntry(that);//updates the entry in the refCache (without the uuid)
             deferred.resolve(event);
           });
