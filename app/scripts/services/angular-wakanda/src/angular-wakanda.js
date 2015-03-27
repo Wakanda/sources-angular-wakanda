@@ -291,26 +291,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               thatArguments.push(arguments[i]);
             }
           }
-          //sync before request
-          if(mode === '$_entity'){
-            this.$syncPojoToEntity();
-          }
-          else{
-            //@todo sync to the collection ???
-          }
           //prepare the promise
           deferred = $q.defer();
           var that = this;
           wakOptions.onSuccess = function(event) {
             rootScopeSafeApply(function() {
 //              console.log('userMethods.onSuccess', 'event', event);
-              //sync after request
-              if(mode === '$_entity'){
-                that.$syncEntityToPojo();
-              }
-              else{
-                //@todo sync to the collection ???
-              }
               deferred.resolve(event);
             });
           };
@@ -982,49 +968,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         this.$_entity.remove(wakOptions);
         console.groupEnd();
         return deferred.promise;
-      },
-      $syncPojoToEntity : function(){
-        console.group('$syncPojoToEntity');
-        var pojo = this, key, infos, info;
-        if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
-          for(key in pojo.$_entity._private.values){
-            //only update modified values which are not related entities
-            if(pojo.$_entity[key].getValue() !== pojo[key] && (pojo.$_entity[key] instanceof WAF.EntityAttributeSimple)){
-              pojo.$_entity[key].setValue(pojo[key]);
-            }
-            //@todo to sync related attributes (it's a start)
-//            //update attribute related (only if is loaded for the moment)
-//            if((pojo.$_entity[key] instanceof WAF.EntityAttributeRelated) && pojo[key].$isLoaded()){
-//              console.log('related',key,'pojo.$_entity[key]',pojo.$_entity[key],'pojo[key]',pojo[key]);
-//              console.log('$_entity',pojo.$_entity[key].getValue(),'pojo',pojo[key]);
-//              console.log(pojo.$_entity[key].relEntity.getDataClass().$attr());
-//              infos = pojo.$_entity[key].relEntity.getDataClass().$attr();
-//              //find the id field's name
-//              for(info in infos){
-//                if(infos[info].identifying === true){
-//                  console.log(info,'pojo',pojo[key][info],'$_entity',pojo.$_entity[key][info]);
-//                }
-//              }
-//            }
-          }
-        }
-        console.groupEnd();
-      },
-      //@todo toutes variable n'atant pas object remonte
-      $syncEntityToPojo : function(){
-        var pojo = this, key;
-        if(pojo.$_entity && pojo.$_entity._private && pojo.$_entity._private.values){
-          for(key in pojo.$_entity._private.values){
-//            console.log(key,pojo.$_entity._private.values[key]);
-            //only update modified values which are not related entities
-            if(pojo.$_entity[key].getValue() !== pojo[key] && (pojo.$_entity[key] instanceof WAF.EntityAttributeSimple)){
-              pojo[key] = pojo.$_entity[key].getValue();
-            }
-          }
-        }
-        pojo.__KEY = pojo.$_entity.getKey();
-        pojo.__STAMP = pojo.$_entity.getStamp();
-//        console.log("$syncEntityToPojo (should it be public ?)");
       },
       /**
        * @todo in the getCachedEntity routine, create fake entities using their key for related entities even if they're not autoExpanded
