@@ -797,7 +797,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       //prepare the promise
       deferred = $q.defer();
       result.$promise = deferred.promise;
-      //update $fteching ($apply needed)
+      //update $fetching ($apply needed)
       rootScopeSafeApply(function() {
         result.$fetching = true;
       });
@@ -825,13 +825,48 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       return result;
     };
 
-    var $$findOne = function(id,options){
+    var $$findOne = function(key,options){
       //@todo @warn check with the regression on $find using only one (need to return temporary NgWakEntity, then async populate it)
-      console.warn('temporary regression on $findOne');
-      options = typeof options === 'undefined' ? {} : options;
-      options.filter = this.$_identifyingAttr.name+' = '+id;
-      options.onlyOne = true;
-      return this.$find(options);
+      var deferred, wakOptions = {}, ngWakEntity;
+      //input check
+      if (!options || typeof options !== "object") {
+        options = {};
+      }
+      //prepare options
+      if (options.select) {
+        wakOptions.autoExpand = options.select;
+      }
+      //prepare the promise
+      deferred = $q.defer();
+      //create dummy ngWakEntity (without a WAF.Entity pointer) and cache it in $refCache
+      //@todo if in $refCache - retrieve it from $refCache
+      ngWakEntity = new NgWakEntityClasses[this.$name](this, key);
+      ngWakEntity.$promise = deferred.promise;
+      ngWakEntity.$fetching = true;
+      //prepare callbacks
+      wakOptions.onSuccess = function(event){
+        rootScopeSafeApply(function(){
+          ngWakEntity.$_entity = event.entity;
+          //todo freeze $_entity
+          delete ngWakEntity.$_key;
+          ngWakEntity.$fetching = false;
+          deferred.resolve(event);//@todo @warn pass the ngWakEntity in the resolve
+        });
+      };
+      wakOptions.onError = function(event){
+        rootScopeSafeApply(function(){
+          console.error('$findOne > getEntity > error',event);
+          ngWakEntity.$fetching = false;
+          deferred.reject(event);
+          //@todo @warn what about the ngWakEntity that was returned AND cached - maybe uncache it ?
+        });
+      };
+      //cache the entity
+      this.$refCache.setEntry(ngWakEntity);
+      //make the async call
+      options = null;
+      this.getEntity(key, wakOptions);
+      return ngWakEntity;
     };
 
     /** Code organization, heritage, objects used (todo : split this into multiple files which should be insject by dependency injection OR module) */
@@ -855,16 +890,20 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         Object.defineProperty(this, "$_entity", {
           enumerable: false,
           configurable: false,
-          writable: false
+          writable: true //@todo rechange it to true on freeze (necessary when no $_entity assigned but $_key)
         });
         Object.defineProperty(this, "$_tempUUID", {
           enumerable: false,
           configurable: false,
           get: function(){
-            return this.$_entity.$_tempUUID;
+            if(this.$_entity){
+              return this.$_entity.$_tempUUID;
+            }
           },
           set: function(newValue){
-            return this.$_entity.$_tempUUID = newValue;
+            if(this.$_entity){
+              return this.$_entity.$_tempUUID = newValue;
+            }
           }
         });
         dataClass.getAttributes().forEach(function(attr){
@@ -873,27 +912,31 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               enumerable: true,
               configurable: true,
               get: function(){
-                if(this.$_entity[attr.name] && this.$_entity[attr.name].relEntity && typeof this.$_entity[attr.name].relEntity.getKey() !== 'undefined'){
-                  return ds[this.$_entity[attr.name].relEntity.getDataClass().getName()].$refCache.getCachedNgWakEntity(this.$_entity[attr.name].relEntity);
-                }
-                else if(this.$_entity[attr.name] && this.$_entity[attr.name].relEntity === null && typeof this.$_entity[attr.name].relKey !== 'undefined'){
-                  var cachedEntity = ds[this.$_entity[attr.name].att.getRelatedClass().getName()].$refCache.getCacheInfo(this.$_entity[attr.name].relKey);
-                  if(cachedEntity){
-                    return cachedEntity;
+                if(this.$_entity){
+                  if(this.$_entity[attr.name] && this.$_entity[attr.name].relEntity && typeof this.$_entity[attr.name].relEntity.getKey() !== 'undefined'){
+                    return ds[this.$_entity[attr.name].relEntity.getDataClass().getName()].$refCache.getCachedNgWakEntity(this.$_entity[attr.name].relEntity);
                   }
+                  else if(this.$_entity[attr.name] && this.$_entity[attr.name].relEntity === null && typeof this.$_entity[attr.name].relKey !== 'undefined'){
+                    var cachedEntity = ds[this.$_entity[attr.name].att.getRelatedClass().getName()].$refCache.getCacheInfo(this.$_entity[attr.name].relKey);
+                    if(cachedEntity){
+                      return cachedEntity;
+                    }
+                    else{
+                      //@todo create and cache a blank entity on the fly (to be filled later) ?
+                    }
+                  }
+                  //case where 'this' is new and doesn't have a relatedEntity yet
                   else{
                     //@todo create and cache a blank entity on the fly (to be filled later) ?
                   }
                 }
-                //case where 'this' is new and doesn't have a relatedEntity yet
-                else{
-                  //@todo create and cache a blank entity on the fly (to be filled later) ?
-                }
               },
               set: function(ngWakEntity){
-                rootScopeSafeApply(function(){
-                  this.$_entity[attr.name].setValue(ngWakEntity.$_entity);
-                }.bind(this));
+                if(this.$_entity){
+                  rootScopeSafeApply(function(){
+                    this.$_entity[attr.name].setValue(ngWakEntity.$_entity);
+                  }.bind(this));
+                }
               }
             });
           }
@@ -907,17 +950,21 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               enumerable: true,
               configurable: true,
               get: function(){
-                return this.$_entity[attr.name].getValue();
+                if(this.$_entity){
+                  return this.$_entity[attr.name].getValue();
+                }
               },
               //can only set when attr.readOnly !== true (if there is a setter server-side)
               set: function(newValue){
-                if(attr.readOnly !== true){
-                  rootScopeSafeApply(function(){
-                    this.$_entity[attr.name].setValue(newValue);
-                  }.bind(this));
-                }
-                else{
-                  throw new Error('Attribute ' + attr.name + ' is readOnly (you may want to declare a setter server-side).');
+                if(this.$_entity){
+                  if(attr.readOnly !== true){
+                    rootScopeSafeApply(function(){
+                      this.$_entity[attr.name].setValue(newValue);
+                    }.bind(this));
+                  }
+                  else{
+                    throw new Error('Attribute ' + attr.name + ' is readOnly (you may want to declare a setter server-side).');
+                  }
                 }
               }
             });
@@ -928,27 +975,43 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               enumerable: true,
               configurable: true,
               get: function(){
-                return this.$_entity[attr.name].getValue();
+                if(this.$_entity){
+                  return this.$_entity[attr.name].getValue();
+                }
               },
               set: function(newValue){
-                rootScopeSafeApply(function(){
-                  this.$_entity[attr.name].setValue(newValue);
-                }.bind(this));
+                if(this.$_entity){
+                  rootScopeSafeApply(function(){
+                    this.$_entity[attr.name].setValue(newValue);
+                  }.bind(this));
+                }
               }
             });
           }
         }.bind(this));
       },
       $key : function(){
-        return this.$_entity.getKey();
+        if(this.$_entity){
+          return this.$_entity.getKey();
+        }
+        else if(this.$_key){
+          return this.$_key;
+        }
       },
       $stamp : function(){
-        return this.$_entity.getStamp();
+        if(this.$_entity){
+          return this.$_entity.getStamp();
+        }
       },
       $isNew : function(){
-        return this.$_entity.isNew();
+        if(this.$_entity){
+          return this.$_entity.isNew();
+        }
       },
       $save : function(){
+        if(!this.$_entity){
+          throw new Error("Can't $save() without pointer, please $fetch() before.");//@todo is is the right way ?
+        }
         console.group('$save');
         var deferred, wakOptions = {}, that = this;
         //prepare the promise
@@ -972,6 +1035,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         return deferred.promise;
       },
       $remove : function(){
+        if(!this.$_entity){
+          throw new Error("Can't $remove() without pointer, please $fetch() before.");//@todo is is the right way ? (should be able to remove without fetching, based on $_key only)
+        }
         console.group('$remove');
         var deferred, wakOptions = {}, that = this;
         //prepare the promise
