@@ -837,14 +837,26 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     /** Code organization, heritage, objects used (todo : split this into multiple files which should be insject by dependency injection OR module) */
     
     var NgWakEntityAbstractPrototype = {
-      init: function(wafEntity){
-        this.$_entity = wafEntity;
+      /**
+       * Constructor signature :
+       * - (wafEntity) or (dataClass,key)
+       * @returns {NgWakEntity}
+       */
+      init: function(){
+        var dataClass;
+        if(arguments[0] instanceof WAF.Entity){
+          this.$_entity = arguments[0];
+          dataClass = this.$_entity.getDataClass();
+        }
+        else if(arguments[0] instanceof WAF.DataClass && typeof arguments[1] !== 'undefined'){
+          this.$_key = arguments[1];
+          dataClass = arguments[0];
+        }
         Object.defineProperty(this, "$_entity", {
           enumerable: false,
           configurable: false,
           writable: false
         });
-        //@todo this will be an other getter / setter (for the moment, it points to $_entity)
         Object.defineProperty(this, "$_tempUUID", {
           enumerable: false,
           configurable: false,
@@ -855,7 +867,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             return this.$_entity.$_tempUUID = newValue;
           }
         });
-        wafEntity.getDataClass().getAttributes().forEach(function(attr){
+        dataClass.getAttributes().forEach(function(attr){
           if(attr.kind === 'relatedEntity'){
             Object.defineProperty(this, attr.name, {
               enumerable: true,
@@ -895,17 +907,18 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               enumerable: true,
               configurable: true,
               get: function(){
-                if(typeof this.$_entity[attr.name].$_tempValue !== 'undefined'){
-                  return this.$_entity[attr.name].$_tempValue;//this is cleaned up on $save by transform.cleanNgWakEntityAfterSave()
+                return this.$_entity[attr.name].getValue();
+              },
+              //can only set when attr.readOnly !== true (if there is a setter server-side)
+              set: function(newValue){
+                if(attr.readOnly !== true){
+                  rootScopeSafeApply(function(){
+                    this.$_entity[attr.name].setValue(newValue);
+                  }.bind(this));
                 }
                 else{
-                  return this.$_entity[attr.name].getValue();
+                  throw new Error('Attribute ' + attr.name + ' is readOnly (you may want to declare a setter server-side).');
                 }
-              },
-              set: function(newValue){
-                rootScopeSafeApply(function(){
-                  this.$_entity[attr.name].$_tempValue = newValue;
-                }.bind(this));
               }
             });
           }
