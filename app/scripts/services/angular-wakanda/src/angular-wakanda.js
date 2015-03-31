@@ -863,6 +863,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           //@todo @warn what about the ngWakEntity that was returned AND cached - maybe uncache it ?
         });
       };
+      wakOptions.forceReload = (typeof options.forceReload === 'undefined' ? true : options.forceReload);
       //make the async call
       options = null;
       this.getEntity(key, wakOptions);
