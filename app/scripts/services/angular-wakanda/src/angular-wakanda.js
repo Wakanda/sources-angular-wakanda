@@ -206,7 +206,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         ds[dataClass.getName()].$Entity = NgWakEntityClasses[dataClass.getName()].prototype;
       },
       wafDataClassCreateRefCache : function(dataClass){
-        dataClass.$refCache = new NgWakEntityCache();
+        dataClass.$refCache = new NgWakEntityCache({
+          dataClass: dataClass
+        });
       }
     };
     
@@ -839,8 +841,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       //prepare the promise
       deferred = $q.defer();
       //create dummy ngWakEntity (without a WAF.Entity pointer) and cache it in $refCache
-      //@todo if in $refCache - retrieve it from $refCache
-      ngWakEntity = new NgWakEntityClasses[this.$name](this, key);
+      //if a reference is already in cache, retrieve it, if not, create a dummy one and cache it
+      ngWakEntity = ds[this.$name].$refCache.getCachedDummyNgWakEntity(key);
       ngWakEntity.$promise = deferred.promise;
       ngWakEntity.$fetching = true;
       //prepare callbacks
@@ -861,8 +863,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           //@todo @warn what about the ngWakEntity that was returned AND cached - maybe uncache it ?
         });
       };
-      //cache the entity
-      this.$refCache.setEntry(ngWakEntity);
       //make the async call
       options = null;
       this.getEntity(key, wakOptions);
@@ -922,13 +922,17 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                       return cachedEntity;
                     }
                     else{
-                      //@todo create and cache a blank entity on the fly (to be filled later) ?
+                      //create and cache a dummy entity on the fly
+                      return ds[attr.path].$refCache.getCachedDummyNgWakEntity(this.$_entity[attr.name].relKey);
                     }
                   }
                   //case where 'this' is new and doesn't have a relatedEntity yet
                   else{
                     //@todo create and cache a blank entity on the fly (to be filled later) ?
                   }
+                }
+                else{
+                  //create and cache a dummy entity on the fly ?
                 }
               },
               set: function(ngWakEntity){
@@ -1159,7 +1163,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       this.maxEntities = options.maxEntities || DEFAULT_CACHE_SIZE;
       this.entitiesByKey = {};
       this.nbEntries = 0;
+      this.dataClass = options.dataClass;
       
+    };
+    
+    NgWakEntityCache.prototype.getDataClass = function(){
+      return this.dataClass;
     };
     
     /**
@@ -1211,6 +1220,18 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     
     NgWakEntityCache.prototype.removeCachedEntity = function(key){
       
+    };
+    
+    NgWakEntityCache.prototype.getCachedDummyNgWakEntity = function(key){
+      var ngWakEntity;
+      if(this.getDataClass().$refCache.getCacheInfo(key)){
+        ngWakEntity = this.getDataClass().$refCache.getCacheInfo(key);
+      }
+      else{
+        ngWakEntity = new NgWakEntityClasses[this.getDataClass().$name](this.getDataClass(), key);
+      }
+      this.setEntry(ngWakEntity);
+      return ngWakEntity;
     };
     
     NgWakEntityCache.prototype.getCachedNgWakEntity = function(wafEntity){

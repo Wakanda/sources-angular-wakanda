@@ -16,7 +16,7 @@ angular.module('angularWakandaFrontApp')
       window.employees = this.employees = $wakanda.$ds.Employee.$find({
 //        select: 'employer.staff.employer',
 //        select: 'employer, employer.staff',
-        select: 'employer',
+//        select: 'employer',
         pageSize: 15,
         orderBy: 'ID desc'
       });
