@@ -888,6 +888,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           this.$_key = arguments[1];
           dataClass = arguments[0];
         }
+        this.$_dataClass = dataClass;
+        Object.defineProperty(this, "$_dataClass", {
+          enumerable: false,
+          configurable: false,
+          writable: false
+        });
         Object.defineProperty(this, "$_entity", {
           enumerable: false,
           configurable: false,
@@ -1064,68 +1070,45 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         return deferred.promise;
       },
       /**
-       * @todo in the getCachedEntity routine, create fake entities using their key for related entities even if they're not autoExpanded
        * 
-       * If entity not loaded, fetched is from the server with the $_deferred.uri @deprecated
-       * If entity is loaded, executes a serverRefresh
-       * 
-       * Both ways, makes sure your entity is up to date
-       * 
+       * @param {Object} options
        * @returns {$q.promise}
        */
-      $fetch : function(){
-        var deferred, that = this, result, wakOptions = {};
+      $fetch : function(options){
+        var key, deferred, wakOptions = {}, dataClass;
+        options = typeof options === 'undefined' ? {} : options;
+        if(!this.$key()){
+          throw new Error("$fetch error - no key nor pointer was found");
+        }
+        key = this.$key();
         //prepare the promise
         deferred = $q.defer();
         
-        //2 cases
-        //- serverRefresh if $_entity
-        //- fetch on deferred if $_deferred
+        var that = this;
         
-        if(this.$_entity){
-          wakOptions.onSuccess = function(event) {
-            rootScopeSafeApply(function() {
-              result = that.$_entity.getDataClass().$create(event.entity);
-              //populate current object
-              for(var key in result){
-                if(result.hasOwnProperty(key)){
-                  that[key] = result[key];
-                }
-              }
-              deferred.resolve(result);
-            });
-          };
-          wakOptions.onError = function(error) {
-            rootScopeSafeApply(function() {
-              console.error('$fetch > Error while serverRefresh', error);
-              deferred.reject('$fetch > Error while serverRefresh'+error);
-            });
-          };
-          this.$_entity.serverRefresh(wakOptions);
-          return deferred.promise;
-        }
-        else if(this.$_deferred){
-          $http({method: 'GET', url: this.$_deferred.uri})
-            .success(function(data, status, headers, config){
-              result = that.$_deferred.dataClass.$create(data);
-              //populate current object
-              for(var key in result){
-                if(result.hasOwnProperty(key)){
-                  that[key] = result[key];
-                }
-              }
-              //remove the deferred pointer which isn't needed any more
-              delete that.$_deferred;
-              deferred.resolve(result);
-            })
-            .error(function(data, status, headers, config){
-              console.error('$fetch > Error while fetching deferred entity',data, 'status',status);
-              deferred.reject('$fetch > Error while fetching deferred entity'+data);
-            });
-        }
-        else{
-          throw new Error('Couldn\'t fetch, an error occured, no $_entity or $_deferred');
-        }
+        rootScopeSafeApply(function(){
+          that.$fetching = true;
+        });
+        
+        wakOptions.onSuccess = function(event){
+          rootScopeSafeApply(function(){
+            that.$_entity = event.entity;
+            //todo freeze $_entity
+            delete that.$_key;
+            that.$fetching = false;
+            deferred.resolve(event);//@todo @warn make sure to pass correct entity inside resolve
+          });
+        };
+        wakOptions.onError = function(event){
+          rootScopeSafeApply(function(){
+            that.$fetching = false;
+            deferred.resolve(event);
+          });
+        };
+        wakOptions.forceReload = typeof options.forceReload === 'undefined' ? true : options.forceReload;
+        
+        this.$_dataClass.getEntity(key,wakOptions);
+        //return the promise
         return deferred.promise;
       },
       //@todo check for regression according to changes
@@ -1253,9 +1236,11 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             if(attr.kind === 'relatedEntity'){
               var nestedEntity;
               if(wafEntity[attr.name] && wafEntity[attr.name].relEntity){
+                console.log(1);
                 nestedEntity = ds[wafEntity[attr.name].relEntity.getDataClass().getName()].$refCache.getCachedNgWakEntity(wafEntity[attr.name].relEntity);
               }
               else if(wafEntity[attr.name] && wafEntity[attr.name].relKey){
+                console.log(2);
                 nestedEntity = ds[wafEntity[attr.name].att.getRelatedClass().getName()].$refCache.getCacheInfo(wafEntity[attr.name].relKey);
               }
               return nestedEntity;

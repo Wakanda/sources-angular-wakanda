@@ -21,3 +21,7 @@ Keep in mind this is an ongoing process (the work is still in progress). Anythin
 * `$find()` : returns a new collection fro the current collection (feature from the v0.4.3 to merge)
 
 ###$wakanda.$ds
+
+##Temporary regressions
+
+* You can auto expand on n>1 relationships but not yet on 1>n (next sprint)
