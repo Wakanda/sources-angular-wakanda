@@ -25,3 +25,9 @@ Keep in mind this is an ongoing process (the work is still in progress). Anythin
 ##Temporary regressions
 
 * You can auto expand on n>1 relationships but not yet on 1>n (next sprint)
+
+##Main features added
+
+There is now a reference cache. This means that an instance of the employee "John Doe" will be exactly the same object weather you retrieve it via a $find, a $findOne a little later or $fetch.
+
+And the instance of company "Wakanda" will be exactly the same for "John Doe", "Jane Doe" and the 40 other ones ...

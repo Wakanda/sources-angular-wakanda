@@ -938,9 +938,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                     //@todo create and cache a blank entity on the fly (to be filled later) ?
                   }
                 }
-                else{
-                  //create and cache a dummy entity on the fly ?
-                }
               },
               set: function(ngWakEntity){
                 if(this.$_entity){
@@ -1203,7 +1200,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     };
     
     NgWakEntityCache.prototype.removeCachedEntity = function(key){
-      
+      //@todo manage cache cleaning
     };
     
     NgWakEntityCache.prototype.getCachedDummyNgWakEntity = function(key){
@@ -1236,11 +1233,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             if(attr.kind === 'relatedEntity'){
               var nestedEntity;
               if(wafEntity[attr.name] && wafEntity[attr.name].relEntity){
-                console.log(1);
                 nestedEntity = ds[wafEntity[attr.name].relEntity.getDataClass().getName()].$refCache.getCachedNgWakEntity(wafEntity[attr.name].relEntity);
               }
               else if(wafEntity[attr.name] && wafEntity[attr.name].relKey){
-                console.log(2);
                 nestedEntity = ds[wafEntity[attr.name].att.getRelatedClass().getName()].$refCache.getCacheInfo(wafEntity[attr.name].relKey);
               }
               return nestedEntity;
