@@ -9,9 +9,14 @@
  */
 angular.module('angularWakandaFrontApp')
   .controller('Test4Ctrl', function ($scope, $wakanda) {
+    
+    window.ds = $wakanda.$ds;
+    
     $scope.init = function(){
-      this.employees = $wakanda.$ds.Employee.$find({
-        select: 'employer',
+      window.employees = this.employees = $wakanda.$ds.Employee.$find({
+//        select: 'employer.staff.employer',
+//        select: 'employer, employer.staff',
+//        select: 'employer',
         pageSize: 15,
         orderBy: 'ID desc'
       });

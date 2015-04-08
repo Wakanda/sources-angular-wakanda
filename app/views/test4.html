@@ -3,14 +3,95 @@
   <div db-state init-async="false" init-collapsed="true" change-callback="init()"></div>
   <p>Test related entities assignement</p>
   <h4>Employees ( {{employees.$totalCount}} ) <span ng-click="employees.$prevPage()">&#8592;</span> <span ng-click="employees.$nextPage()">&#8594;</span></h4>
-  <ul>
-    <li ng-repeat="employee in employees">{{employee.firstName}} {{employee.lastName}} - {{employee.employer.name}}</li>
-  </ul>
+  <table>
+    <thead>
+      <tr>
+        <td>firstName</td>
+        <td>lastname</td>
+        <td>employer.name</td>
+        <td>employerName</td>
+        <td>salary</td>
+        <td>salaryProcessed</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="employee in employees">
+        <td>{{employee.firstName}}</td>
+        <td>{{employee.lastName}}</td>
+        <td>{{employee.employer.name}}</td>
+        <td>{{employee.employerName}}</td>
+        <td>{{employee.salary}}</td>
+        <td>{{employee.salaryProcessed}}</td>
+      </tr>
+    </tbody>
+  </table>
   <div>
     <button ng-click="addEmployee1()">addEmployee1()</button>
     <button ng-click="addEmployee2()">addEmployee2()</button>
     <button ng-click="updateEmployee1()">updateEmployee1()</button>
     <button ng-click="addEmployeeAndCompany1()">addEmployeeAndCompany1()</button>
     <button ng-click="addEmployeeAndCompany2()">addEmployeeAndCompany2()</button>
+    <button ng-click="rootScopeSafeApply()">rootScopeSafeApply()</button>
   </div>
+  <p>Warning : for test purpose : no request were made at init (see controller)</p>
+  <pre>
+var employees = [],companies = [];
+var wafCollection;
+ds.Employee.query('',{
+      autoExpand: 'employer',
+      onSuccess:function(e){
+        console.log('e',e);
+        wafCollection = e.result;
+
+        console.group('companies name');
+		wafCollection.forEachInCache({
+                  onSuccess: function(e){
+                    employees.push(e.entity);
+                    if(e.entity.employer.relEntity){
+                      console.log(e.entity.employer.relEntity.name.getValue(),e.entity.employer.relEntity);
+                      companies.push(e.entity.employer.relEntity);
+                    }
+                    else{
+                      console.warn(e.entity);
+                    }
+                  },
+                  first: 0,
+                  limit: 39
+                });
+		console.groupEnd();
+		console.log('employees',employees);
+		console.log('companies',companies);
+      }
+    });
+
+//reference to owner n>1
+employees[0].employer.owner === employees[0];
+
+//without autoExpand: 'employer' -> relKey is populated, NOT relEntity
+employees[0].employer.relKey
+
+//otherwise
+employees[0].employer.relEntity
+
+
+//with refCache: true
+
+//references are kept and objects can be compared
+companies[2] === companies[1]
+
+//objects in refCache can be accessed (only via key -> new objects created on frontend WON'T be in until save)
+ds.Employee.getRefCache().getCacheInfo(2962).entity.employer.relEntity === ds.Company.getRefCache().getCacheInfo(182).entity
+
+------------
+
+var wakCollection;
+ds.Employee.query('',{
+      autoExpand: 'employer',
+      onSuccess:function(e){
+        console.log('e',e);
+        wakCollection = transform.wafEntityCollectionToNgWakEntityCollection(e.result);
+        console.log('wakCollection',wakCollection);
+      }
+    });
+  </pre>
 </div>
