@@ -8,7 +8,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         DEFAULT_CACHE_SIZE = 300,
         DEFAULT_CACHE_DEEP = 3;
 
-    /** connexion part */
+    var $wakandaResult = {};
 
     /**
      * Init method to execute once on your application (that will retrieve the WAF catalog, a description of your db)
@@ -17,7 +17,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      * @param {String} catalog
      * @returns {$q.promise}
      */
-    var init = function(catalog) {
+    $wakandaResult.init = function(catalog) {
       console.log('>$wakanda init');
       var deferred = $q.defer();
       if (typeof catalog !== "string" || catalog === '*' || catalog === '') {
@@ -51,7 +51,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      *
      * @returns {event.dataStore}
      */
-    var getDatastore = function() {
+    $wakandaResult.getDatastore = function() {
       if (ds !== null) {
         return ds;
       }
@@ -59,6 +59,76 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         throw new Error("The Datastore isn't initialized please execute .init(catalog) before you run your app.");
       }
     };
+
+    Object.defineProperty($wakandaResult, '$ds', {
+      get: $wakandaResult.getDatastore
+    });
+
+    /**
+     * Returns a promise :
+     * - success : in param an object like {result : true} if ok - {result : false} if ko
+     * - error : if the request had a problem
+     * @param {string} login
+     * @param {string} password
+     * @returns {deferred.promise}
+     */
+    $wakandaResult.$loginByPassword = $wakandaResult.$login = function(login, password) {
+      return _wrapInPromise(WAF.directory.loginByPassword, login, password);
+    };
+
+    /**
+     * Returns a promise :
+     * - success : in param an object like {result : currentUserInfos} if ok
+     * - error : if the request had a problem
+     * @returns {deferred.promise}
+     */
+    $wakandaResult.$currentUser = function() {
+      return _wrapInPromise(WAF.directory.currentUser);
+    };
+
+    /**
+     * Returns a promise :
+     * - success : in param an object like {result : true} if ok - {result : false} if ko
+     * - error : if the request had a problem
+     * @returns {deferred.promise}
+     */
+    $wakandaResult.$logout = function() {
+      return _wrapInPromise(WAF.directory.logout);
+    };
+
+    /**
+     * Returns a promise :
+     * - success : in param an object like {result : true} if ok - {result : false} if ko
+     * - error : if the request had a problem
+     * @param {String} groupName
+     * @returns {deferred.promise}
+     */
+    $wakandaResult.$currentUserBelongsTo = function(groupName) {
+      return _wrapInPromise(WAF.directory.currentUserBelongsTo, groupName);
+    };
+
+    function _wrapInPromise() {
+        var args = Array.prototype.slice.call(arguments);
+        var callback = args.shift();
+        var deferred,
+          wakOptions = {};
+        deferred = $q.defer();
+
+        wakOptions.onSuccess = function(event) {
+          deferred.resolve({ result : event.result });
+        };
+        wakOptions.onError = function(event) {
+          deferred.reject(event);
+        };
+        args.push(wakOptions);
+        callback.apply(this, args);
+        return deferred.promise;
+    }
+
+    // todo remove
+    window.WAF = WAF;
+    window.transform = transform;
+    // end todo remove
 
     /**
      * Safe $rootScope.$apply which check for $apply or $digest phase before
@@ -77,26 +147,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       }
     };
 
-    /** base helpers */
-
-    var helpers = {
-      //deeply inspired by the one in AngularJS ngResource source code
-      shallowClearAndCopy: function(src, dst) {
-        dst = dst || {};
-
-        angular.forEach(dst, function(value, key) {
-          delete dst[key];
-        });
-
-        for (var key in src) {
-          if (src.hasOwnProperty(key)) {
-            dst[key] = src[key];
-          }
-        }
-
-        return dst;
-      }
-    };
 
     /** Prepare DataStore, etc ... */
 
@@ -536,7 +586,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     };
 
     //@todo the method bellow will change (nested collections management)
-    $$isLoadedOnNestedCollection = function() {
+    var $$isLoadedOnNestedCollection = function() {
       if(this.$_deferred) {
         return false;
       }
@@ -631,7 +681,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      * Return a JSON representation of an NgWak object (must clean the object before to avoid circular references)
      * @returns {String}
      */
-    $$toJSON = function() {
+    var $$toJSON = function() {
 
       var getCleanObject = function(obj) {
         var tmp, key, i;
@@ -1254,129 +1304,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 
     /** end cache */
 
-    /** directory */
-
-    /**
-     * Returns a promise :
-     * - success : in param an object like {result : true} if ok - {result : false} if ko
-     * - error : if the request had a problem
-     * @param {string} login
-     * @param {string} password
-     * @returns {deferred.promise}
-     */
-    var directoryLoginByPassword = function(login, password) {
-      var deferred, wakOptions = {};
-      //prepare the promise
-      deferred = $q.defer();
-
-      wakOptions.onSuccess = function(event) {
-          deferred.resolve({result : event.result});
-      };
-      wakOptions.onError = function(event) {
-        deferred.reject(event);
-      };
-
-      WAF.directory.loginByPassword(login,password,wakOptions);
-
-      return deferred.promise;
-    };
-
-
-    /**
-     * Returns a promise :
-     * - success : in param an object like {result : currentUserInfos} if ok
-     * - error : if the request had a problem
-     * @returns {deferred.promise}
-     */
-    var directoryCurrentUser = function() {
-      var deferred, wakOptions = {};
-      //prepare the promise
-      deferred = $q.defer();
-
-      wakOptions.onSuccess = function(event) {
-        deferred.resolve({result : event.result});
-      };
-      wakOptions.onError = function(event) {
-        deferred.reject(event);
-      };
-
-      WAF.directory.currentUser(wakOptions);
-
-      return deferred.promise;
-    };
-
-
-
-    /**
-     * Returns a promise :
-     * - success : in param an object like {result : true} if ok - {result : false} if ko
-     * - error : if the request had a problem
-     * @returns {deferred.promise}
-     */
-    var directoryLogout = function() {
-      var deferred, wakOptions = {};
-      //prepare the promise
-      deferred = $q.defer();
-
-      wakOptions.onSuccess = function(event) {
-        deferred.resolve({result : event.result});
-      };
-      wakOptions.onError = function(event) {
-        console.error('>logout',event);
-        deferred.reject(event);
-      };
-
-      WAF.directory.logout(wakOptions);
-
-      return deferred.promise;
-    };
-
-
-    /**
-     * Returns a promise :
-     * - success : in param an object like {result : true} if ok - {result : false} if ko
-     * - error : if the request had a problem
-     * @param {String} groupName
-     * @returns {deferred.promise}
-     */
-    var directoryCurrentUserBelongsTo = function(groupName) {
-      var deferred, wakOptions = {};
-      //prepare the promise
-      deferred = $q.defer();
-
-      wakOptions.onSuccess = function(event) {
-        deferred.resolve({result : event.result});
-      };
-      wakOptions.onError = function(event) {
-        deferred.reject(event);
-      };
-
-      WAF.directory.currentUserBelongsTo(groupName,wakOptions);
-
-      return deferred.promise;
-    };
-
-    //todo remove
-    window.WAF = WAF;
-    window.transform = transform;
-    //end todo remove
-
-    /** returned object */
-
-    var $wakandaResult = {
-      init: init,
-      getDatastore: getDatastore,
-      $login : directoryLoginByPassword,
-      $loginByPassword : directoryLoginByPassword,
-      $currentUser : directoryCurrentUser,
-      $logout : directoryLogout,
-      $currentUserBelongsTo : directoryCurrentUserBelongsTo
-    };
-
-    Object.defineProperty($wakandaResult,'$ds',{
-      get:getDatastore
-    });
 
     return $wakandaResult;
-
   }]);
