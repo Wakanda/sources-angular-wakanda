@@ -259,7 +259,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         var proto;
         proto = prepareHelpers.createUserDefinedEntityMethods(dataClass);
         NgWakEntityClasses[dataClass.getName()] = NgWakEntityAbstract.extend(proto);
-        ds[dataClass.getName()].$Entity = NgWakEntityClasses[dataClass.getName()].prototype;
+        dataClass.$Entity = NgWakEntityClasses[dataClass.getName()].prototype;
       },
       wafDataClassCreateRefCache : function(dataClass) {
         dataClass.$refCache = new NgWakEntityCache({
@@ -900,7 +900,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       deferred = $q.defer();
       //create dummy ngWakEntity (without a WAF.Entity pointer) and cache it in $refCache
       //if a reference is already in cache, retrieve it, if not, create a dummy one and cache it
-      ngWakEntity = ds[this.$name].$refCache.getCachedDummyNgWakEntity(key);
+      ngWakEntity = this.$refCache.getCachedDummyNgWakEntity(key);
       ngWakEntity.$promise = deferred.promise;
       ngWakEntity.$fetching = true;
       //prepare callbacks
@@ -979,16 +979,16 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               get: function() {
                 if(this.$_entity) {
                   if(this.$_entity[attr.name] && this.$_entity[attr.name].relEntity && typeof this.$_entity[attr.name].relEntity.getKey() !== 'undefined') {
-                    return ds[this.$_entity[attr.name].relEntity.getDataClass().getName()].$refCache.getCachedNgWakEntity(this.$_entity[attr.name].relEntity);
+                    return this.$_entity[attr.name].relEntity.getDataClass().$refCache.getCachedNgWakEntity(this.$_entity[attr.name].relEntity);
                   }
                   else if(this.$_entity[attr.name] && this.$_entity[attr.name].relEntity === null && typeof this.$_entity[attr.name].relKey !== 'undefined') {
-                    var cachedEntity = ds[this.$_entity[attr.name].att.getRelatedClass().getName()].$refCache.getCacheInfo(this.$_entity[attr.name].relKey);
+                    var cachedEntity = this.$_entity[attr.name].att.getRelatedClass().$refCache.getCacheInfo(this.$_entity[attr.name].relKey);
                     if(cachedEntity) {
                       return cachedEntity;
                     }
                     else{
                       //create and cache a dummy entity on the fly
-                      return ds[attr.path].$refCache.getCachedDummyNgWakEntity(this.$_entity[attr.name].relKey);
+                      return attr.getRelatedClass().$refCache.getCachedDummyNgWakEntity(this.$_entity[attr.name].relKey);
                     }
                   }
                   //case where 'this' is new and doesn't have a relatedEntity yet
@@ -1291,10 +1291,10 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             if(attr.kind === 'relatedEntity') {
               var nestedEntity;
               if(wafEntity[attr.name] && wafEntity[attr.name].relEntity) {
-                nestedEntity = ds[wafEntity[attr.name].relEntity.getDataClass().getName()].$refCache.getCachedNgWakEntity(wafEntity[attr.name].relEntity);
+                nestedEntity = attr.getRelatedClass().$refCache.getCachedNgWakEntity(wafEntity[attr.name].relEntity);
               }
               else if(wafEntity[attr.name] && wafEntity[attr.name].relKey) {
-                nestedEntity = ds[wafEntity[attr.name].att.getRelatedClass().getName()].$refCache.getCacheInfo(wafEntity[attr.name].relKey);
+                nestedEntity = attr.getRelatedClass().$refCache.getCacheInfo(wafEntity[attr.name].relKey);
               }
               return nestedEntity;
             }
