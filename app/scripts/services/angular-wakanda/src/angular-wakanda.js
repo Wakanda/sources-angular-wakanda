@@ -107,22 +107,28 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       return _wrapInPromise(WAF.directory.currentUserBelongsTo, groupName);
     };
 
+    /**
+     * Private helper - call generic DataProvider methods and wrap them in promise
+     * @param {Function} The async DataProvider's method to be called
+     * @param Any parameters needed by the method wrapped
+     * @returns {deferred.promise}
+     */
     function _wrapInPromise() {
-        var args = Array.prototype.slice.call(arguments);
-        var callback = args.shift();
-        var deferred,
+      var args = Array.prototype.slice.call(arguments);
+      var callback = args.shift();
+      var deferred,
           wakOptions = {};
-        deferred = $q.defer();
+      deferred = $q.defer();
 
-        wakOptions.onSuccess = function(event) {
-          deferred.resolve({ result : event.result });
-        };
-        wakOptions.onError = function(event) {
-          deferred.reject(event);
-        };
-        args.push(wakOptions);
-        callback.apply(this, args);
-        return deferred.promise;
+      wakOptions.onSuccess = function(event) {
+        deferred.resolve({ result : event.result });
+      };
+      wakOptions.onError = function(event) {
+        deferred.reject(event);
+      };
+      args.push(wakOptions);
+      callback.apply(this, args);
+      return deferred.promise;
     }
 
     // todo remove
