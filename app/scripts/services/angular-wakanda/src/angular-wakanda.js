@@ -282,7 +282,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             proto[methodName+"Sync"] = function() {
               return this.$_entity[methodName].apply(this.$_entity,arguments);
             };
-            prepareHelpers.wakandaUserDefinedMethodToPromisableMethods(proto, methodName, dataClass._private.entityMethods[methodName]);
+            proto[methodName] = prepareHelpers.wakandaUserDefinedMethodToPromisableMethods(dataClass._private.entityMethods[methodName]);
           }
         }
 
@@ -295,7 +295,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             proto[methodName+"Sync"] = function() {
               return this.$_collection[methodName].apply(this.$_collection,arguments);
             };
-            prepareHelpers.wakandaUserDefinedMethodToPromisableMethods(proto, methodName, dataClass._private.entityCollectionMethods[methodName]);
+            proto[methodName] = prepareHelpers.wakandaUserDefinedMethodToPromisableMethods(dataClass._private.entityCollectionMethods[methodName]);
           }
         }
         return proto;
@@ -326,9 +326,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           };
         });
       },
-      wakandaUserDefinedMethodToPromisableMethods : function(proto, methodName, method) {
+      wakandaUserDefinedMethodToPromisableMethods : function(method) {
 
-        proto[methodName] = function() {
+        return function() {
           var thatArguments = [],
               that,
               wakOptions = {},
