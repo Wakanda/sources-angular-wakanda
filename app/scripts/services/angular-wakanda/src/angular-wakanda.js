@@ -1279,8 +1279,14 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         return this.entitiesByKey[wafEntity.$_tempUUID];
       }
       else if(this.entitiesByKey[wafEntity.getKey()]) {
-        //trasverse relatedEntity and relatedEntities attributes - to update them
-        return this.entitiesByKey[wafEntity.getKey()];
+        var cachedNgWakEntity = this.entitiesByKey[wafEntity.getKey()];
+        //case this ngWakEntity only contains a key - has no $_entity pointer - add the pointer and recache the ngWakEntity (under same reference and key)
+        if(typeof cachedNgWakEntity.$_key !== 'undefined') {
+          delete cachedNgWakEntity.$_key;
+          cachedNgWakEntity.$_entity = wafEntity;
+          this.setEntry(cachedNgWakEntity);
+        }
+        return cachedNgWakEntity;
       }
       //manage : new WAF.Entity, new WAF.Entity from server,
       else{
