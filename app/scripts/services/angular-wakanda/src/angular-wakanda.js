@@ -911,6 +911,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           //todo freeze $_entity
           delete ngWakEntity.$_key;
           ngWakEntity.$fetching = false;
+          event.result = ngWakEntity;
           deferred.resolve(event);//@todo @warn pass the ngWakEntity in the resolve
         });
       };
@@ -1152,6 +1153,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             //todo freeze $_entity
             delete that.$_key;
             that.$fetching = false;
+            event.result = that;
             deferred.resolve(event);//@todo @warn make sure to pass correct entity inside resolve
           });
         };
