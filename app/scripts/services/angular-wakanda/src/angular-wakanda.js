@@ -1175,8 +1175,33 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           return false;
         }
       },
-      $toJSON: $$toJSON
+      $toJSON: $$toJSON,
+      $serverRefresh: function(options) {
+        var deferred = $q.defer(),
+          that = this,
+          options = options || {};
 
+        if(! this.$_entity) {
+          throw new Error("Can't $serverRefresh() without pointer, please $fetch() before.");
+        }
+
+        var wakOptions = {
+          onSuccess: function(e) {
+            rootScopeSafeApply(function() {
+              that.$_entity.getDataClass().$refCache.setEntry(that);
+              deferred.resolve(e);
+            });
+          },
+          onError: function(e) {
+            rootScopeSafeApply(function() {
+              console.error('serverRefresh.error', e);
+              deferred.reject(e);
+            });
+          }
+        };
+        this.$_entity.serverRefresh(wakOptions);
+        return deferred.promise;
+      }
     };
 
     var NgWakEntityAbstract = Class.extend(NgWakEntityAbstractPrototype);
