@@ -5,7 +5,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     var ds = null,
         NgWakEntityClasses = {},
         DEFAULT_PAGESIZE_NESTED_COLLECTIONS = 40,
-        DEFAULT_CACHE_SIZE = 300,
+        DEFAULT_CACHE_SIZE = 1000,
         DEFAULT_CACHE_DEEP = 3;
 
     var $wakandaResult = {};
@@ -262,6 +262,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         dataClass.$Entity = NgWakEntityClasses[dataClass.getName()].prototype;
       },
       wafDataClassCreateRefCache: function(dataClass) {
+        dataClass.getRefCache().setSize(DEFAULT_CACHE_SIZE);//@todo - later adaptive refCache size mechanism (DataProvider AND Connector)
         dataClass.$refCache = new NgWakEntityCache({
           dataClass: dataClass
         });
@@ -1249,6 +1250,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       if (typeof size !== 'number' || size < DEFAULT_CACHE_SIZE) {
         size = DEFAULT_CACHE_SIZE;
       }
+      //@todo update DataProvider's cache size via dataClass.getCache().setSize()
       this.maxEntities = size;
     };
 

@@ -110,5 +110,54 @@ angular.module('angularWakandaFrontApp')
       });
     };
     
+    $scope.testForEachInCache = function(){
+      var companies = [];
+      var totalEmployees = 0;
+      var wafCollection;
+      window.ds.Company.query('',{
+            autoExpand: 'staff',
+            onSuccess:function(e){
+              console.log('e',e);
+              wafCollection = e.result;
+
+              console.group('companies');
+                      wafCollection.forEachInCache({
+                onSuccess: function(e){
+                  var company = {
+                      "name": e.entity.name.getValue(),
+                      "staff" : [],
+                      "entity": e.entity
+                  };
+                  console.group('company',company.name,'length',e.entity.staff.relEntityCollection.length,'e',e);
+                  e.entity.staff.relEntityCollection.forEachInCache({
+                      onSuccess: function(e){
+                          var employee = {
+                              "firstName": e.entity.firstName.getValue(),
+                              "lastName": e.entity.lastName.getValue(),
+                              "entity": e.entity
+                          };
+                          console.log('employee',employee.firstName,employee.lastName,'e',e);
+                          totalEmployees++;
+                          company.staff.push(employee);
+                      },
+                      onError: function(e){
+                          console.warn(e);
+                      },
+                      first: 0,
+                      limit: 39
+                  });
+                  console.groupEnd();
+                  companies.push(company);
+                },
+                first: 0,
+                limit: 39
+              });
+              console.groupEnd();
+              console.log('companies',companies);
+              console.log('totalEmployees',totalEmployees);
+            }
+          });
+    };
+    
     $scope.init();
   });

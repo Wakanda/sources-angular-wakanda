@@ -2666,9 +2666,12 @@ WAF.EntityCollection.forEach = function(options, userData)
 	userData = resOp.userData;
 	options = resOp.options;
 	
+	var limit = entityCollection.length;
+	if (options.limit != null && options.limit < limit)
+		limit = options.limit;
 	var parseInfo = { 
 						curelem : options.first || 0, 
-						limit : options.limit || entityCollection.length,
+						limit : limit,
 						userData: userData,
 						entityCollection: entityCollection
 					};
@@ -2698,7 +2701,9 @@ WAF.EntityCollection.forEachInCache = function(options, userData)
 	var curstart = 0;
 	
 	var absolutestart = options.first || 0;
-	var absoluteend = options.limit || entityCollection.length;
+	var absoluteend = entityCollection.length;
+	if (options.limit != null && options.limit < absoluteend)
+		absoluteend = options.limit;
 	
 	while (!stop)
 	{
@@ -3351,18 +3356,16 @@ WAF.EntityAttributeRelated.setRawValue = function(rawVal)
 
 WAF.EntityAttributeRelated.getRawValue = function()
 {
-	var result = this.relEntity;
-	if (result != null)
-	{
-		var key = result.getKey();
-		if (key != null)
-		{
-			result = { __KEY: key };
-		}
-		else
-			result = result._private.getRESTFormat();
+	var key = this.relKey;
+	if(this.relEntity) {
+		key = this.relEntity.getKey();
 	}
-	return result;
+	if (key != null) {
+		return { __KEY: key };
+	} else if(this.relEntity) {
+		return this.relEntity._private.getRESTFormat();
+	}
+	return null;
 }
 
 
@@ -3515,6 +3518,7 @@ WAF.Entity = function(dataClass, rawData, options)
 	var entity = this;
 	options = options || {};
 	var tryToGetRefFromCache = (options.getRefFromCache || false) && dataClass.mustCacheRef();
+	var mergeExistingEntity = tryToGetRefFromCache && (rawData != null);
 	
 	var cache;
 	var cacheInfo = null;
@@ -3533,6 +3537,40 @@ WAF.Entity = function(dataClass, rawData, options)
 				{
 					cacheInfo.timeStamp = new Date();
 					entity = cacheInfo.entity;
+					if (mergeExistingEntity)
+					{
+						var attsByName = dataClass._private.attributesByName;
+						for (var e in attsByName)
+						{
+							var att = attsByName[e];
+							var val = rawData[e];
+							if (val != undefined)
+							{
+								valAtt = entity[e];
+								if (!att.related)
+								{
+									valAtt.setRawValue(val);
+								}
+								else
+								{
+									if (att.relatedOne)
+									{
+										if (val != null && val.__deferred == null)
+										{
+											valAtt.setRawValue(val);
+										}
+									}
+									else
+									{
+										if (val != null && val.__deferred == null)
+										{
+											valAtt.setRawValue(val);
+										}
+									}
+								}
+							}
+						}	
+					}
 					return entity;
 				}
 			}
