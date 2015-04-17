@@ -157,11 +157,11 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     /** Prepare DataStore, etc ... */
 
     var prepare = {
-      wafDatastore : function(dataStore) {
+      wafDatastore: function(dataStore) {
         //expose NgWak*Abstract prototypes
         dataStore.$Entity = NgWakEntityAbstract.prototype;
       },
-      wafDataClasses : function(dataStore) {
+      wafDataClasses: function(dataStore) {
         var dataClassName;
         //add some to prototype
         WAF.DataClass.prototype.$find = $$find;
@@ -181,7 +181,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
         }
       },
-      wafDataClassAddMetas : function(dataClass) {
+      wafDataClassAddMetas: function(dataClass) {
         var methodInfo,
             dataClassMethods = [],
             collectionMethods = [],
@@ -189,15 +189,15 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             attributes,
             attributeName;
 
-        angular.forEach(dataClass.getMethodList(),function(methodInfo) {
+        angular.forEach(dataClass.getMethodList(), function(methodInfo) {
           switch(methodInfo.applyTo) {
-            case "entity" :
+            case "entity":
               entityMethods.push(methodInfo.name);
               break;
-            case "entityCollection" :
+            case "entityCollection":
               collectionMethods.push(methodInfo.name);
               break;
-            case "dataClass" :
+            case "dataClass":
               dataClassMethods.push(methodInfo.name);
               break;
           }
@@ -252,16 +252,16 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         });
 
       },
-      wafDataClassAddDataClassMethods : function(dataClass) {
+      wafDataClassAddDataClassMethods: function(dataClass) {
         prepareHelpers.createUserDefinedDataClassMethods(dataClass);
       },
-      wafDataClassCreateNgWakEntityClasses : function(dataClass) {
+      wafDataClassCreateNgWakEntityClasses: function(dataClass) {
         var proto;
         proto = prepareHelpers.createUserDefinedEntityMethods(dataClass);
         NgWakEntityClasses[dataClass.getName()] = NgWakEntityAbstract.extend(proto);
         dataClass.$Entity = NgWakEntityClasses[dataClass.getName()].prototype;
       },
-      wafDataClassCreateRefCache : function(dataClass) {
+      wafDataClassCreateRefCache: function(dataClass) {
         dataClass.$refCache = new NgWakEntityCache({
           dataClass: dataClass
         });
@@ -279,10 +279,10 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 
         for(methodName in dataClass._private.entityMethods) {
           if(dataClass._private.entityMethods.hasOwnProperty(methodName)) {
-            proto[methodName+"Sync"] = function() {
+            proto[methodName + 'Sync'] = function() {
               return this.$_entity[methodName].apply(this.$_entity,arguments);
             };
-            prepareHelpers.wakandaUserDefinedMethodToPromisableMethods(proto, methodName, dataClass._private.entityMethods[methodName]);
+            proto[methodName] = prepareHelpers.wakandaUserDefinedMethodToPromisableMethods(dataClass._private.entityMethods[methodName]);
           }
         }
 
@@ -292,16 +292,16 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         var methodName, proto = {};
         for(methodName in dataClass._private.entityCollectionMethods) {
           if(dataClass._private.entityCollectionMethods.hasOwnProperty(methodName)) {
-            proto[methodName+"Sync"] = function() {
+            proto[methodName + 'Sync'] = function() {
               return this.$_collection[methodName].apply(this.$_collection,arguments);
             };
-            prepareHelpers.wakandaUserDefinedMethodToPromisableMethods(proto, methodName, dataClass._private.entityCollectionMethods[methodName]);
+            proto[methodName] = prepareHelpers.wakandaUserDefinedMethodToPromisableMethods(dataClass._private.entityCollectionMethods[methodName]);
           }
         }
         return proto;
       },
       createUserDefinedDataClassMethods: function(dataClass) {
-        angular.forEach(dataClass.$dataClassMethods(),function(methodName) {
+        angular.forEach(dataClass.$dataClassMethods(), function(methodName) {
           dataClass[methodName] = function() {
             var defer = $q.defer();
             dataClass.callMethod({
@@ -313,22 +313,22 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                 console.error('userDataClassMethods.onError','error', error);
                 defer.reject(error);
               },
-              arguments : arguments.length > 0 ? Array.prototype.slice.call(arguments,0) : []
+              arguments: arguments.length > 0 ? Array.prototype.slice.call(arguments,0) : []
             });
             return defer.promise;
           };
-          dataClass[methodName+'Sync'] = function() {
+          dataClass[methodName + 'Sync'] = function() {
             return dataClass.callMethod({
               method: methodName,
               sync: true,
-              arguments : arguments.length > 0 ? Array.prototype.slice.call(arguments,0) : []
+              arguments: arguments.length > 0 ? Array.prototype.slice.call(arguments,0) : []
             });
           };
         });
       },
-      wakandaUserDefinedMethodToPromisableMethods : function(proto, methodName, method) {
+      wakandaUserDefinedMethodToPromisableMethods: function(method) {
 
-        proto[methodName] = function() {
+        return function() {
           var thatArguments = [],
               that,
               wakOptions = {},
@@ -449,7 +449,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         result.$toJSON = $$toJSON;
       },
       //@todo adapt / wrap some of the method bellow for nested collections (since their management changed)
-      addFrameworkMethodsToNestedCollection : function(result) {
+      addFrameworkMethodsToNestedCollection: function(result) {
         result.$fetch = $fetchOnNestedCollection;
         result.$find = $$find.bind(result.$_collection);
         result.$more = $$more;
@@ -557,7 +557,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               that.length = 0;
             }
             e.entityCollection.forEach({
-              onSuccess : function(item) {
+              onSuccess: function(item) {
                 rootScopeSafeApply(function() {
                   console.log(item.position,item.entity,that.$_collection.relEntityCollection.getDataClass());
                   that.push(that.$_collection.relEntityCollection.getDataClass().$create(item.entity));
@@ -567,8 +567,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                 console.log('atTheEnd','e',e);
               },
               //@todo not always passed
-              first : wakOptions.skip,
-              limit : wakOptions.skip + wakOptions.top
+              first: wakOptions.skip,
+              limit: wakOptions.skip + wakOptions.top
             });
             //remove the deferred pointer to show that the collection has been loaded anyway
             delete that.$_deferred;
@@ -724,7 +724,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     /**
      * shortcuts for fetch - @todo spectify the exact return value when no more result
      * for the moment, when there is still data loaded, returns the promise from $fetch
-     * if there is no data, returns a promise to be resolved with an object at noMore : true
+     * if there is no data, returns a promise to be resolved with an object at noMore: true
      */
 
     var $$more = function() {
@@ -745,14 +745,14 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       if(start >= totalCount) {
         deferred = new $q.defer();
         deferred.resolve({
-          noMore : true
+          noMore: true
         });
         return deferred.promise;
       }
       else{
         return this.$fetch({
-          'start' : start,
-          'pageSize' : pageSize
+          'start': start,
+          'pageSize': pageSize
         },'append');
       }
     };
@@ -774,14 +774,14 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       if(start >= totalCount) {
         deferred = new $q.defer();
         deferred.resolve({
-          noMore : true
+          noMore: true
         });
         return deferred.promise;
       }
       else{
         return this.$fetch({
-          'start' : start,
-          'pageSize' : pageSize
+          'start': start,
+          'pageSize': pageSize
         });
       }
     };
@@ -804,8 +804,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         start = 0;
       }
       return this.$fetch({
-        'start' : start,
-        'pageSize' : pageSize
+        'start': start,
+        'pageSize': pageSize
       }).then(function(e) {
         if(noMore === true) {
           e.noMore = true;
@@ -1056,7 +1056,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
         }.bind(this));
       },
-      $key : function() {
+      $key: function() {
         if(this.$_entity) {
           return this.$_entity.getKey();
         }
@@ -1064,17 +1064,17 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           return this.$_key;
         }
       },
-      $stamp : function() {
+      $stamp: function() {
         if(this.$_entity) {
           return this.$_entity.getStamp();
         }
       },
-      $isNew : function() {
+      $isNew: function() {
         if(this.$_entity) {
           return this.$_entity.isNew();
         }
       },
-      $save : function() {
+      $save: function() {
         if(!this.$_entity) {
           throw new Error("Can't $save() without pointer, please $fetch() before.");//@todo is is the right way ?
         }
@@ -1100,7 +1100,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         console.groupEnd();
         return deferred.promise;
       },
-      $remove : function() {
+      $remove: function() {
         if(!this.$_entity) {
           throw new Error("Can't $remove() without pointer, please $fetch() before.");//@todo is is the right way ? (should be able to remove without fetching, based on $_key only)
         }
@@ -1129,7 +1129,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
        * @param {Object} options
        * @returns {$q.promise}
        */
-      $fetch : function(options) {
+      $fetch: function(options) {
         var key, deferred, wakOptions = {}, dataClass;
         options = typeof options === 'undefined' ? {} : options;
         if(!this.$key()) {
@@ -1167,7 +1167,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         return deferred.promise;
       },
       //@todo check for regression according to changes
-      $isLoaded : function() {
+      $isLoaded: function() {
         if(this.$_entity) {
           return true;
         }
@@ -1175,8 +1175,33 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           return false;
         }
       },
-      $toJSON : $$toJSON
+      $toJSON: $$toJSON,
+      $serverRefresh: function(options) {
+        var deferred = $q.defer(),
+          that = this,
+          options = options || {};
 
+        if(! this.$_entity) {
+          throw new Error("Can't $serverRefresh() without pointer, please $fetch() before.");
+        }
+
+        var wakOptions = {
+          onSuccess: function(e) {
+            rootScopeSafeApply(function() {
+              that.$_entity.getDataClass().$refCache.setEntry(that);
+              deferred.resolve(e);
+            });
+          },
+          onError: function(e) {
+            rootScopeSafeApply(function() {
+              console.error('serverRefresh.error', e);
+              deferred.reject(e);
+            });
+          }
+        };
+        this.$_entity.serverRefresh(wakOptions);
+        return deferred.promise;
+      }
     };
 
     var NgWakEntityAbstract = Class.extend(NgWakEntityAbstractPrototype);
