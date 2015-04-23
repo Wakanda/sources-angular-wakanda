@@ -126,15 +126,16 @@ angular.module('angularWakandaFrontApp')
                   var company = {
                       "name": e.entity.name.getValue(),
                       "staff" : [],
-                      "entity": e.entity
+                      "$_entity": e.entity
                   };
+                  company.staff.$_collection = e.entity.staff.relEntityCollection;
                   console.group('company',company.name,'length',e.entity.staff.relEntityCollection.length,'e',e);
                   e.entity.staff.relEntityCollection.forEachInCache({
                       onSuccess: function(e){
                           var employee = {
                               "firstName": e.entity.firstName.getValue(),
                               "lastName": e.entity.lastName.getValue(),
-                              "entity": e.entity
+                              "$_entity": e.entity
                           };
                           console.log('employee',employee.firstName,employee.lastName,'e',e);
                           totalEmployees++;
