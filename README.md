@@ -11,7 +11,7 @@ Welcome to the **source repository** of the **angular-wakanda connector**. You'l
 * An angular application
 * A wakanda solution
 
-[Read more on wiki ...](/Wakanda/sources-angular-wakanda/wiki/included)
+[Read more on wiki ...](https://github.com/Wakanda/sources-angular-wakanda/wiki/included)
 
 ##Setup
 
@@ -37,7 +37,7 @@ $ cd ./app/scripts/services/angular-wakanda
 $ npm install
 ```
 
-[Full version on wiki ...](/Wakanda/sources-angular-wakanda/wiki/project-setup#setup)
+[Full version on wiki ...](https://github.com/Wakanda/sources-angular-wakanda/wiki/project-setup#setup)
 
 ###Run
 
@@ -46,19 +46,19 @@ Open two Terminal tabs :
 1. Launch the Wakanda Solution with your Wakanda Server : `/Users/path/to/your/wakanda/server/Wakanda\ Enterprise\ Server.app/Contents/MacOS/Wakanda\ Enterprise\ Server WakandaBaseSolution/Contacts/Contacts\ Solution/Contacts.waSolution`
 2. Launch the dev server : `grunt serve`
 
-[Full version on wiki](/Wakanda/sources-angular-wakanda/wiki/project-setup#run)
+[Full version on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/project-setup#run)
 
 ###Test
 
-[Read Test section on wiki](/Wakanda/sources-angular-wakanda/wiki/test)
+[Read Test section on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/test)
 
 ##Contributing
 
-[Read Contributing section on wiki](/Wakanda/sources-angular-wakanda/wiki/contributing)
+[Read Contributing section on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/contributing)
 
 ##FAQ
 
-[Read FAQ section on wiki](/Wakanda/sources-angular-wakanda/wiki/faq)
+[Read FAQ section on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/faq)
 
 ##Resources
 
