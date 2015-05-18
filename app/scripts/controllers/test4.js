@@ -9,9 +9,14 @@
  */
 angular.module('angularWakandaFrontApp')
   .controller('Test4Ctrl', function ($scope, $wakanda) {
+    
+    window.ds = $wakanda.$ds;
+    
     $scope.init = function(){
-      this.employees = $wakanda.$ds.Employee.$find({
-        select: 'employer',
+      window.employees = this.employees = $wakanda.$ds.Employee.$find({
+//        select: 'employer.staff.employer',
+//        select: 'employer, employer.staff',
+//        select: 'employer',
         pageSize: 15,
         orderBy: 'ID desc'
       });
@@ -103,6 +108,56 @@ angular.module('angularWakandaFrontApp')
           $scope.init();
         });
       });
+    };
+    
+    $scope.testForEachInCache = function(){
+      var companies = [];
+      var totalEmployees = 0;
+      var wafCollection;
+      window.ds.Company.query('',{
+            autoExpand: 'staff',
+            onSuccess:function(e){
+              console.log('e',e);
+              wafCollection = e.result;
+
+              console.group('companies');
+                      wafCollection.forEachInCache({
+                onSuccess: function(e){
+                  var company = {
+                      "name": e.entity.name.getValue(),
+                      "staff" : [],
+                      "$_entity": e.entity
+                  };
+                  company.staff.$_collection = e.entity.staff.relEntityCollection;
+                  console.group('company',company.name,'length',e.entity.staff.relEntityCollection.length,'e',e);
+                  e.entity.staff.relEntityCollection.forEachInCache({
+                      onSuccess: function(e){
+                          var employee = {
+                              "firstName": e.entity.firstName.getValue(),
+                              "lastName": e.entity.lastName.getValue(),
+                              "$_entity": e.entity
+                          };
+                          console.log('employee',employee.firstName,employee.lastName,'e',e);
+                          totalEmployees++;
+                          company.staff.push(employee);
+                      },
+                      onError: function(e){
+                          console.warn(e);
+                      },
+                      first: 0,
+                      limit: 39
+                  });
+                  console.groupEnd();
+                  companies.push(company);
+                },
+                first: 0,
+                limit: 39
+              });
+              console.groupEnd();
+              console.log('companies',companies);
+              console.log('totalEmployees',totalEmployees);
+            }
+          });
     };
     
     $scope.init();

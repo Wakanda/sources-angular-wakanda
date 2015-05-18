@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TODO supply a title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body ng-app="angularWakandaFrontAppProfile" ng-controller="init">
+    <button ng-click="launchProfiling()">start</button>
+    <script src="../bower_components/angular/angular.js"></script>
+    <script src="../scripts/services/angular-wakanda/angular-wakanda.debug.min.js"></script>
+    <script>
+      var myApp = angular.module('angularWakandaFrontAppProfile',['wakanda']);
+      var ds;
+      myApp.run(function($wakanda){
+        $wakanda.init().then(function(){
+          ds = $wakanda.$ds;
+        });
+      })
+      .controller('init',function($scope){
+        $scope.launchProfiling = function(){
+          var MAX = 100000;
+          ds.Employee.$refCache.setSize(MAX);
+          console.profile('creating '+MAX+' dummy entities in cache');
+          for(var i=0; i<MAX; i++){
+            ds.Employee.$refCache.getCachedDummyNgWakEntity(i);
+          }
+          console.profileEnd();
+          console.log(ds.Employee.$refCache);
+        };
+      });
+    </script>
+  </body>
+</html>

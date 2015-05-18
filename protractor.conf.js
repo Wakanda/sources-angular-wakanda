@@ -27,7 +27,8 @@ exports.config = (function(){
   
   return {
     specs : specs,
-    baseUrl : baseUrl
+    baseUrl : baseUrl,
+    framework : 'jasmine2'
   };
   
 })();
