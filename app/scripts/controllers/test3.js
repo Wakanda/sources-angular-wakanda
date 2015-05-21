@@ -27,7 +27,7 @@ angular.module('angularWakandaFrontApp')
     //retrieve infos from db
     ds = $wakanda.getDatastore();
     employees = $scope.employees = ds.Employee.$find({
-      select : 'firstName, lastName, salary, employer, photo',
+      select : 'firstName, lastName, salary, employer',
       pageSize:5,
       orderBy : 'firstName asc'
     });
@@ -35,11 +35,4 @@ angular.module('angularWakandaFrontApp')
         console.log('CTRL - employees',event,employees);
 //        employees = $scope.employees = event.result;
     });
-    
-    $scope.employeeImageSrc = null;
-    
-    $scope.displayPhoto = function(employee){
-      $scope.employeeImageSrc = employee.photo.src;
-    };
-    
   }]);

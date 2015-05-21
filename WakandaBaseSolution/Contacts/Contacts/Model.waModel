@@ -153,12 +153,6 @@
 					"path": "Company"
 				},
 				{
-					"name": "photo",
-					"kind": "storage",
-					"scope": "public",
-					"type": "image"
-				},
-				{
 					"name": "salaryProcessed",
 					"kind": "calculated",
 					"scope": "public",
@@ -253,9 +247,9 @@
 				},
 				{
 					"name": "photo",
+					"kind": "storage",
 					"scope": "public",
-					"type": "image",
-					"kind": "storage"
+					"type": "image"
 				}
 			],
 			"methods": [
