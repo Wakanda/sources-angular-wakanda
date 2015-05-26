@@ -1039,22 +1039,44 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
           //@warn specific case for object ? @warn check date types
           else{
-            Object.defineProperty(this, attr.name, {
+            var descriptor = {
               enumerable: true,
               configurable: true,
               get: function() {
                 if(this.$_entity) {
                   return this.$_entity[attr.name].getValue();
                 }
-              },
-              set: function(newValue) {
+              }
+            };
+
+            if(attr.type === 'image') {
+              descriptor.set = function(newValue) {
+                throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method to upload image.');
+              };
+            } else {
+              descriptor.set = function(newValue) {
                 if(this.$_entity) {
                   rootScopeSafeApply(function() {
                     this.$_entity[attr.name].setValue(newValue);
                   }.bind(this));
                 }
-              }
-            });
+              };
+            }
+            Object.defineProperty(this, attr.name, descriptor);
+
+            // accessor to uri
+            if(attr.type === 'image' && this[attr.name]) {
+              Object.defineProperty(this[attr.name], 'uri', {
+                enumerable: true,
+                configurable: true,
+                get: function() {
+                  return this.__deferred && this.__deferred.uri;
+                },
+                set: function(newValue) {
+                  throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method to upload image.');
+                }
+              });
+            }
           }
         }.bind(this));
       },

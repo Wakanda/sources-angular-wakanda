@@ -1,6 +1,6 @@
 'use strict';
 
-var ds, employees, company;
+var ds, employees, company, products;
 
 angular.module('angularWakandaFrontApp')
   .controller('E2E.FirstDraftCtrl', ['$scope','$wakanda',function($scope,$wakanda) {
@@ -8,6 +8,7 @@ angular.module('angularWakandaFrontApp')
       ds = $wakanda.getDatastore();
       
       $scope.employees = [];
+      $scope.products = [];
             
       $scope.orderByOptions = [
         {"label" : "none", "value" : undefined},
@@ -36,6 +37,10 @@ angular.module('angularWakandaFrontApp')
           filter : $scope.filter
         });
         company = $scope.company = null;
+
+        products = $scope.products = ds.Product.$find({
+          orderBy: 'name asc'
+        });
       };
       
       $scope.applyFilter = function(keyCode){
