@@ -43,6 +43,19 @@
       <li>Type any filter on employees (like <code>lastName=tr*</code>) <input type="text" ng-model="filter" ng-keyup="applyFilter($event.keyCode)"></li>
     </ul>
     <h4>Manipulating data</h4>
+
+    <div>
+      <h3>Product list</h3>
+      <ul class="products-list">
+       <li ng-repeat="product in products">
+         <span class="product-name">{{product.name}}</span>,
+         <span class="product-myboolean">{{product.myBoolean}}</span>,
+         <span class="product-spec-name">{{product.spec.name}}</span>,
+         <span class="product-photo-uri">{{product.photo.uri}}</span>,
+       </li>
+      </ul>
+    </div>
+
     <h5>Employee</h5>
     <form id="form-data-manipulation">
       <div class="form-group">
