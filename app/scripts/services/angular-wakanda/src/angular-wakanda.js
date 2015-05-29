@@ -1,6 +1,24 @@
 var wakanda = angular.module('wakanda', []);
 
-wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScope, $http) {
+wakanda.provider("$wakandaConfig", function() {
+    this.hostname = "";
+    this.$get = function() {
+      var hostname = this.hostname;
+      return {
+        getHostname: function() {
+          return hostname;
+        },
+        setHostname: function(hostname) {
+          this.hostname = hostname;
+        }
+      }
+    };
+    this.setHostname = function(hostname) {
+      this.hostname = hostname;
+    };
+  });
+
+wakanda.factory("$wakanda", [ "$q", "$rootScope", "$http", "$wakandaConfig", function($q, $rootScope, $http, $wakandaConfig) {
 
     var ds = null,
         NgWakEntityClasses = {},
@@ -19,6 +37,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      */
     $wakandaResult.init = function(catalog) {
       console.log('>$wakanda init');
+      WAF.hostname = $wakandaConfig.getHostname();
       var deferred = $q.defer();
       if (typeof catalog !== "string" || catalog === '*' || catalog === '') {
         catalog = null;

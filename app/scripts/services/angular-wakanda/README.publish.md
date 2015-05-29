@@ -48,6 +48,16 @@ $wakanda.init().then(function (ds) {
 });
 ```
 
+## Configuration
+
+You can use the `$wakandaConfig` provider to specify a different hostname than the default one which is `/`. *Do not include the final slash character.*
+
+```
+app.config(function($wakandaConfigProvider) {
+  $wakandaConfigProvider.setHostname('http://127.0.0.1:8081');
+}
+```
+
 ## Resources
 
 * [Tutorial](https://wakanda.github.io/NG-Wakanda-Pack)

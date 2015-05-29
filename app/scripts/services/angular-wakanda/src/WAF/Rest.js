@@ -416,7 +416,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 		var handler = this.handler;
 
 		// Build the url:
-		var url = "/";
+		var url = (WAF.hostname ? WAF.hostname : "") + "/";
 
 		// app (optional):
 		if (this.app != null)
