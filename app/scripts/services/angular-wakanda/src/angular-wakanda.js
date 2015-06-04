@@ -4,9 +4,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 
     var ds = null,
         NgWakEntityClasses = {},
-        DEFAULT_PAGESIZE_NESTED_COLLECTIONS = 40,
-        DEFAULT_CACHE_SIZE = 1000,
-        DEFAULT_CACHE_DEEP = 3;
+        DEFAULT_PAGESIZE_NESTED_COLLECTIONS = 40;
 
     var $wakandaResult = {};
 
@@ -37,7 +35,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             deferred.reject(event);
           },
           catalog: catalog,
-          cacheRef: true
+          cacheRef: false
         });
       }
       else {
@@ -177,7 +175,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             prepare.wafDataClassAddMetas(dataStore[dataClassName]);
             prepare.wafDataClassAddDataClassMethods(dataStore[dataClassName]);
             prepare.wafDataClassCreateNgWakEntityClasses(dataStore[dataClassName]);
-            prepare.wafDataClassCreateRefCache(dataStore[dataClassName]);
+            //prepare.wafDataClassCreateRefCache(dataStore[dataClassName]);
           }
         }
       },
@@ -260,13 +258,13 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         proto = prepareHelpers.createUserDefinedEntityMethods(dataClass);
         NgWakEntityClasses[dataClass.getName()] = NgWakEntityAbstract.extend(proto);
         dataClass.$Entity = NgWakEntityClasses[dataClass.getName()].prototype;
-      },
-      wafDataClassCreateRefCache: function(dataClass) {
-        dataClass.getRefCache().setSize(DEFAULT_CACHE_SIZE);//@todo - later adaptive refCache size mechanism (DataProvider AND Connector)
-        dataClass.$refCache = new NgWakEntityCache({
-          dataClass: dataClass
-        });
       }
+      // ,wafDataClassCreateRefCache: function(dataClass) {
+      //   dataClass.getRefCache().setSize(DEFAULT_CACHE_SIZE);//@todo - later adaptive refCache size mechanism (DataProvider AND Connector)
+      //   dataClass.$refCache = new NgWakEntityCache({
+      //     dataClass: dataClass
+      //   });
+      // }
     };
 
     var prepareHelpers = {
@@ -337,7 +335,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               deferred;
           //check if we are on an entity or a collection. The mode var will also be used as the name of the pointer later
           if(this instanceof NgWakEntityAbstract) {
-            if(typeof this.$_entity === 'undefined' || !this.$_entity instanceof WAF.Entity) {
+            if(typeof this.$_entity === 'undefined' || !(this.$_entity instanceof WAF.Entity)) {
               throw new Error('Calling user defined method on unfetched entity, please call $fetch before or retrieve data on $find');
             }
             mode = '$_entity';
@@ -353,7 +351,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
           //prepare the promise
           deferred = $q.defer();
-          var that = this;
+          that = this;
           wakOptions.onSuccess = function(event) {
             rootScopeSafeApply(function() {
               deferred.resolve(event);
@@ -388,7 +386,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       wafEntityCollectionToNgWakEntityCollection: function(ngWakEntityCollection, wafEntityCollection, wakOptions) {
 
         wakOptions = typeof wakOptions === 'undefined' ? {} : wakOptions;
-        mode = (typeof mode === "undefined" || mode === "replace") ? "replace" : mode;
+        var mode = (typeof mode === "undefined" || mode === "replace") ? "replace" : mode;
         var currentDataClass = wafEntityCollection.getDataClass();
         var start = typeof wakOptions.start === 'undefined' ? 0 : wakOptions.start;
         var pageSize = typeof wakOptions.pageSize === 'undefined' ? DEFAULT_PAGESIZE_NESTED_COLLECTIONS : wakOptions.pageSize;
@@ -402,13 +400,15 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           transform.addUserDefinedMethodsToCollection(ngWakEntityCollection, true);//@todo @warn refactor for any level / sublevel of collection
         }
 
-        //populate collection
+        // populate collection
         wafEntityCollection.forEachInCache({
           onSuccess: function(item) {
-            ngWakEntityCollection.push(currentDataClass.$refCache.getCachedNgWakEntity(item.entity));
+            //ngWakEntityCollection.push(currentDataClass.$refCache.getCachedNgWakEntity(item.entity));
+            ngWakEntityCollection.push(createNgWakEntity(item.entity));
+
           },
           first: start,
-          limit: start+pageSize
+          limit: start + pageSize
         });
       },
       addUserDefinedMethodsToCollection: function(result, root) {
@@ -450,7 +450,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         result.$toJSON = $$toJSON;
       },
       //@todo adapt / wrap some of the method bellow for nested collections (since their management changed)
-      addFrameworkMethodsToNestedCollection: function(result) {
+      addFrameworkMethodsToNestedCollection: function(result) { //FIXME : confirm with Christophe, this method is defined but never used
         result.$fetch = $fetchOnNestedCollection;
         result.$find = $$find.bind(result.$_collection);
         result.$more = $$more;
@@ -481,14 +481,23 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      * @returns {NgWakEntity}
      */
     var $$create = function(pojo) {
-      var dataClassName = this.getName(),
-          ngWakEntity,
-          wafEntity;
-      pojo = typeof pojo === "undefined" ? {} : pojo;
-      wafEntity = new WAF.Entity(this, pojo);
-      ngWakEntity = this.$refCache.getCachedNgWakEntity(wafEntity);
-      return ngWakEntity;
+        return createNgWakEntity(new WAF.Entity(this, pojo || {}), { expend: true });
     };
+
+    //ngWakEntity = new NgWakEntityClasses[this.getName()](wafEntity);
+    //_createRelatedNgWakEntity(ngWakEntity);
+    //return ngWakEntity;
+
+    //var $$create = function(pojo) {
+    //  var dataClassName = this.getName(),
+    //      ngWakEntity,
+    //      wafEntity;
+    //  pojo = typeof pojo === "undefined" ? {} : pojo;
+    //  wafEntity = new WAF.Entity(this, pojo);
+    //  ngWakEntity = this.$refCache.getCachedNgWakEntity(wafEntity);
+    //  return ngWakEntity;
+    //};
+
 
     var $$upload = function(file) {
       console.log('$upload not yet implemented');
@@ -649,24 +658,40 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       }
       //prepare the promise
       deferred = $q.defer();
-      var that = this;
+      that = this;
       //update $fteching ($apply needed)
       rootScopeSafeApply(function() {
         that.$fetching = true;
       });
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
+         // if(mode === 'replace') {
+         //   that.length = 0;
+         //   for(var i=0; i<event.entities.length; i++) {
+         //     that[i] = event.result.getDataClass().$refCache.getCachedNgWakEntity(event.entities[i]);
+         //     that[i] = createNgWakEntity(event.entities[i]);
+         //   }
+         // }
+         // else if(mode === 'append') {
+         //   for(var i=0; i<event.entities.length; i++) {
+         //     that.push( event.result.getDataClass().$refCache.getCachedNgWakEntity(event.entities[i]) );
+         //     that.push(createNgWakEntity(event.entities[i]));
+         //   }
+         // }
           if(mode === 'replace') {
             that.length = 0;
-            for(var i=0; i<event.entities.length; i++) {
-              that[i] = event.result.getDataClass().$refCache.getCachedNgWakEntity(event.entities[i]);
-            }
           }
-          else if(mode === 'append') {
-            for(var i=0; i<event.entities.length; i++) {
-              that.push( event.result.getDataClass().$refCache.getCachedNgWakEntity(event.entities[i]) );
+          event.entities.forEach(function(entity, i) {
+            var ngWakEntity = createNgWakEntity(entity, { expend: true });
+            if(mode === 'replace') {
+              that[i] = ngWakEntity;
+            } else if(mode === 'append') {
+              that.push(ngWakEntity);
+            } else {
+              throw("Unknow mode " + mode + ", mode must be replace or append.");
             }
-          }
+          });
+
           updateQueryInfos(that, options.pageSize || that.$_collection._private.pageSize, skip);
           that.$fetching = false;
           deferred.resolve(event);//@todo @warn what is passing on the resolve ?
@@ -825,52 +850,37 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      * @returns {Array[NgWakEntity]|NgWakEntity}
      */
     var $$find = function(options) {
-      var deferred, wakOptions = {}, query = null, onlyOne, result;
-      //input check
-      if (!options || typeof options !== "object") {
-        options = {};
-      }
-      //prepare options
+      var wakOptions = {},
+          result = [],
+          deferred;
+
+      options = typeof(options) === 'object' && options || {};
       if (options.select) {
         wakOptions.autoExpand = options.select;
       }
-      if (options.filter) {
-        query = options.filter;
-      }
-      if (options.params) {
-        wakOptions.params = options.params;
-      }
-      if (options.orderBy) {
-        wakOptions.orderby = options.orderBy;// !!! watch the case
-      }
-      if (typeof options.pageSize !== "undefined") {// !!! no pageSize on toArray
-        wakOptions.pageSize = options.pageSize;
-      }
-      //prepare the returned object
-      onlyOne = !!options.onlyOne;
-      if(onlyOne) {
-        throw new Error('Temporary regression');
-        result = new NgWakEntityClasses[this.$name]();
-      }
-      else{
-        result = [];
-      }
-      //prepare the promise
+
+      ['params', 'orderBy', 'pageSize'].forEach(function(opt) {
+        if(options[opt] !== undefined) {
+          wakOptions[opt] = options[opt];
+        }
+      });
+
       deferred = $q.defer();
       result.$promise = deferred.promise;
-      //update $fetching ($apply needed)
+
       rootScopeSafeApply(function() {
         result.$fetching = true;
       });
+
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
           transform.wafEntityCollectionToNgWakEntityCollection(result, event.result, wakOptions);
-          if(onlyOne === false) {
-            updateQueryInfos(result, result.$_collection._private.pageSize, 0, query);
-          }
+          //if(! onlyOne) {
+              updateQueryInfos(result, result.$_collection._private.pageSize, 0, options.query);
+          //}
           result.$fetching = false;
           event.result = result;
-          deferred.resolve(event);//@todo @warn what is passing on resolve ?
+          deferred.resolve(event);
         });
       };
       wakOptions.onError = function(event) {
@@ -880,55 +890,120 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           deferred.reject(event);
         });
       };
-      //make the call
-      options = null;
-      this.query(query, wakOptions);
+
+      this.query(options.filter || null, wakOptions);
       return result;
     };
 
     var $$findOne = function(key, options) {
-      //@todo @warn check with the regression on $find using only one (need to return temporary NgWakEntity, then async populate it)
-      var deferred, wakOptions = {}, ngWakEntity;
-      //input check
-      if (!options || typeof options !== "object") {
-        options = {};
-      }
-      //prepare options
-      if (options.select) {
-        wakOptions.autoExpand = options.select;
-      }
-      //prepare the promise
-      deferred = $q.defer();
-      //create dummy ngWakEntity (without a WAF.Entity pointer) and cache it in $refCache
-      //if a reference is already in cache, retrieve it, if not, create a dummy one and cache it
-      ngWakEntity = this.$refCache.getCachedDummyNgWakEntity(key);
-      ngWakEntity.$promise = deferred.promise;
-      ngWakEntity.$fetching = true;
-      //prepare callbacks
-      wakOptions.onSuccess = function(event) {
-        rootScopeSafeApply(function() {
-          ngWakEntity.$_entity = event.entity;
-          //todo freeze $_entity
-          delete ngWakEntity.$_key;
-          ngWakEntity.$fetching = false;
-          event.result = ngWakEntity;
-          deferred.resolve(event);//@todo @warn pass the ngWakEntity in the resolve
-        });
-      };
-      wakOptions.onError = function(event) {
-        rootScopeSafeApply(function() {
-          console.error('$findOne > getEntity > error', event);
-          ngWakEntity.$fetching = false;
-          deferred.reject(event);
-          //@todo @warn what about the ngWakEntity that was returned AND cached - maybe uncache it ?
-        });
-      };
-      wakOptions.forceReload = (typeof options.forceReload === 'undefined' ? true : options.forceReload);
-      //make the async call
-      options = null;
-      this.getEntity(key, wakOptions);
-      return ngWakEntity;
+      return $$find('ID = :1', { params: [ key ], select: options && options.select || undefined });
     };
+
+    // var $$find = function(options) {
+    //   var deferred, wakOptions = {}, query = null, onlyOne, result;
+    //   //input check
+    //   if (!options || typeof options !== "object") {
+    //     options = {};
+    //   }
+    //   //prepare options
+    //   if (options.select) {
+    //     wakOptions.autoExpand = options.select;
+    //   }
+    //   if (options.filter) {
+    //     query = options.filter;
+    //   }
+    //   if (options.params) {
+    //     wakOptions.params = options.params;
+    //   }
+    //   if (options.orderBy) {
+    //     wakOptions.orderby = options.orderBy;// !!! watch the case
+    //   }
+    //   if (typeof options.pageSize !== "undefined") {// !!! no pageSize on toArray
+    //     wakOptions.pageSize = options.pageSize;
+    //   }
+    //   //prepare the returned object
+    //   onlyOne = !!options.onlyOne;
+    //   if(onlyOne) {
+    //     throw new Error('Temporary regression');
+    //     result = new NgWakEntityClasses[this.$name]();
+    //   }
+    //   else{
+    //     result = [];
+    //   }
+    //   //prepare the promise
+    //   deferred = $q.defer();
+    //   result.$promise = deferred.promise;
+    //   //update $fetching ($apply needed)
+    //   rootScopeSafeApply(function() {
+    //     result.$fetching = true;
+    //   });
+    //   wakOptions.onSuccess = function(event) {
+    //     rootScopeSafeApply(function() {
+    //       transform.wafEntityCollectionToNgWakEntityCollection(result, event.result, wakOptions);
+    //       if(onlyOne === false) {
+    //         updateQueryInfos(result, result.$_collection._private.pageSize, 0, query);
+    //       }
+    //       result.$fetching = false;
+    //       event.result = result;
+    //       deferred.resolve(event);//@todo @warn what is passing on resolve ?
+    //     });
+    //   };
+    //   wakOptions.onError = function(event) {
+    //     rootScopeSafeApply(function() {
+    //       console.error('$find > query > onError', event);
+    //       result.$fetching = false;
+    //       deferred.reject(event);
+    //     });
+    //   };
+    //   //make the call
+    //   options = null;
+    //   this.query(query, wakOptions);
+    //   return result;
+    // };
+
+    // var $$findOne = function(key, options) {
+    //   //@todo @warn check with the regression on $find using only one (need to return temporary NgWakEntity, then async populate it)
+    //   var deferred, wakOptions = {}, ngWakEntity;
+    //   //input check
+    //   if (!options || typeof options !== "object") {
+    //     options = {};
+    //   }
+    //   //prepare options
+    //   if (options.select) {
+    //     wakOptions.autoExpand = options.select;
+    //   }
+    //   //prepare the promise
+    //   deferred = $q.defer();
+    //   //create dummy ngWakEntity (without a WAF.Entity pointer) and cache it in $refCache
+    //   //if a reference is already in cache, retrieve it, if not, create a dummy one and cache it
+    //   ngWakEntity = this.$refCache.getCachedDummyNgWakEntity(key);
+    //   ngWakEntity.$promise = deferred.promise;
+    //   ngWakEntity.$fetching = true;
+    //   //prepare callbacks
+    //   wakOptions.onSuccess = function(event) {
+    //     rootScopeSafeApply(function() {
+    //       ngWakEntity.$_entity = event.entity;
+    //       //todo freeze $_entity
+    //       delete ngWakEntity.$_key;
+    //       ngWakEntity.$fetching = false;
+    //       event.result = ngWakEntity;
+    //       deferred.resolve(event);//@todo @warn pass the ngWakEntity in the resolve
+    //     });
+    //   };
+    //   wakOptions.onError = function(event) {
+    //     rootScopeSafeApply(function() {
+    //       console.error('$findOne > getEntity > error', event);
+    //       ngWakEntity.$fetching = false;
+    //       deferred.reject(event);
+    //       //@todo @warn what about the ngWakEntity that was returned AND cached - maybe uncache it ?
+    //     });
+    //   };
+    //   wakOptions.forceReload = (typeof options.forceReload === 'undefined' ? true : options.forceReload);
+    //   //make the async call
+    //   options = null;
+    //   this.getEntity(key, wakOptions);
+    //   return ngWakEntity;
+    // };
 
     /** Code organization, heritage, objects used (todo : split this into multiple files which should be insject by dependency injection OR module) */
 
@@ -979,25 +1054,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               enumerable: true,
               configurable: true,
               get: function() {
-                if(this.$_entity) {
-                  if(this.$_entity[attr.name] && this.$_entity[attr.name].relEntity && typeof this.$_entity[attr.name].relEntity.getKey() !== 'undefined') {
-                    return this.$_entity[attr.name].relEntity.getDataClass().$refCache.getCachedNgWakEntity(this.$_entity[attr.name].relEntity);
-                  }
-                  else if(this.$_entity[attr.name] && this.$_entity[attr.name].relEntity === null && typeof this.$_entity[attr.name].relKey !== 'undefined') {
-                    var cachedEntity = this.$_entity[attr.name].att.getRelatedClass().$refCache.getCacheInfo(this.$_entity[attr.name].relKey);
-                    if(cachedEntity) {
-                      return cachedEntity;
-                    }
-                    else{
-                      //create and cache a dummy entity on the fly
-                      return attr.getRelatedClass().$refCache.getCachedDummyNgWakEntity(this.$_entity[attr.name].relKey);
-                    }
-                  }
-                  //case where 'this' is new and doesn't have a relatedEntity yet
-                  else{
-                    //@todo create and cache a blank entity on the fly (to be filled later) ?
-                  }
-                }
+                return getRelatedEntity(this, attr.name);
               },
               set: function(ngWakEntity) {
                 if(this.$_entity) {
@@ -1110,7 +1167,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           rootScopeSafeApply(function() {
             console.log('save.onSuccess', 'event', event);
             transform.cleanNgWakEntityAfterSave(that);//remove $_tempValue on processed attributes
-            that.$_entity.getDataClass().$refCache.setEntry(that);//updates the entry in the refCache (without the uuid)
+
+            //that.$_entity.getDataClass().$refCache.setEntry(that);//updates the entry in the refCache (without the uuid)
+
             deferred.resolve(event);
           });
         };
@@ -1203,8 +1262,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       $toJSON: $$toJSON,
       $serverRefresh: function(options) {
         var deferred = $q.defer(),
-          that = this,
-          options = options || {};
+          that = this;
+        options = options || {};
 
         if(! this.$_entity) {
           throw new Error("Can't $serverRefresh() without pointer, please $fetch() before.");
@@ -1213,7 +1272,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         var wakOptions = {
           onSuccess: function(e) {
             rootScopeSafeApply(function() {
-              that.$_entity.getDataClass().$refCache.setEntry(that);
+              //FIXME
+              //that.$_entity.getDataClass().$refCache.setEntry(that);
               deferred.resolve(e);
             });
           },
@@ -1245,128 +1305,174 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      * @param {Object} options
      * @returns {NgWakEntityCache}
      */
-    var NgWakEntityCache = function(options) {
+   // var NgWakEntityCache = function(options) {
 
-      options = typeof options === 'undefined' ? {} : options;
+   //   options = typeof options === 'undefined' ? {} : options;
 
-      this.maxEntities = options.maxEntities || DEFAULT_CACHE_SIZE;
-      this.entitiesByKey = {};
-      this.nbEntries = 0;
-      this.dataClass = options.dataClass;
+   //   this.maxEntities = options.maxEntities || DEFAULT_CACHE_SIZE;
+   //   this.entitiesByKey = {};
+   //   this.nbEntries = 0;
+   //   this.dataClass = options.dataClass;
 
-    };
+   // };
 
-    NgWakEntityCache.prototype.getDataClass = function() {
-      return this.dataClass;
-    };
+   // NgWakEntityCache.prototype.getDataClass = function() {
+   //   return this.dataClass;
+   // };
 
-    /**
-     * A simple way to generate UUIDs - http://stackoverflow.com/a/2117523/2733488
-     */
-    NgWakEntityCache.prototype.generateUUID = function() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-          return v.toString(16);
-      });
-    };
+   // /**
+   //  * A simple way to generate UUIDs - http://stackoverflow.com/a/2117523/2733488
+   //  */
+   // NgWakEntityCache.prototype.generateUUID = function() {
+   //   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+   //       var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+   //       return v.toString(16);
+   //   });
+   // };
 
-    NgWakEntityCache.prototype.setSize = function(size) {
-      if (typeof size !== 'number' || size < DEFAULT_CACHE_SIZE) {
-        size = DEFAULT_CACHE_SIZE;
-      }
-      //@todo update DataProvider's cache size via dataClass.getCache().setSize()
-      this.maxEntities = size;
-    };
+   // NgWakEntityCache.prototype.setSize = function(size) {
+   //   if (typeof size !== 'number' || size < DEFAULT_CACHE_SIZE) {
+   //     size = DEFAULT_CACHE_SIZE;
+   //   }
+   //   //@todo update DataProvider's cache size via dataClass.getCache().setSize()
+   //   this.maxEntities = size;
+   // };
 
-    NgWakEntityCache.prototype.getCacheInfo = function(key) {
-      return this.entitiesByKey[key] || null;
-    };
+   // NgWakEntityCache.prototype.getCacheInfo = function(key) {
+   //   return this.entitiesByKey[key] || null;
+   // };
 
-    NgWakEntityCache.prototype.setEntry = function(ngWakEntity) {
-      var cacheInfo = null;
-      var key = ngWakEntity.$key();
-      var uuid = ngWakEntity.$_tempUUID;
-      //it has a key -> it's already in the db serverside
-      if(key !== null) {
-        //remove the entry under the uuid if it was present
-        if(typeof uuid !== 'undefined') {
-          delete this.entitiesByKey[uuid];
-          ngWakEntity.$_tempUUID = null;
-          this.nbEntries--;
-        }
-        if(!this.entitiesByKey[key]) {
-          this.nbEntries++;
-        }
-        this.entitiesByKey[key] = ngWakEntity;//whatever, update the ref in the cache
-      }
-      //it doesn't have a key, it's not yet saved in the db server side
-      else{
-        uuid = this.generateUUID();
-        ngWakEntity.$_tempUUID = uuid;
-        this.entitiesByKey[uuid] = ngWakEntity;
-        this.nbEntries++;
-      }
-    };
+   // NgWakEntityCache.prototype.setEntry = function(ngWakEntity) {
+   //   var cacheInfo = null;
+   //   var key = ngWakEntity.$key();
+   //   var uuid = ngWakEntity.$_tempUUID;
+   //   //it has a key -> it's already in the db serverside
+   //   if(key !== null) {
+   //     //remove the entry under the uuid if it was present
+   //     if(typeof uuid !== 'undefined') {
+   //       delete this.entitiesByKey[uuid];
+   //       ngWakEntity.$_tempUUID = null;
+   //       this.nbEntries--;
+   //     }
+   //     if(!this.entitiesByKey[key]) {
+   //       this.nbEntries++;
+   //     }
+   //     this.entitiesByKey[key] = ngWakEntity;//whatever, update the ref in the cache
+   //   }
+   //   //it doesn't have a key, it's not yet saved in the db server side
+   //   else{
+   //     uuid = this.generateUUID();
+   //     ngWakEntity.$_tempUUID = uuid;
+   //     this.entitiesByKey[uuid] = ngWakEntity;
+   //     this.nbEntries++;
+   //   }
+   // };
 
-    NgWakEntityCache.prototype.removeCachedEntity = function(key) {
-      //@todo manage cache cleaning
-    };
+   // NgWakEntityCache.prototype.removeCachedEntity = function(key) {
+   //   //@todo manage cache cleaning
+   // };
 
-    NgWakEntityCache.prototype.getCachedDummyNgWakEntity = function(key) {
-      var ngWakEntity;
-      if(this.getDataClass().$refCache.getCacheInfo(key)) {
-        ngWakEntity = this.getDataClass().$refCache.getCacheInfo(key);
-      }
-      else{
-        ngWakEntity = new NgWakEntityClasses[this.getDataClass().$name](this.getDataClass(), key);
-      }
-      this.setEntry(ngWakEntity);
-      return ngWakEntity;
-    };
+   // NgWakEntityCache.prototype.getCachedDummyNgWakEntity = function(key) {
+   //   var ngWakEntity;
+   //   if(this.getDataClass().$refCache.getCacheInfo(key)) {
+   //     ngWakEntity = this.getDataClass().$refCache.getCacheInfo(key);
+   //   }
+   //   else{
+   //     ngWakEntity = new NgWakEntityClasses[this.getDataClass().$name](this.getDataClass(), key);
+   //   }
+   //   this.setEntry(ngWakEntity);
+   //   return ngWakEntity;
+   // };
 
-    NgWakEntityCache.prototype.getCachedNgWakEntity = function(wafEntity) {
-      var ngWakEntity;
-      if(wafEntity.isNew() && this.entitiesByKey[wafEntity.$_tempUUID]) {
-        return this.entitiesByKey[wafEntity.$_tempUUID];
-      }
-      else if(this.entitiesByKey[wafEntity.getKey()]) {
-        var cachedNgWakEntity = this.entitiesByKey[wafEntity.getKey()];
-        //case this ngWakEntity only contains a key - has no $_entity pointer - add the pointer and recache the ngWakEntity (under same reference and key)
-        if(typeof cachedNgWakEntity.$_key !== 'undefined') {
-          delete cachedNgWakEntity.$_key;
-          cachedNgWakEntity.$_entity = wafEntity;
-          this.setEntry(cachedNgWakEntity);
-        }
-        return cachedNgWakEntity;
-      }
-      //manage : new WAF.Entity, new WAF.Entity from server,
-      else{
-        ngWakEntity = new NgWakEntityClasses[wafEntity.getDataClass().getName()](wafEntity);
-        //trasverse relatedEntity and relatedEntities attributes
-        if(wafEntity.getDataClass().$_relatedAttributes && wafEntity.getDataClass().$_relatedAttributes.length > 0) {
-          wafEntity.getDataClass().$_relatedAttributes.forEach(function(attr) {
-            if(attr.kind === 'relatedEntity') {
-              var nestedEntity;
-              if(wafEntity[attr.name] && wafEntity[attr.name].relEntity) {
-                nestedEntity = attr.getRelatedClass().$refCache.getCachedNgWakEntity(wafEntity[attr.name].relEntity);
-              }
-              else if(wafEntity[attr.name] && wafEntity[attr.name].relKey) {
-                nestedEntity = attr.getRelatedClass().$refCache.getCacheInfo(wafEntity[attr.name].relKey);
-              }
-              return nestedEntity;
-            }
-            else if(attr.kind === 'relatedEntities') {
-              console.warn('getCachedNgWakEntity not on relatedEntities', attr.name, wafEntity[attr.name]);
-            }
-          }.bind(this));
-        }
-        this.setEntry(ngWakEntity);
-        return ngWakEntity;
-      }
-    };
-
+   // NgWakEntityCache.prototype.getCachedNgWakEntity = function(wafEntity) {
+   //   var ngWakEntity;
+   //   if(wafEntity.isNew() && this.entitiesByKey[wafEntity.$_tempUUID]) {
+   //     return this.entitiesByKey[wafEntity.$_tempUUID];
+   //   }
+   //   else if(this.entitiesByKey[wafEntity.getKey()]) {
+   //     var cachedNgWakEntity = this.entitiesByKey[wafEntity.getKey()];
+   //     //case this ngWakEntity only contains a key - has no $_entity pointer - add the pointer and recache the ngWakEntity (under same reference and key)
+   //     if(typeof cachedNgWakEntity.$_key !== 'undefined') {
+   //       delete cachedNgWakEntity.$_key;
+   //       cachedNgWakEntity.$_entity = wafEntity;
+   //       this.setEntry(cachedNgWakEntity);
+   //     }
+   //     return cachedNgWakEntity;
+   //   }
+   //   //manage : new WAF.Entity, new WAF.Entity from server,
+   //   else{
+   //     ngWakEntity = new NgWakEntityClasses[wafEntity.getDataClass().getName()](wafEntity);
+   //     //trasverse relatedEntity and relatedEntities attributes
+   //     if(wafEntity.getDataClass().$_relatedAttributes && wafEntity.getDataClass().$_relatedAttributes.length > 0) {
+   //       wafEntity.getDataClass().$_relatedAttributes.forEach(function(attr) {
+   //         if(attr.kind === 'relatedEntity') {
+   //           var nestedEntity;
+   //           if(wafEntity[attr.name] && wafEntity[attr.name].relEntity) {
+   //             nestedEntity = attr.getRelatedClass().$refCache.getCachedNgWakEntity(wafEntity[attr.name].relEntity);
+   //           }
+   //           else if(wafEntity[attr.name] && wafEntity[attr.name].relKey) {
+   //             nestedEntity = attr.getRelatedClass().$refCache.getCacheInfo(wafEntity[attr.name].relKey);
+   //           }
+   //           return nestedEntity;
+   //         }
+   //         else if(attr.kind === 'relatedEntities') {
+   //           console.warn('getCachedNgWakEntity not on relatedEntities', attr.name, wafEntity[attr.name]);
+   //         }
+   //       }.bind(this));
+   //     }
+   //     this.setEntry(ngWakEntity);
+   //     return ngWakEntity;
+   //   }
+   // };
     /** end cache */
 
+
+    function getRelatedEntity(ngEntity, attr) {
+      var dataClass = ngEntity.$_entity.getDataClass();
+
+      if(dataClass.getAttributeByName(attr).kind !== 'relatedEntity' || ! ngEntity.$_entity || ! ngEntity.$_entity[attr]) {
+        return;
+      }
+
+      if(! ngEntity._related) {
+        ngEntity._related = {};
+      }
+
+      if(ngEntity._related[attr]) {
+        return ngEntity._related[attr];
+      } else {
+        if(ngEntity.$_entity[attr].relEntity) {
+          var wafEntity = ngEntity.$_entity[attr].relEntity;
+          ngEntity._related[attr] = new NgWakEntityClasses[wafEntity.getDataClass().getName()](wafEntity);
+        } else {
+          dataClass = ngEntity.$_entity[attr].att.getRelatedClass();
+          ngEntity._related[attr] = new NgWakEntityClasses[dataClass.getName()](dataClass, ngEntity.$_entity[attr].getRelatedKey());
+        }
+      }
+    }
+
+    function createNgWakEntity(wafEntity, options) {
+        var name,
+            ngWakEntity;
+
+        options = options || {};
+
+        name = wafEntity.getDataClass().getName();
+        ngWakEntity = new NgWakEntityClasses[name](wafEntity, options.key);
+
+        if(! options.expend) {
+          return ngWakEntity;
+        }
+
+        ngWakEntity.$_dataClass.$_relatedAttributes.forEach(function(attr) {
+          if(attr.kind !== 'relatedEntity' || ! ngWakEntity.$_entity[attr.name]) {
+            return;
+          }
+
+          getRelatedEntity(ngWakEntity, attr.name);
+        });
+        return ngWakEntity;
+    }
 
     return $wakandaResult;
   }]);
