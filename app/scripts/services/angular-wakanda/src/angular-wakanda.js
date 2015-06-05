@@ -896,7 +896,37 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
     };
 
     var $$findOne = function(key, options) {
-      return $$find('ID = :1', { params: [ key ], select: options && options.select || undefined });
+      var wakOptions = {},
+          deferred = $q.defer(),
+          ngWakEntity = createNgWakEntity(new WAF.Entity(this, {}), { expend: true });
+
+      options = typeof(options) === 'object' && options || {};
+
+      wakOptions.forceReload = typeof options.forceReload === 'undefined' ? true : options.forceReload;
+      wakOptions.select = options && options.select || undefined;
+
+      ngWakEntity.$promise = deferred.promise;
+      ngWakEntity.$fetching = true;
+
+      wakOptions.onSuccess = function(event) {
+        rootScopeSafeApply(function() {
+          ngWakEntity.$_entity = event.entity;
+          delete ngWakEntity.$_key;
+          ngWakEntity.$fetching = false;
+          event.result = ngWakEntity;
+          deferred.resolve(event);
+        });
+      };
+      wakOptions.onError = function(event) {
+        rootScopeSafeApply(function() {
+          console.error('$findOne > getEntity > error', event);
+          ngWakEntity.$fetching = false;
+          deferred.reject(event);
+        });
+      };
+
+      this.getEntity(key, wakOptions);
+      return ngWakEntity;
     };
 
     // var $$find = function(options) {
