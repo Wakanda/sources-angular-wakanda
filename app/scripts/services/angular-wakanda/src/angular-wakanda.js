@@ -1302,8 +1302,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         var wakOptions = {
           onSuccess: function(e) {
             rootScopeSafeApply(function() {
-              //FIXME
-              //that.$_entity.getDataClass().$refCache.setEntry(that);
               deferred.resolve(e);
             });
           },
@@ -1314,6 +1312,11 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             });
           }
         };
+
+        if(options.forceReload !== undefined) {
+          wakOptions.forceReload = options.forceReload;
+        }
+
         this.$_entity.serverRefresh(wakOptions);
         return deferred.promise;
       }
