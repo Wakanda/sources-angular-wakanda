@@ -838,9 +838,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       wakOptions.onSuccess = function(event) {
         rootScopeSafeApply(function() {
           transform.wafEntityCollectionToNgWakEntityCollection(result, event.result, wakOptions);
-          //if(! onlyOne) {
-              updateQueryInfos(result, result.$_collection._private.pageSize, 0, options.query);
-          //}
+          updateQueryInfos(result, result.$_collection._private.pageSize, 0, options.query);
           result.$fetching = false;
           event.result = result;
           deferred.resolve(event);
@@ -1040,9 +1038,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           rootScopeSafeApply(function() {
             console.log('save.onSuccess', 'event', event);
             transform.cleanNgWakEntityAfterSave(that);//remove $_tempValue on processed attributes
-
-            //that.$_entity.getDataClass().$refCache.setEntry(that);//updates the entry in the refCache (without the uuid)
-
             deferred.resolve(event);
           });
         };
