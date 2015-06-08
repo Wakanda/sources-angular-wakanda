@@ -921,20 +921,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           configurable: false,
           writable: true //@todo rechange it to true on freeze (necessary when no $_entity assigned but $_key)
         });
-        Object.defineProperty(this, "$_tempUUID", {
-          enumerable: false,
-          configurable: false,
-          get: function() {
-            if(this.$_entity) {
-              return this.$_entity.$_tempUUID;
-            }
-          },
-          set: function(newValue) {
-            if(this.$_entity) {
-              return this.$_entity.$_tempUUID = newValue;
-            }
-          }
-        });
         dataClass.getAttributes().forEach(function(attr) {
           if(attr.kind === 'relatedEntity') {
             Object.defineProperty(this, attr.name, {
