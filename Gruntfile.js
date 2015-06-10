@@ -544,6 +544,7 @@ module.exports = function(grunt) {
     }
     _register('wakConnector-build-debug', 'build-debug');
     _register('wakConnector-build', 'build');
+    _register('wakConnector-post-import-waf', 'post-import-waf');
 
     grunt.registerTask('build-connector',['wakConnector-build','wakConnector-build-debug']);
 
