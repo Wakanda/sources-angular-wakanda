@@ -129,11 +129,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       return deferred.promise;
     }
 
-    // todo remove
-    window.WAF = WAF;
-    window.transform = transform;
-    // end todo remove
-
     /**
      * Safe $rootScope.$apply which check for $apply or $digest phase before
      *
