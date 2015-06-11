@@ -81,7 +81,7 @@ describe("firstDraft test - data manipulation",function(){
           // name, spec and image
           expect(getTextFromClassName(products[0], 'product-name')).toBe('apple');
           expect(getTextFromClassName(products[0], 'product-spec-name')).toBe(getTextFromClassName(products[0], 'product-name'));
-          expect(getTextFromClassName(products[0], 'product-photo-uri')).toMatch(/^\/rest\/Product\(\d+\)\/photo\?\$imageformat=best\&\$expand=photo$/);
+          expect(getTextFromClassName(products[0], 'product-photo-uri')).toMatch(/^\/rest\/Product\(\d+\)\/photo\?\$imageformat=best\&\$version=\d+\&\$expand=photo$/);
         });
       });
 
