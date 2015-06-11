@@ -524,6 +524,12 @@ module.exports = function(grunt) {
         'copy:wakandaConfig'
     ]);
     
+    /**
+     * wakanda connector grunt registry action
+     * @param {String} task name
+     * @param {String} wakanda connector task name
+     * @return {undefined}
+     */
     function _register() {
       var args = Array.prototype.slice.call(arguments);
       grunt.registerTask(args.shift(), function() {
