@@ -5,7 +5,7 @@
 [![MIT Licensed](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](#license)
 
 
-*Wakanda® and 4D® are registered trademarks of 4D SAS in France and/or other countries. All other names mentioned may be trademarks or registered trademarks of their respective owners.*
+*Wakanda® is a registered trademark of WAKANDA SAS in France and/or other countries. All other names mentioned may be trademarks or registered trademarks of their respective owners.*
 
 This repo is for distribution on [Bower](http://bower.io/). You can check out demos
 in the [NG-Wakanda-Pack](https://github.com/Wakanda/NG-Wakanda-Pack/) repository.
@@ -60,7 +60,7 @@ $wakanda.init().then(function (ds) {
 
 *The MIT License*
 
-Copyright (c) 2014 4D S.A.S.
+Copyright (c) 2015 WAKANDA S.A.S.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
