@@ -436,8 +436,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         result.$toJSON = $$toJSON;
       },
       //@todo adapt / wrap some of the method bellow for nested collections (since their management changed)
-      addFrameworkMethodsToNestedCollection: function(result) { //FIXME : confirm with Christophe, this method is defined but never used
-        result.$fetch = $fetchOnNestedCollection;
+      addFrameworkMethodsToNestedCollection: function(result) {
+        result.$fetch = $fetchRelatedEntities.bind(result);
         result.$find = $$find.bind(result.$_collection);
         result.$more = $$more;
         result.$nextPage = $$nextPage;
@@ -946,7 +946,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
 
                 var result = [];
                 result.$_collection = this.$_entity[attr.name];
-                result.$fetch = $$_fetchRelatedEntities.bind(result);
+
+                transform.addFrameworkMethodsToNestedCollection(result);
+
                 this._related[attr.name] = result;
                 return result;
               },
@@ -1225,7 +1227,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         return ngWakEntity;
     }
 
-    var $$_fetchRelatedEntities = function(options, mode) {
+    var $fetchRelatedEntities = function(options, mode) {
       var wakOptions = {},
           deferred,
           that = this;
