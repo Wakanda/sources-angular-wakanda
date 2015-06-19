@@ -932,7 +932,15 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             });
           }
           else if(attr.kind === 'relatedEntities') {
-            //@todo relatedEntities - caching
+            Object.defineProperty(this, attr.name, {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+              },
+              set: function() {
+                throw new Error("Can't set relatedEntities attribute " + attr.name + ".");
+              }
+            });
           }
           else if(attr.kind === 'calculated' || attr.kind === 'alias') {
             //no setters on those kind of attributes (in breaks the save if they are changed)
