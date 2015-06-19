@@ -936,6 +936,48 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
               enumerable: true,
               configurable: true,
               get: function() {
+                if(! this._related) {
+                  this._related = {};
+                }
+
+                if(this._related[attr.name]) {
+                  return this._related[attr.name];
+                }
+
+                var wakOptions = {},
+                    result = [],
+                    deferred;
+
+                deferred = $q.defer();
+                result.$promise = deferred.promise;
+
+                rootScopeSafeApply(function() {
+                  result.$fetching = true;
+                });
+
+                wakOptions.onSuccess = function(event) {
+                  rootScopeSafeApply(function() {
+                    transform.wafEntityCollectionToNgWakEntityCollection(result, event.entityCollection, wakOptions);
+                    updateQueryInfos(result, result.$_collection._private.pageSize, 0);
+                    result.$fetching = false;
+                    event.result = result;
+                    delete result.$add;
+                    deferred.resolve(event);
+                  });
+                };
+                wakOptions.onError = function(event) {
+                  rootScopeSafeApply(function() {
+                    console.error(event);
+                    result.$fetching = false;
+                    deferred.reject(event);
+                  });
+                };
+
+                wakOptions.reselect = null;
+
+                this.$_entity[attr.name].getValue(wakOptions);
+                this._related[attr.name] = result;
+                return result;
               },
               set: function() {
                 throw new Error("Can't set relatedEntities attribute " + attr.name + ".");
