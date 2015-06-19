@@ -944,38 +944,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                   return this._related[attr.name];
                 }
 
-                var wakOptions = {},
-                    result = [],
-                    deferred;
-
-                deferred = $q.defer();
-                result.$promise = deferred.promise;
-
-                rootScopeSafeApply(function() {
-                  result.$fetching = true;
-                });
-
-                wakOptions.onSuccess = function(event) {
-                  rootScopeSafeApply(function() {
-                    transform.wafEntityCollectionToNgWakEntityCollection(result, event.entityCollection, wakOptions);
-                    updateQueryInfos(result, result.$_collection._private.pageSize, 0);
-                    result.$fetching = false;
-                    event.result = result;
-                    delete result.$add;
-                    deferred.resolve(event);
-                  });
-                };
-                wakOptions.onError = function(event) {
-                  rootScopeSafeApply(function() {
-                    console.error(event);
-                    result.$fetching = false;
-                    deferred.reject(event);
-                  });
-                };
-
-                wakOptions.reselect = null;
-
-                this.$_entity[attr.name].getValue(wakOptions);
+                var result = [];
+                result.$_collection = this.$_entity[attr.name];
+                result.$fetch = $$_fetchRelatedEntities.bind(result);
                 this._related[attr.name] = result;
                 return result;
               },
@@ -1253,6 +1224,70 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         });
         return ngWakEntity;
     }
+
+    var $$_fetchRelatedEntities = function(options, mode) {
+      var wakOptions = {},
+          deferred,
+          that = this;
+
+      mode = mode || 'replace';
+      options = options || {};
+
+      deferred = $q.defer();
+
+      // prepare options
+      wakOptions.skip = options.start = typeof options.start === 'undefined' ? (this.$query ? this.$query.start : 0) : options.start;
+      wakOptions.top = options.pageSize = typeof options.pageSize === 'undefined' ? (this.$query ? this.$query.pageSize : DEFAULT_PAGESIZE_NESTED_COLLECTIONS) : options.pageSize;
+
+      if (options.select) {
+        wakOptions.autoExpand = options.select;
+        console.warn("select can't be change on a $fetch (query collection's cached on server side in some way)");
+      }
+
+      if (options.orderBy) {
+        wakOptions.orderby = options.orderBy;
+        console.warn("orderBy can't be change on a $fetch (nested query collection's cached on server side in some way)");
+      }
+
+      // update $fetching ($apply needed)
+      rootScopeSafeApply(function() {
+        that.$fetching = true;
+      });
+
+      wakOptions.onSuccess = function(e) {
+        rootScopeSafeApply(function() {
+          if(mode === 'replace') {
+            that.length = 0;
+          }
+          e.entityCollection.forEach({
+            onSuccess: function(item) {
+              rootScopeSafeApply(function() {
+                that.push(that.$_collection.relEntityCollection.getDataClass().$create(item.entity));
+              });
+            },
+            first: wakOptions.skip,
+            limit: wakOptions.skip + wakOptions.top
+          });
+
+          // remove the deferred pointer to show that the collection has been loaded anyway
+          delete that.$_deferred;
+          updateCollectionQueryInfos(that, options.pageSize, options.start);
+          that.$totalCount = e.entityCollection.length;
+          that.$fetching = false;
+          deferred.resolve(that);
+        });
+      };
+      wakOptions.onError = function(event) {
+        rootScopeSafeApply(function() {
+          console.error('$fetch (nestedEntities) ) > onError', event);
+          that.$fetching = false;
+          deferred.reject(event);
+        });
+      };
+      that.$_collection.getValue(wakOptions);
+      //that.$_entity[attr.name].getValue(wakOptions);
+      return deferred.promise;
+    };
 
     return $wakandaResult;
   }]);
