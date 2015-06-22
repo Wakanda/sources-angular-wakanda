@@ -4,11 +4,13 @@ dist
 *.swp
 .sass-cache
 app/bower_components
+app/scripts/services/angular-wakanda/reports
 app/scripts/services/angular-wakanda/publish
 app/scripts/services/angular-wakanda/publish.zip
 /nbproject/private/
 /nbproject
 wakandaApp.json
+reports/
 
 WakandaBaseSolution/Contacts/Contacts Solution/breakpoints.json
 WakandaBaseSolution/Contacts/Contacts Solution/*.waPreferences
