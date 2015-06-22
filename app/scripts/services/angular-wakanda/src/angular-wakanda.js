@@ -1170,8 +1170,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           }
           e.entityCollection.forEach({
             onSuccess: function(item) {
+              var ngWakEntity = createNgWakEntity(item.entity, { expend: true });
               rootScopeSafeApply(function() {
-                that.push(that.$_collection.relEntityCollection.getDataClass().$create(item.entity));
+                that.push(ngWakEntity);
               });
             },
             first: wakOptions.skip,
