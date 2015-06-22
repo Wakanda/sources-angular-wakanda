@@ -443,7 +443,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         result.$nextPage = $$nextPage;
         result.$prevPage = $$prevPage;
         result.$toJSON = $$toJSON;
-        result.$isLoaded = $$isLoadedOnNestedCollection;
+        result.$isLoaded = function() { return !! result.$_isLoaded; };
         result.$totalCount = null;
       },
       cleanNgWakEntityAfterSave: function(ngWakEntity) {
@@ -487,16 +487,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       }
       resultSet.$query.pageSize   = pageSize;
       resultSet.$query.start      = start;
-    };
-
-    //@todo the method bellow will change (nested collections management)
-    var $$isLoadedOnNestedCollection = function() {
-      if(this.$_deferred) {
-        return false;
-      }
-      else{
-        return true;
-      }
     };
 
     /**
@@ -1188,8 +1178,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             limit: wakOptions.skip + wakOptions.top
           });
 
-          // remove the deferred pointer to show that the collection has been loaded anyway
-          delete that.$_deferred;
+          that.$_isLoaded = true;
           updateCollectionQueryInfos(that, options.pageSize, options.start);
           that.$totalCount = e.entityCollection.length;
           that.$fetching = false;
