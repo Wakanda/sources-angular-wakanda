@@ -1,4 +1,4 @@
-# bower-angular-wakanda
+# angular-wakanda
 
 [![ angular-wakanda ](http://www.wakanda.org/sites/default/files/medias/128.png)](http://www.wakanda.org/angular-wakanda/)
 
