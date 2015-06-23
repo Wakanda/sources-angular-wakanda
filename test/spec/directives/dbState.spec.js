@@ -15,6 +15,6 @@ describe('Directive: dbState', function () {
   it('should make hidden element visible', inject(function ($compile) {
     element = angular.element('<div db-state></db-state>');
     element = $compile(element)(scope);
-//    expect(element.find('h3').text()).toBe('E2E Tests - First draft');
+//    expect(element.find('h3').text()).to.be.equal('E2E Tests - First draft');
   }));
 });

@@ -20,7 +20,7 @@ describe('Controller: AboutCtrl', function() {
     }));
 
     it('should attach url1 and url2 to the scope', function() {
-        expect(typeof scope.url1).toBe('string');
-        expect(typeof scope.url2).toBe('string');
+        expect(typeof scope.url1).to.be.a.string;
+        expect(typeof scope.url2).to.be.a.string;
     });
 });

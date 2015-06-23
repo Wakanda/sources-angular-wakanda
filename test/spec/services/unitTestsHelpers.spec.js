@@ -7,12 +7,12 @@ describe('Service: unitTestsHelpers', function () {
   });
 
   it('should do be ready to rock', inject(function (unitTestsHelpers) {
-    expect(!!unitTestsHelpers).toBe(true);
-    expect(!!unitTestsHelpers.db).toBe(true);
-    expect(!!unitTestsHelpers.db.flush).toBe(true);
-    expect(!!unitTestsHelpers.db.fill).toBe(true);
-    expect(!!unitTestsHelpers.db.reset).toBe(true);
-    expect(!!unitTestsHelpers.db.state).toBe(true);
+    expect(!!unitTestsHelpers).to.be.true;
+    expect(!!unitTestsHelpers.db).to.be.true;
+    expect(!!unitTestsHelpers.db.flush).to.be.true;
+    expect(!!unitTestsHelpers.db.fill).to.be.true;
+    expect(!!unitTestsHelpers.db.reset).to.be.true;
+    expect(!!unitTestsHelpers.db.state).to.be.true;
   }));
 
   it('unitTestsHelpers.db.state()', inject(function ($httpBackend,unitTestsHelpers) {
@@ -25,7 +25,7 @@ describe('Service: unitTestsHelpers', function () {
     });
 
     unitTestsHelpers.db.state().success(function(result){
-      expect(result).toMatch({
+      expect(result).to.deep.equal({
         "employees":1000,
         "companies":62,
         "products":24
@@ -56,7 +56,7 @@ describe('Service: unitTestsHelpers', function () {
     });
 
     unitTestsHelpers.db.fill().success(function(result){
-      expect(result).toMatch({
+      expect(result).to.deep.equal({
         "before":{
           "employees":1000,
           "companies":62,
@@ -94,7 +94,7 @@ describe('Service: unitTestsHelpers', function () {
     });
 
     unitTestsHelpers.db.flush().success(function(result){
-      expect(result).toMatch({
+      expect(result).to.deep.equal({
         "before":{
           "employees":1000,
           "companies":62,
@@ -138,7 +138,7 @@ describe('Service: unitTestsHelpers', function () {
     });
 
     unitTestsHelpers.db.reset().success(function(result){
-      expect(result).toMatch({
+      expect(result).to.deep.equal({
         "before":{
           "employees":1000,
           "companies":62,

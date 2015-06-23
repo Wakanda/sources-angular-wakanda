@@ -16,12 +16,16 @@ module.exports = function(config) {
     ],
 
     // testing framework to use (jasmine/mocha/qunit/...)
-    frameworks: ['jasmine'],
+    frameworks: [
+      'mocha',
+      'sinon',
+      'chai'
+    ],
 
     preprocessors: {
       // source files, that you wanna generate coverage for
       // do not include tests or libraries
-      'app/scripts/services/angular-wakanda/angular-wakanda.debug.min.js' : ['coverage'],
+      'app/scripts/services/angular-wakanda/src/angular-wakanda.js' : ['coverage'],
       '**/*.html'   : ['html2js'],
       '**/*.json'   : ['json_fixtures']
     },
@@ -36,8 +40,15 @@ module.exports = function(config) {
       'app/bower_components/angular-route/angular-route.js',
       // APP
       'app/scripts/app.js',
+      // WAF libraries injection
+      'app/scripts/services/angular-wakanda/src/WAF/extra-init.js',
+      'app/scripts/services/angular-wakanda/src/WAF/Dates.js',
+      'app/scripts/services/angular-wakanda/src/WAF/Data-Provider.js',
+      'app/scripts/services/angular-wakanda/src/WAF/Rest.js',
+      // extras
+      'app/scripts/services/angular-wakanda/src/extras/Class.js',
       // angular-wakanda
-      'app/scripts/services/angular-wakanda/angular-wakanda.debug.min.js',
+      'app/scripts/services/angular-wakanda/src/angular-wakanda.js',
       // helpers
       'app/scripts/services/unitTestsHelpers.js',
       'app/scripts/services/rootScopeSafeApply.js',
