@@ -852,6 +852,11 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                 }
 
                 var result = [];
+                if(this.$_entity[attr.name].value.__ENTITIES) {
+                  result = this.$_entity[attr.name].value.__ENTITIES;
+                  result.$_isLoaded = true;
+                }
+
                 result.$_collection = this.$_entity[attr.name];
 
                 transform.addFrameworkMethodsToNestedCollection(result);
@@ -1194,7 +1199,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         });
       };
       that.$_collection.getValue(wakOptions);
-      //that.$_entity[attr.name].getValue(wakOptions);
       return deferred.promise;
     };
 
