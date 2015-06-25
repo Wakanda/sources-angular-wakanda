@@ -56,7 +56,8 @@ module.exports = function(config) {
       'app/scripts/services/rootScopeSafeApply.js',
       'app/scripts/controllers/*.js',
 //      'test/mock/**/*.js',
-      'test/spec/**/*spec.js'
+      'test/spec/services/unitTestsHelpers.js',
+      'test/spec/*-spec.js'
     ],
     
     proxies:  {
