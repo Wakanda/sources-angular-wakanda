@@ -100,7 +100,11 @@ module.exports = function(config) {
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: false,
 
-
+    client: {
+      mocha: {
+        timeout : 6000 // 6 seconds - upped from 2 seconds to allow slow emulators to complete
+      }
+    },
     // Start these browsers, currently available:
     // - Chrome
     // - ChromeCanary
@@ -109,7 +113,7 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
 
 
     // Continuous Integration mode
