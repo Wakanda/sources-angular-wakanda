@@ -7,11 +7,10 @@ describe('Connector/Authentication:', function() {
     module('unitTestsHelpersModule');
   });
 
-  beforeEach(inject(function(_$rootScope_, _$wakanda_, _$q_, unitTestsHelpers) {
+  beforeEach(inject(function(_$rootScope_, _$wakanda_, _$q_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $wakanda = _$wakanda_;
-    unitTestsHelpers.db.reset(false);
     // https://github.com/domenic/chai-as-promised/issues/68
     intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
   }));
@@ -22,9 +21,11 @@ describe('Connector/Authentication:', function() {
       expect($wakanda.$loginByPassword().then).to.be.an.instanceof(Function);
     });
     it('promise should return true if credentials are valid', function (done) {
-      $wakanda.$loginByPassword('bar','bar').should.be.fulfilled.then(function (loginResult) {
-        expect(loginResult.result).to.be.true;
-        $wakanda.$logout().should.be.fulfilled.should.notify(done);
+      $wakanda.init().then(function(){
+        $wakanda.$loginByPassword('bar','bar').should.be.fulfilled.then(function (loginResult) {
+          expect(loginResult.result).to.be.true;
+          $wakanda.$logout().should.be.fulfilled.should.notify(done);
+        });
       });
     });
     it('promise should return false if credentials are unvalid', function (done) {
@@ -47,10 +48,12 @@ describe('Connector/Authentication:', function() {
       expect($wakanda.$logout().then).to.be.an.instanceof(Function);
     });
     it('promise should return true if user is logged out', function (done) {
-      $wakanda.$loginByPassword('bar','bar').should.be.fulfilled.then(function(loginResult){
-        $wakanda.$logout().should.be.fulfilled.then(function (logoutResult) {
-          expect(logoutResult.result).to.be.true;
-        }).should.notify(done);
+      $wakanda.init().then(function(){
+        $wakanda.$loginByPassword('bar','bar').should.be.fulfilled.then(function(loginResult){
+          $wakanda.$logout().should.be.fulfilled.then(function (logoutResult) {
+            expect(logoutResult.result).to.be.true;
+          }).should.notify(done);
+        });
       });
     });
   });
@@ -61,9 +64,11 @@ describe('Connector/Authentication:', function() {
       expect($wakanda.$currentUser().then).to.be.an.instanceof(Function);
     });
     it('promise should return null if no user is logged', function (done) {
-      $wakanda.$currentUser().should.be.fulfilled.then(function (user) {
-        expect(user.result).to.be.null;
-      }).should.notify(done);
+      $wakanda.init().then(function(){
+        $wakanda.$currentUser().should.be.fulfilled.then(function (user) {
+          expect(user.result).to.be.null;
+        }).should.notify(done);
+      });
     });
     it('promise should return user-info if user is logged', function (done) {
       $wakanda.init().then(function(){

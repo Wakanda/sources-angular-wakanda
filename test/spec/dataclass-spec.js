@@ -1,5 +1,5 @@
 describe('Connector/Dataclass:', function() {
-  var $wakanda, $rootScope, $q, unitTestsHelpers,
+  var $wakanda, $rootScope, $q,
     intervalRef;
 
   beforeEach(function(){
