@@ -100,6 +100,7 @@ module.exports = function(config) {
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: false,
 
+    // mocha config
     client: {
       mocha: {
         timeout : 6000 // 6 seconds - upped from 2 seconds to allow slow emulators to complete
