@@ -3,14 +3,15 @@ describe('Connector/Initialize:', function() {
     intervalRef;
 
   beforeEach(function(){
-    module('angularWakandaFrontApp');
+    module('wakanda');
     module('unitTestsHelpersModule');
   });
 
-  beforeEach(inject(function(_$rootScope_,_$wakanda_, _$q_) {
+  beforeEach(inject(function(_$rootScope_, _$wakanda_, _$q_, unitTestsHelpers) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $wakanda = _$wakanda_;
+    unitTestsHelpers.db.reset(false);
     // https://github.com/domenic/chai-as-promised/issues/68
     intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
   }));
