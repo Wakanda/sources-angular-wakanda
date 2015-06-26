@@ -1,5 +1,5 @@
 describe('Connector/EntityCollection:', function() {
-  var $wakanda, $rootScope, $q,
+  var $wakanda, $rootScope, $q, unitTestsHelpers,
     intervalRef;
 
   beforeEach(function(){
@@ -7,10 +7,11 @@ describe('Connector/EntityCollection:', function() {
     module('unitTestsHelpersModule');
   });
 
-  beforeEach(inject(function(_$rootScope_, _$wakanda_, _$q_, unitTestsHelpers) {
+  beforeEach(inject(function(_$rootScope_, _$wakanda_, _$q_, _unitTestsHelpers_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $wakanda = _$wakanda_;
+    unitTestsHelpers = _unitTestsHelpers_;
     unitTestsHelpers.db.reset(false);
     // https://github.com/domenic/chai-as-promised/issues/68
     intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
