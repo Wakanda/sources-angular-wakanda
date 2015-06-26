@@ -26,19 +26,16 @@ describe('Connector/Initialize:', function() {
     it('promise to be fulfilled if ds is found', function(done) {
       var $init = $wakanda.init();
       $init.should.be.fulfilled.then(function (ds) {
-        expect($init.$$state.value).to.be.an('object');
-        expect($init.$$state.status).to.equal(1);
+        expect(ds).to.be.an('object');
       }).should.notify(done);
     });
     it('promise to be rejected if ds is not found', function(done) {
       var $badInit = $wakanda.init('abc123cde456');
       $badInit.should.be.rejected.then(function(ds){
-        expect($badInit.$$state.value).to.be.an('object');
-        expect($badInit.$$state.status).to.equal(2);
+        expect(ds).to.be.an('object');
         var $correctInit = $wakanda.init('*');
         $correctInit.should.be.fulfilled.then(function (ds) {
-          expect($correctInit.$$state.value).to.be.an('object');
-          expect($correctInit.$$state.status).to.equal(1);
+          expect(ds).to.be.an('object');
         }).should.notify(done);
       })
     });
