@@ -337,6 +337,8 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default null
      **/
 	this.postdata = null;
+
+	this.postAFile = false;
     
     /**
      * queryPlan
@@ -416,12 +418,12 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 		var handler = this.handler;
 
 		// Build the url:
-		var url = "/";
+		var url = (WAF.hostname ? WAF.hostname : "") + "/";
 
 		// app (optional):
 		if (this.app != null)
 		{
-			url += this.app + "/";
+			url = this.app + "/";
 		}
 
 		// service:
@@ -502,7 +504,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 		// $params
 		if (this.params)
 		{
-			queryString += (!deja$ ? "$params=" : "&$params=") + encodeURIComponent("'"+JSON.stringify(this.params)+"'");
+			queryString += (!deja$ ? "$params=" : "&$params=") + encodeURIComponent("'"+JSON.stringify(this.params).replace(/'/g, "\\u0027")+"'");
 			deja$ = true;
 		}
 		// $method
@@ -581,6 +583,12 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 		if (this.atOnce)
 		{
 			queryString+=(!deja$?"$atOnce=":"&$atOnce=")+this.atOnce;
+			deja$=true;		
+		}
+		// $rawPict
+		if (this.postAFile)
+		{
+			queryString+=(!deja$?"$rawPict=true":"&$rawPict=true");
 			deja$=true;		
 		}
 		// $retainPositions
@@ -765,7 +773,10 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 	
 				if (this.postdata)
 				{
-					this.http_request.setRequestHeader('Content-Type', 'application/json');
+					if (this.postAFile)
+						this.http_request.setRequestHeader('Content-Type', this.postdata.type);
+					else
+						this.http_request.setRequestHeader('Content-Type', 'application/json');
 				}
 	
 				this.http_request.setRequestHeader('If-Modified-Since', 'Thu, 1 Jan 1970 00:00:00 GMT'); // due to IE9 caching XHR
