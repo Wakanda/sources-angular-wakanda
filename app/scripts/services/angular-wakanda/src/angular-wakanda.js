@@ -16,6 +16,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      * @returns {$q.promise}
      */
     $wakandaResult.init = function(catalog) {
+      //FIXME bug potentiel, si init appelé une deuxième fois avec un catalog différent !
       console.log('>$wakanda init');
       var deferred = $q.defer();
       if (typeof catalog !== "string" || catalog === '*' || catalog === '') {
@@ -468,10 +469,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      */
     var $$create = function(pojo) {
         return createNgWakEntity(new WAF.Entity(this, pojo || {}), { expend: true });
-    };
-
-    var $$upload = function(file) {
-      console.log('$upload not yet implemented');
     };
 
     /**
@@ -959,47 +956,83 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                 }
               }
             });
+          } else if(attr.type === 'image') {
+
+            Object.defineProperty(this, attr.name, {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+                var attribute = this.$_entity[attr.name];
+                var value = attribute.getValue() || {};
+                value.$upload = function(file, options) {
+                  var deferred = $q.defer(),
+                      wakOptions = {
+                        onSuccess: function(e) {
+                          deferred.resolve(e);
+                        },
+                        onError: function(e) {
+                         deferred.reject(e);
+                        },
+                        timeout: 300 // seconds
+                      };
+
+                  if(! (file instanceof window.File)) {
+                    throw("$upload accept only File type as parameter !");
+                  }
+
+                  attribute.setValue(file);
+                  attribute.resolveFile(wakOptions);
+
+                  // file must be available bofore $save
+                  // the below code is just to test
+                  //var reader = new FileReader();
+                  //reader.readAsDataURL(file);
+                  //reader.onloadend = function(e) {
+                       //img.src = e.target.result;
+                  //};
+                  //
+
+                  return deferred.promise;
+                };
+                return value;
+              },
+              set: function(newValue) {
+                throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method to upload image.');
+              }
+            });
+
+            // accessor to uri
+            Object.defineProperty(this[attr.name], 'uri', {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+                return this.__deferred && this.__deferred.uri;
+              },
+              set: function(newValue) {
+                throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method to upload image.');
+              }
+            });
+
           }
           //@warn specific case for object ? @warn check date types
-          else{
-            var descriptor = {
+          else {
+
+            Object.defineProperty(this, attr.name, {
               enumerable: true,
               configurable: true,
               get: function() {
                 if(this.$_entity) {
                   return this.$_entity[attr.name].getValue();
                 }
-              }
-            };
-
-            if(attr.type === 'image') {
-              descriptor.set = function(newValue) {
-                throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method to upload image.');
-              };
-            } else {
-              descriptor.set = function(newValue) {
+              },
+              set: function(newValue) {
                 if(this.$_entity) {
                   rootScopeSafeApply(function() {
                     this.$_entity[attr.name].setValue(newValue);
                   }.bind(this));
                 }
-              };
-            }
-            Object.defineProperty(this, attr.name, descriptor);
-
-            // accessor to uri
-            if(attr.type === 'image' && this[attr.name]) {
-              Object.defineProperty(this[attr.name], 'uri', {
-                enumerable: true,
-                configurable: true,
-                get: function() {
-                  return this.__deferred && this.__deferred.uri;
-                },
-                set: function(newValue) {
-                  throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method to upload image.');
-                }
-              });
-            }
+              }
+            });
           }
         }.bind(this));
       },
