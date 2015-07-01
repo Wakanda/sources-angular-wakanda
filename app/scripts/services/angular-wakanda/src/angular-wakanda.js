@@ -956,62 +956,73 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                 }
               }
             });
-          } else if(attr.type === 'image') {
-
+         } else if(attr.type === 'image') {
+           var attribute = this.$_entity[attr.name];
+            var value = {};
             Object.defineProperty(this, attr.name, {
               enumerable: true,
               configurable: true,
               get: function() {
-                var attribute = this.$_entity[attr.name];
-                var value = attribute.getValue() || {};
-                value.$upload = function(file, options) {
-                  var deferred = $q.defer(),
-                      wakOptions = {
-                        onSuccess: function(e) {
-                          deferred.resolve(e);
-                        },
-                        onError: function(e) {
-                         deferred.reject(e);
-                        },
-                        timeout: 300 // seconds
-                      };
-
-                  if(! (file instanceof window.File)) {
-                    throw("$upload accept only File type as parameter !");
+                if(! attribute.resolvedID) {
+                  var val = attribute.getValue();
+                  if(val) {
+                    value.__deferred = angular.extend({}, val.__deferred);
+                  } else {
+                    delete value.__deferred;
                   }
-
-                  attribute.setValue(file);
-                  attribute.resolveFile(wakOptions);
-
-                  // file must be available bofore $save
-                  // the below code is just to test
-                  //var reader = new FileReader();
-                  //reader.readAsDataURL(file);
-                  //reader.onloadend = function(e) {
-                       //img.src = e.target.result;
-                  //};
-                  //
-
-                  return deferred.promise;
-                };
+                }
                 return value;
               },
-              set: function(newValue) {
-                throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method to upload image.');
+              set: function(value) {
+                attribute.setValue(value);
               }
             });
 
             // accessor to uri
-            Object.defineProperty(this[attr.name], 'uri', {
+            Object.defineProperty(value, 'uri', {
               enumerable: true,
               configurable: true,
               get: function() {
                 return this.__deferred && this.__deferred.uri;
               },
-              set: function(newValue) {
-                throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method to upload image.');
+              set: function(value) {
+                throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method or assign the value directly to the attribute.');
               }
             });
+
+            // upload file
+            value.$upload = function(file) {
+              var deferred = $q.defer(),
+                  wakOptions = {
+                    onSuccess: function(e) {
+                      deferred.resolve(e);
+                    },
+                    onError: function(e) {
+                     deferred.reject(e);
+                    },
+                    timeout: 300 // seconds
+                  };
+
+              if(file) {
+                attribute.setValue(file);
+              } else if(! attribute.unResolvedFile) {
+                throw new Error("there is no file to upload !");
+              }
+
+              attribute.resolveFile(wakOptions);
+
+              // just to test
+              var reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onloadend = function(e) {
+                if(! value.__deferred) {
+                  value.__deferred = {};
+                }
+                value.__deferred.uri = reader.result;
+              };
+
+              return deferred.promise;
+            };
 
           }
           //@warn specific case for object ? @warn check date types
