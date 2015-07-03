@@ -55,7 +55,7 @@ module.exports = function(config) {
       'app/scripts/services/unitTestsHelpers.js',
       'app/scripts/services/rootScopeSafeApply.js',
       'app/scripts/controllers/*.js',
-      'test/spec/services/unitTestsHelpers.js',
+      'test/spec/services/unitTestsPolyfill.js',
       'test/spec/*-spec.js'
     ],
     
