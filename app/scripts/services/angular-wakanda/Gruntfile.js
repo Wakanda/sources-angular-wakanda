@@ -103,6 +103,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', ['uglify:prod']);
   grunt.registerTask('build-debug', ['uglify:debug']);
+  grunt.registerTask('post-import-waf', ['remove-date-tojson']);
 
   //simply call (the following command with your specified version) example : grunt publish:0.5.2
   grunt.registerTask('publish-bowerFile',function(target){
@@ -122,4 +123,13 @@ module.exports = function(grunt) {
     grunt.task.run('publish-bowerFile:'+version);
   });
 
+  grunt.registerTask('remove-date-tojson', function() {
+    try {
+      var content = grunt.file.read('src/WAF/Dates.js');
+      content = content.replace(/^Date\.prototype\.toJSON = function(^([^^])+|([^}])+|(^}[^$])+$)^}$/m, '');
+      grunt.file.write('src/WAF/Dates.js', content);
+    } catch(e) {
+      console.warn(e);
+    }
+  });
 };

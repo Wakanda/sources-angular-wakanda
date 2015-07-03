@@ -524,40 +524,36 @@ module.exports = function(grunt) {
         'copy:wakandaConfig'
     ]);
     
-    grunt.registerTask('wakConnector-build', function(){
-      var done = this.async();
-      grunt.util.spawn({
-        grunt: true,
-        args: ['build'],
-        opts: {
-            cwd: 'app/scripts/services/angular-wakanda'
-        }
-      }, function(err, result, code){
-        if(err){
-          grunt.log.error('An error occured building angular-wakanda.min.js',err.message);
-        }
-        done();
+    /**
+     * wakanda connector grunt registry action
+     * @param {String} task name
+     * @param {String} wakanda connector task name
+     * @return {undefined}
+     */
+    function _register() {
+      var args = Array.prototype.slice.call(arguments);
+      grunt.registerTask(args.shift(), function() {
+        var done = this.async();
+        grunt.util.spawn({
+          grunt: true,
+          args: args,
+          opts: {
+              cwd: 'app/scripts/services/angular-wakanda'
+          }
+        }, function(err, result, code) {
+          if(err) {
+            grunt.log.error('An error occured building angular-wakanda.min.js',err.message);
+          }
+          done();
+        });
       });
-    });
-    
-    grunt.registerTask('wakConnector-build-debug', function(){
-      var done = this.async();
-      grunt.util.spawn({
-        grunt: true,
-        args: ['build-debug'],
-        opts: {
-            cwd: 'app/scripts/services/angular-wakanda'
-        }
-      }, function(err, result, code){
-        if(err){
-          grunt.log.error('An error occured building angular-wakanda.debug.min.js',err.message);
-        }
-        done();
-      });
-    });
-    
+    }
+    _register('wakConnector-build-debug', 'build-debug');
+    _register('wakConnector-build', 'build');
+    _register('wakConnector-post-import-waf', 'post-import-waf');
+
     grunt.registerTask('build-connector',['wakConnector-build','wakConnector-build-debug']);
-    
+
     grunt.registerTask('publish-connector-help',function(){
       grunt.log.writeln('1) If it\'s the first time, you need to :');
       grunt.log.writeln('* git init');
@@ -568,7 +564,7 @@ module.exports = function(grunt) {
       grunt.log.writeln('* git tag');
       grunt.log.writeln('* git push');
     });
-    
+
     //this task publish-connector is only to use when you're asked to share only the connector's part of the project (but also with all the building routines), it will simply make a copy/paste of the files without the node_modules
     //when you publish to bower please use the other way - in app/scripts/services/angular-wakanda just run grunt publish versionNumber
     grunt.registerTask('publish-connector-init',function(){
