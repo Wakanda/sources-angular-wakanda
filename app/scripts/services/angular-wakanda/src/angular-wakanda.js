@@ -610,7 +610,11 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
      */
     var $$fetch = function(options, mode) {
       var deferred, wakOptions = {}, that = this, skip, top;
-      mode = (typeof mode === "undefined" || mode === "replace") ? "replace" : mode;
+      mode = mode || 'replace';
+      if(mode != 'replace' && mode != 'append') {
+        throw new Error("Unknow mode " + mode + ", mode must be replace or append.");
+      }
+
       //input check
       if (!options) {
         options = {};//@todo refresh collection when no param passed
@@ -646,7 +650,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             } else if(mode === 'append') {
               that.push(ngWakEntity);
             } else {
-              throw("Unknow mode " + mode + ", mode must be replace or append.");
+              throw new Error("Unknow mode " + mode + ", mode must be replace or append.");
             }
           });
 
