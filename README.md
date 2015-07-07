@@ -4,7 +4,7 @@
 
 Welcome to the **source repository** of the **angular-wakanda connector**. You'll find here the whole environment that lets us develop the connector.
 
-**If you only wish to retrieve the connector itself**, just get it from bower `bower install angular-wakanda` or from the publish repo [Wakanda/bower-angular-wakanda](https://github.com/Wakanda/bower-angular-wakanda).
+**If you only wish to retrieve the connector itself**, just get it from bower `bower install angular-wakanda` or from the publish repo [Wakanda/angular-wakanda](https://github.com/Wakanda/angular-wakanda).
 
 ##Included
 
@@ -63,7 +63,7 @@ Open two Terminal tabs :
 ##Resources
 
 * [Home page](http://www.wakanda.org/angular-wakanda/)
-* [Bower publish repo](https://github.com/Wakanda/bower-angular-wakanda)
+* [Bower publish repo](https://github.com/Wakanda/angular-wakanda)
 * [Connector tutorial](https://wakanda.github.io/NG-Wakanda-Pack)
 * [Connector Documentation](http://doc.wakanda.org/Wakanda/help/Title/en/page4419.html)
 * [Yeoman generator](https://www.npmjs.org/package/generator-angular-wakanda)

@@ -9,7 +9,7 @@ The versions provided can be unstable, the features may not be finished. I'll tr
 * add `$find()` method on collections to create a sub-collection from an existing one.
 
 ##v0.4.2
-* fixes https://github.com/Wakanda/bower-angular-wakanda/issues/3 (pointer returned by $find is now the same as the one passed in its callback, so that it could be correctly used in promise chaining)
+* fixes : pointer returned by $find is now the same as the one passed in its callback, so that it could be correctly used in promise chaining
 
 ##v0.4.1
 * remove logs on prod build - merge PR from @paulsouche
