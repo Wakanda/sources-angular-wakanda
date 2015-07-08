@@ -28,7 +28,7 @@ describe("firstDraft test",function(){
         }
       }));
     });
-  
+
     describe("> check we are on the correct page", function(){
 
       it("> should have a title",function(){
@@ -47,7 +47,34 @@ describe("firstDraft test",function(){
     describe("> reset db", function(){
 
       dbStateHelper.launch(['init']);
-      
+
+      it('> check fetching relatedEntities company.staff', function() {
+        var employes = element.all(by.css('.employees-list li'));
+        var staffs = element.all(by.css('.staff-list li'));
+
+        employes.first().element(by.css('[ng-click="selectCompany(employee.employer)"]')).click().then(function() {
+
+          expect(staffs.count()).toBe(0);
+
+          browser.findElement(by.css('[ng-click="company.staff.$fetch({pageSize:5})"]')).click().then(function() {
+
+            expect(staffs.count()).toBe(1);
+            expect(staffs.first().element(by.css('.last-name')).getText() === 'LUHEJI');
+          });
+        });
+
+        employes.get(1).element(by.css('[ng-click="selectCompany(employee.employer)"]')).click().then(function() {
+
+          expect(staffs.count()).toBe(0);
+
+          browser.findElement(by.css('[ng-click="company.staff.$fetch({pageSize:5})"]')).click().then(function() {
+
+            expect(staffs.count()).toBe(5);
+            expect(staffs.first().element(by.css('.last-name')).getText() === 'VEGGGAR');
+          });
+        });
+      });
+
       it("> employees list should be loaded and have 10 entries",function(){
         var list = element.all(by.css('.employees-list li'));
         expect(list.count()).toBe(10);
@@ -196,15 +223,14 @@ describe("firstDraft test",function(){
               });
               expect(getEmployer(employees[1])).toBe('Hand Year Papers');
             });
-              
+
           });
-          
+
         });
-        
+
       });
 
     });
-  
+
   });
-  
 });

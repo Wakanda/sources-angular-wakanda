@@ -436,14 +436,14 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         result.$toJSON = $$toJSON;
       },
       //@todo adapt / wrap some of the method bellow for nested collections (since their management changed)
-      addFrameworkMethodsToNestedCollection: function(result) { //FIXME : confirm with Christophe, this method is defined but never used
-        result.$fetch = $fetchOnNestedCollection;
+      addFrameworkMethodsToNestedCollection: function(result) {
+        result.$fetch = $fetchRelatedEntities.bind(result);
         result.$find = $$find.bind(result.$_collection);
         result.$more = $$more;
         result.$nextPage = $$nextPage;
         result.$prevPage = $$prevPage;
         result.$toJSON = $$toJSON;
-        result.$isLoaded = $$isLoadedOnNestedCollection;
+        result.$isLoaded = function() { return !! result.$_isLoaded; };
         result.$totalCount = null;
       },
       cleanNgWakEntityAfterSave: function(ngWakEntity) {
@@ -487,99 +487,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
       }
       resultSet.$query.pageSize   = pageSize;
       resultSet.$query.start      = start;
-    };
-
-    //@todo the method bellow will change (nested collections management)
-    //@todo change the pageSize to the collection length
-    var $fetchOnNestedCollection = function(options, mode) {
-      //@todo take mode param in account for pagination / also $query
-      //@todo bug inside getValue + forEach with boundaries
-      //@todo add collection methods if not present
-      console.warn('This method is currently under refactoring');
-      var that = this,
-          deferred = $q.defer(),
-          wakOptions = {};
-      mode = (typeof mode === "undefined" || mode === "replace") ? "replace" : mode;
-      if(!that.$_collection) {
-        deferred.reject('Missing $_collection private pointer (WAF.EntityAttributeRelatedSet), check if you used $find or $fetch to load the collection');
-        console.warn('Missing $_collection private pointer (WAF.EntityAttributeRelatedSet), check if you used $find or $fetch to load the collection');
-      }
-      else{
-        //options check
-        if(!options) {
-          options = {};
-        }
-        //options checking
-        if (typeof options.orderBy !== 'undefined') {
-          console.warn("orderBy can't be change on a $fetch (nested query collection's cached on server side in some way)");
-        }
-        if (typeof options.select !== 'undefined') {
-          console.warn("select can't be change on a $fetch (query collection's cached on server side in some way)");
-        }
-        //prepare options
-        wakOptions.skip = options.start = typeof options.start === 'undefined' ? (this.$query ? this.$query.start : 0) : options.start;
-        wakOptions.top = options.pageSize = typeof options.pageSize === 'undefined' ? (this.$query ? this.$query.pageSize : DEFAULT_PAGESIZE_NESTED_COLLECTIONS) : options.pageSize;
-        //prepare unhandled options @warn
-        if (options.select) {
-          wakOptions.autoExpand = options.select;
-        }
-        if (options.orderBy) {
-          wakOptions.orderby = options.orderBy;
-        }
-        //update $fetching ($apply needed)
-        rootScopeSafeApply(function() {
-          that.$fetching = true;
-        });
-        console.log('>$fetch on nestedCollection','options', options);
-        wakOptions.onSuccess = function(e) {
-          console.log('$fetchOnNestedCollection > onSuccess','e', e);
-          rootScopeSafeApply(function() {
-            if(mode === 'replace') {
-              that.length = 0;
-            }
-            e.entityCollection.forEach({
-              onSuccess: function(item) {
-                rootScopeSafeApply(function() {
-                  console.log(item.position, item.entity, that.$_collection.relEntityCollection.getDataClass());
-                  that.push(that.$_collection.relEntityCollection.getDataClass().$create(item.entity));
-                });
-              },
-              atTheEnd: function(e) {
-                console.log('atTheEnd','e', e);
-              },
-              //@todo not always passed
-              first: wakOptions.skip,
-              limit: wakOptions.skip + wakOptions.top
-            });
-            //remove the deferred pointer to show that the collection has been loaded anyway
-            delete that.$_deferred;
-            updateCollectionQueryInfos(that, options.pageSize, options.start);
-            that.$totalCount = e.entityCollection.length;//@todo check if not e.entityCollection.length or e.result.length
-            that.$fetching = false;
-            deferred.resolve(that);
-          });
-        };
-        wakOptions.onError = function(event) {
-          rootScopeSafeApply(function() {
-            console.error('$fetch (nestedEntities) ) > onError', event);
-            that.$fetching = false;
-            deferred.reject(event);
-          });
-        };
-        console.log('wakOptions', wakOptions);
-        that.$_collection.getValue(wakOptions);
-      }
-      return deferred.promise;
-    };
-
-    //@todo the method bellow will change (nested collections management)
-    var $$isLoadedOnNestedCollection = function() {
-      if(this.$_deferred) {
-        return false;
-      }
-      else{
-        return true;
-      }
     };
 
     /**
@@ -936,7 +843,35 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
             });
           }
           else if(attr.kind === 'relatedEntities') {
-            //@todo relatedEntities - caching
+            Object.defineProperty(this, attr.name, {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+                if(! this._related) {
+                  this._related = {};
+                }
+
+                if(this._related[attr.name]) {
+                  return this._related[attr.name];
+                }
+
+                var result = [];
+                if(this.$_entity[attr.name].value.__ENTITIES) {
+                  result = this.$_entity[attr.name].value.__ENTITIES;
+                  result.$_isLoaded = true;
+                }
+
+                result.$_collection = this.$_entity[attr.name];
+
+                transform.addFrameworkMethodsToNestedCollection(result);
+
+                this._related[attr.name] = result;
+                return result;
+              },
+              set: function() {
+                throw new Error("Can't set relatedEntities attribute " + attr.name + ".");
+              }
+            });
           }
           else if(attr.kind === 'calculated' || attr.kind === 'alias') {
             //no setters on those kind of attributes (in breaks the save if they are changed)
@@ -1207,6 +1142,69 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         });
         return ngWakEntity;
     }
+
+    var $fetchRelatedEntities = function(options, mode) {
+      var wakOptions = {},
+          deferred,
+          that = this;
+
+      mode = mode || 'replace';
+      options = options || {};
+
+      deferred = $q.defer();
+
+      // prepare options
+      wakOptions.skip = options.start = typeof options.start === 'undefined' ? (this.$query ? this.$query.start : 0) : options.start;
+      wakOptions.top = options.pageSize = typeof options.pageSize === 'undefined' ? (this.$query ? this.$query.pageSize : DEFAULT_PAGESIZE_NESTED_COLLECTIONS) : options.pageSize;
+
+      if (options.select) {
+        wakOptions.autoExpand = options.select;
+        console.warn("select can't be change on a $fetch (query collection's cached on server side in some way)");
+      }
+
+      if (options.orderBy) {
+        wakOptions.orderby = options.orderBy;
+        console.warn("orderBy can't be change on a $fetch (nested query collection's cached on server side in some way)");
+      }
+
+      // update $fetching ($apply needed)
+      rootScopeSafeApply(function() {
+        that.$fetching = true;
+      });
+
+      wakOptions.onSuccess = function(e) {
+        rootScopeSafeApply(function() {
+          if(mode === 'replace') {
+            that.length = 0;
+          }
+          e.entityCollection.forEach({
+            onSuccess: function(item) {
+              var ngWakEntity = createNgWakEntity(item.entity, { expend: true });
+              rootScopeSafeApply(function() {
+                that.push(ngWakEntity);
+              });
+            },
+            first: wakOptions.skip,
+            limit: wakOptions.skip + wakOptions.top
+          });
+
+          that.$_isLoaded = true;
+          updateCollectionQueryInfos(that, options.pageSize, options.start);
+          that.$totalCount = e.entityCollection.length;
+          that.$fetching = false;
+          deferred.resolve(that);
+        });
+      };
+      wakOptions.onError = function(event) {
+        rootScopeSafeApply(function() {
+          console.error('$fetch (nestedEntities) ) > onError', event);
+          that.$fetching = false;
+          deferred.reject(event);
+        });
+      };
+      that.$_collection.getValue(wakOptions);
+      return deferred.promise;
+    };
 
     return $wakandaResult;
   }]);

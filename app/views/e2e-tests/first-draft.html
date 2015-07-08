@@ -74,7 +74,7 @@
     <h3>Nested Company selected : <span class="company-name">{{company.name}}</span> - company.staff :</h3>
     <p ng-show="!company.staff.$isLoaded()" ng-click="company.staff.$fetch({pageSize:5})" class="load-nested-employees">Load employees of this company (lazy load)</p>
     <div ng-show="company.staff.$isLoaded()">
-      <ul>
+      <ul class="staff-list">
         <li ng-repeat="employee in company.staff"><span class="last-name">{{employee.lastName}}</span>, <span class="first-name">{{employee.firstName}}</span> - <span class="salary">{{employee.salary | currency}}</span></li>
       </ul>
       <h4>Infos</h4>
