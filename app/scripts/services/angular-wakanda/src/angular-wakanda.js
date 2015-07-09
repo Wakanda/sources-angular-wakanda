@@ -1172,9 +1172,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
         ngEntity._related = {};
       }
 
-      if(ngEntity._related[attr]) {
-        return ngEntity._related[attr];
-      } else {
+      if(! ngEntity._related[attr]) {
         if(ngEntity.$_entity[attr].relEntity) {
           var wafEntity = ngEntity.$_entity[attr].relEntity;
           ngEntity._related[attr] = new NgWakEntityClasses[wafEntity.getDataClass().getName()](wafEntity);
@@ -1183,6 +1181,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
           ngEntity._related[attr] = new NgWakEntityClasses[dataClass.getName()](dataClass, ngEntity.$_entity[attr].getRelatedKey());
         }
       }
+      return ngEntity._related[attr];
     }
 
     function createNgWakEntity(wafEntity, options) {
