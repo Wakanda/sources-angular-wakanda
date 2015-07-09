@@ -416,12 +416,12 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 		var handler = this.handler;
 
 		// Build the url:
-		var url = "/";
+		var url = (WAF.hostname ? WAF.hostname : "") + "/";
 
 		// app (optional):
 		if (this.app != null)
 		{
-			url += this.app + "/";
+			url = this.app + "/";
 		}
 
 		// service:
@@ -502,7 +502,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 		// $params
 		if (this.params)
 		{
-			queryString += (!deja$ ? "$params=" : "&$params=") + encodeURIComponent("'"+JSON.stringify(this.params)+"'");
+			queryString += (!deja$ ? "$params=" : "&$params=") + encodeURIComponent("'"+JSON.stringify(this.params).replace(/'/g, "\\u0027")+"'");
 			deja$ = true;
 		}
 		// $method
