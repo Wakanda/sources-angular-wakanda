@@ -6,6 +6,8 @@ Welcome to the **source repository** of the **angular-wakanda connector**. You'l
 
 **If you only wish to retrieve the connector itself**, just get it from bower `bower install angular-wakanda` or from the publish repo [Wakanda/angular-wakanda](https://github.com/Wakanda/angular-wakanda).
 
+Please file your issues on this repo : [Wakanda/wakanda-issues](https://github.com/Wakanda/wakanda-issues/labels/Angular-Wakanda).
+
 ##Included
 
 * An angular application
