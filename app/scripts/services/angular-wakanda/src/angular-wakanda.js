@@ -1,20 +1,16 @@
 var wakanda = angular.module('wakanda', []);
 
 wakanda.provider("$wakandaConfig", function() {
-    this.hostname = "";
+    var hostname = "";
     this.$get = function() {
-      var hostname = this.hostname;
       return {
         getHostname: function() {
           return hostname;
-        },
-        setHostname: function(hostname) {
-          this.hostname = hostname;
         }
-      }
+      };
     };
-    this.setHostname = function(hostname) {
-      this.hostname = hostname;
+    this.setHostname = function(_hostname) {
+      hostname = _hostname;
     };
   });
 
