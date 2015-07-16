@@ -7,15 +7,10 @@
 
 *Wakanda® is a registered trademark of WAKANDA SAS in France and/or other countries. All other names mentioned may be trademarks or registered trademarks of their respective owners.*
 
-This repo is for distribution on [Bower](http://bower.io/). You can check out demos
-in the [NG-Wakanda-Pack](https://github.com/Wakanda/NG-Wakanda-Pack/) repository.
+This repo is for distribution on `bower`. You can check out demos in the [NG-Wakanda-Pack](https://github.com/Wakanda/NG-Wakanda-Pack/) repository.
 
+The sources for this module are in the main [sources-angular-wakanda](https://github.com/Wakanda/sources-angular-wakanda) repo. Please file pull requests against that repo and issues on this repo : [Wakanda/wakanda-issues](https://github.com/Wakanda/wakanda-issues/labels/Angular-Wakanda).
 
-## EXPERIMENTAL
-
-THIS IS AN ALPHA RELEASE, AND ACTIVE DEVELOPMENT IS ONGOING. THE ANGULAR-WAKANDA CONNECTOR IS UNSTABLE AND NOT FINAL AND SHOULD NOT BE USED IN PRODUCTION (WHATEVER THAT MEANS FOR YOU).
-
-*Fell free to test it for some upcoming project but be aware that it is still incomplete and its API is potentially subject to change.*
 
 ## Install
 
@@ -54,6 +49,8 @@ $wakanda.init().then(function (ds) {
 * [Documentation](http://doc.wakanda.org/Wakanda/help/Title/en/page4419.html)
 * [Home page](http://www.wakanda.org/angular-wakanda/)
 * [Yeoman generator](https://www.npmjs.org/package/generator-angular-wakanda)
+* [Source repo](https://github.com/Wakanda/sources-angular-wakanda)
+* [Github issues](https://github.com/Wakanda/wakanda-issues/labels/Angular-Wakanda)
 
 ## License 
 
