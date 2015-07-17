@@ -45,7 +45,7 @@ describe('Connector/Dataclass:', function() {
 
   describe('$find() function', function() {
     it('should return the Entity collection of the records found in the Model', function(done) {
-      var employees = $wakanda.$ds.Employee.$find({
+      employees = $wakanda.$ds.Employee.$find({
         filter: 'lastName > :1 && salary > :2',
         params: ['a*', 60000],
         orderBy: 'firstName desc',

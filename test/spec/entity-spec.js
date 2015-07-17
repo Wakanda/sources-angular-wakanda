@@ -239,7 +239,7 @@ describe('Connector/Entity:', function() {
 
   describe('$toJSON() function', function() {
     it('should retrieve the JSON of a query', function(done) {
-      var employees = $wakanda.$ds.Employee.$find({
+      employees = $wakanda.$ds.Employee.$find({
         pageSize: 5
       });
       employees.$promise.then(function(){
@@ -254,7 +254,7 @@ describe('Connector/Entity:', function() {
 
   describe('$_collection function', function() {
     it('should retrieve the collection of a query', function(done) {
-      var employees = $wakanda.$ds.Employee.$find({
+      employees = $wakanda.$ds.Employee.$find({
         pageSize: 5
       });
       employees.$promise.then(function(){

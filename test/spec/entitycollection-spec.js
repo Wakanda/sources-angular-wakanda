@@ -121,7 +121,7 @@ describe('Connector/EntityCollection:', function() {
 
   describe('$fetching variable', function() {
     it('should return fetching status', function (done) {
-      var employees = $wakanda.$ds.Employee.$find();
+      employees = $wakanda.$ds.Employee.$find();
       expect(employees.$fetching).to.be.true;
       employees.$promise.then(function() {
         expect(employees.$fetching).to.be.false;
@@ -150,7 +150,7 @@ describe('Connector/EntityCollection:', function() {
 
   describe('$nextPage() function', function() {
     it('should retrieve more and different data', function (done) {
-        var employees = $wakanda.$ds.Employee.$find({
+        employees = $wakanda.$ds.Employee.$find({
           pageSize: 10
         });
         employees.$promise.then(function() {
@@ -168,7 +168,7 @@ describe('Connector/EntityCollection:', function() {
 
   describe('$prevPage() function', function() {
     it('should retrieve more and different data', function (done) {
-      var employees = $wakanda.$ds.Employee.$find({
+      employees = $wakanda.$ds.Employee.$find({
         pageSize: 10
       });
       employees.$promise.then(function() {
