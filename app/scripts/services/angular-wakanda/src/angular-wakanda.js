@@ -853,6 +853,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
                 if(this.$_entity) {
                   rootScopeSafeApply(function() {
                     this.$_entity[attr.name].setValue(ngWakEntity.$_entity);
+                    this[attr.name].$_entity = ngWakEntity.$_entity;
                   }.bind(this));
                 }
               }
