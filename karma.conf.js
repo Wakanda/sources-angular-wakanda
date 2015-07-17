@@ -9,7 +9,7 @@ module.exports = function(config) {
 
     // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
     reporters: [
-      'dots',
+      'verbose',
       'junit',
       'coverage',
       'html'
@@ -18,8 +18,8 @@ module.exports = function(config) {
     // testing framework to use (jasmine/mocha/qunit/...)
     frameworks: [
       'mocha',
-      'sinon-chai',
       'chai-as-promised',
+      'sinon-chai',
       'sinon',
       'chai'
     ],

@@ -5,7 +5,7 @@ describe('Connector/Entity:', function() {
     ds;
 
   beforeEach(function() {
-    if(! $wakanda) {
+    if(!$wakanda) {
       module('wakanda');
       module('unitTestsHelpersModule');
       inject(function(_$rootScope_, _$wakanda_, _$q_, _unitTestsHelpers_) {
@@ -49,13 +49,9 @@ describe('Connector/Entity:', function() {
       });
     });
     it('should return an error if not found', function (done) {
-      try {
-        ds.Employee.$findOne({filter: 'firstName = "abc"'});
-        Assert.Fail();
-      } catch (Exception) {
-        expect(Exception).to.be.an.instanceof(Error);
+      employee = ds.Employee.$findOne({filter: 'firstName = "abc"'}).$promise.should.be.rejected.then(function() {
         done();
-      }
+      });
     });
     it('should provide $key method', function (done) {
       expect(employee.ID).to.be.equal(parseInt(employee.$key()));
@@ -237,24 +233,9 @@ describe('Connector/Entity:', function() {
     });
   });
 
-  describe('$toJSON() function', function() {
-    it('should retrieve the JSON of a query', function(done) {
-      var employees = $wakanda.$ds.Employee.$find({
-        pageSize: 5
-      });
-      employees.$promise.then(function(){
-        var findJson = employees.$toJSON();
-        expect(findJson).to.be.a('string');
-        expect(JSON.parse(findJson)).to.be.an('array');
-        expect(JSON.parse(findJson).length).to.be.equal(5);
-        done();
-      });
-    });
-  });
-
   describe('$_collection function', function() {
     it('should retrieve the collection of a query', function(done) {
-      var employees = $wakanda.$ds.Employee.$find({
+      employees = $wakanda.$ds.Employee.$find({
         pageSize: 5
       });
       employees.$promise.then(function(){
