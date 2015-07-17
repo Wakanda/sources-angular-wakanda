@@ -856,6 +856,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', function($q, $rootScop
                 }
 
                 var result = [];
+                if(! this.$_entity) {
+                  throw new Error("Can't get relatedEntities '" + attr.name + "' before fetching the entity, please use $fetch before !");
+                }
                 if(this.$_entity[attr.name].value.__ENTITIES) {
                   result = this.$_entity[attr.name].value.__ENTITIES;
                   result.$_isLoaded = true;
