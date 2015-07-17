@@ -260,4 +260,26 @@ describe('Connector/Entity:', function() {
    });
   });
 
+  describe('setter on related entity', function() {
+    it('should update the related entity before and after $save', function(done) {
+      employee = employees[2];
+      var companies = $wakanda.$ds.Company.$find();
+      companies.$promise.then(function() {
+        var company = companies[0];
+
+        employee.employer.$fetch().then(function() {
+          expect(employee.employer.ID).to.not.equal(company.ID);
+
+          employee.employer = company;
+          expect(employee.employer.ID).to.be.equal(company.ID);
+
+          employee.$save().then(function() {
+            expect(employee.employer.ID).to.be.equal(company.ID);
+            done();
+          });
+        });
+      });
+    });
+  });
+
 });
