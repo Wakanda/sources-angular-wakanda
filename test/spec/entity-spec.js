@@ -49,13 +49,9 @@ describe('Connector/Entity:', function() {
       });
     });
     it('should return an error if not found', function (done) {
-      try {
-        ds.Employee.$findOne({filter: 'firstName = "abc"'});
-        Assert.Fail();
-      } catch (Exception) {
-        expect(Exception).to.be.an.instanceof(Error);
+      employee = ds.Employee.$findOne({filter: 'firstName = "abc"'}).$promise.should.be.rejected.then(function() {
         done();
-      }
+      });
     });
     it('should provide $key method', function (done) {
       expect(employee.ID).to.be.equal(parseInt(employee.$key()));

@@ -69,7 +69,6 @@ describe('Connector/Initialize:', function() {
       $badInit.should.be.rejected.then(function(ds){
         try {
             $wakanda.getDatastore();
-            Assert.Fail();
         } catch (Exception) {
             expect(Exception).to.be.an.instanceof(Error);
         }
