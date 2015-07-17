@@ -2,20 +2,21 @@ describe('Connector/Initialize:', function() {
   var $wakanda, $rootScope, $q, unitTestsHelpers,
     intervalRef;
 
-  beforeEach(function(){
-    module('wakanda');
-    module('unitTestsHelpersModule');
+  beforeEach(function() {
+    if(!$wakanda) {
+      module('wakanda');
+      module('unitTestsHelpersModule');
+      inject(function(_$rootScope_, _$wakanda_, _$q_, _unitTestsHelpers_) {
+          $q = _$q_;
+          $rootScope = _$rootScope_;
+          $wakanda = _$wakanda_;
+          unitTestsHelpers = _unitTestsHelpers_;
+          unitTestsHelpers.db.reset(false);
+          // https://github.com/domenic/chai-as-promised/issues/68
+          intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
+      });
+    }
   });
-
-  beforeEach(inject(function(_$rootScope_, _$wakanda_, _$q_, _unitTestsHelpers_) {
-    $q = _$q_;
-    $rootScope = _$rootScope_;
-    $wakanda = _$wakanda_;
-    unitTestsHelpers = _unitTestsHelpers_;
-    unitTestsHelpers.db.reset(false);
-    // https://github.com/domenic/chai-as-promised/issues/68
-    intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
-  }));
 
   describe('init() function', function() {
     it('should be defined and return a promise', function() {

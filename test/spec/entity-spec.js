@@ -5,7 +5,7 @@ describe('Connector/Entity:', function() {
     ds;
 
   beforeEach(function() {
-    if(! $wakanda) {
+    if(!$wakanda) {
       module('wakanda');
       module('unitTestsHelpersModule');
       inject(function(_$rootScope_, _$wakanda_, _$q_, _unitTestsHelpers_) {
@@ -250,7 +250,7 @@ describe('Connector/Entity:', function() {
         done();
       });
     });
-  });
+  });*/
 
   describe('$_collection function', function() {
     it('should retrieve the collection of a query', function(done) {

@@ -5,7 +5,7 @@ describe('Connector/EntityCollection:', function() {
     ds;
 
   beforeEach(function() {
-    if(! $wakanda) {
+    if(!$wakanda) {
       module('wakanda');
       module('unitTestsHelpersModule');
       inject(function(_$rootScope_, _$wakanda_, _$q_, _unitTestsHelpers_) {
