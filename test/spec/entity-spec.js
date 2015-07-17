@@ -237,21 +237,6 @@ describe('Connector/Entity:', function() {
     });
   });
 
-  describe('$toJSON() function', function() {
-    it('should retrieve the JSON of a query', function(done) {
-      employees = $wakanda.$ds.Employee.$find({
-        pageSize: 5
-      });
-      employees.$promise.then(function(){
-        var findJson = employees.$toJSON();
-        expect(findJson).to.be.a('string');
-        expect(JSON.parse(findJson)).to.be.an('array');
-        expect(JSON.parse(findJson).length).to.be.equal(5);
-        done();
-      });
-    });
-  });*/
-
   describe('$_collection function', function() {
     it('should retrieve the collection of a query', function(done) {
       employees = $wakanda.$ds.Employee.$find({
