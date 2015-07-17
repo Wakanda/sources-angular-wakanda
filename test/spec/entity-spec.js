@@ -246,4 +246,18 @@ describe('Connector/Entity:', function() {
     });
   });
 
+  describe('$fetch on related entity', function() {
+    it('should return undefined if not fetched', function(done) {
+      expect(employees[2].employer.ID).to.be.equal(undefined);
+      done();
+    });
+
+   it('should return a value', function(done) {
+     employees[2].employer.$fetch().then(function() {
+       expect(employees[2].employer.ID).to.not.equal(undefined);
+       done();
+     });
+   });
+  });
+
 });
