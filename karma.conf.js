@@ -9,7 +9,7 @@ module.exports = function(config) {
 
     // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
     reporters: [
-      'dots',
+      'verbose',
       'junit',
       'coverage',
       'html'
