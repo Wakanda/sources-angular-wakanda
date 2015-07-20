@@ -31,7 +31,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
      * @returns {$q.promise}
      */
     $wakandaResult.init = function(catalog) {
-      console.log('>$wakanda init');
       WAF.hostname = $wakandaConfig.getHostname();
       var deferred = $q.defer();
       if (typeof catalog !== "string" || catalog === '*' || catalog === '') {
