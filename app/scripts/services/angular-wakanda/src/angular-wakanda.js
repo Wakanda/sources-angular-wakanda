@@ -533,7 +533,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
     var $$fetch = function(options, mode) {
       var deferred, wakOptions = {}, that = this, skip, top;
       mode = mode || 'replace';
-      if(mode != 'replace' && mode != 'append') {
+      if(mode !== 'replace' && mode !== 'append') {
         throw new Error("Unknow mode " + mode + ", mode must be replace or append.");
       }
 
@@ -553,6 +553,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       if (options.params) {
         wakOptions.params = options.params;
       }
+
+      Object.defineProperty(this, '$fetching', { enumerable: false, writable: true, configurable: true });
+
       //prepare the promise
       deferred = $q.defer();
       that = this;
@@ -598,37 +601,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
      * @returns {String}
      */
     var $$toJSON = function() {
-
-      var getCleanObject = function(obj) {
-        var tmp, key, i;
-        if(obj instanceof Array) {
-          tmp = [];
-          if(obj.length > 0) {
-            for(i=0; i<obj.length; i++) {
-              tmp.push(getCleanObject(obj[i]));
-            }
-          }
-        }
-        else{
-          tmp = {};
-          for(key in obj) {
-            if(obj.hasOwnProperty(key) && key !== '$_entity' && key !== '$_deferred') {
-              if(obj[key] instanceof Array || obj[key] instanceof NgWakEntityAbstract) {
-                tmp[key] = getCleanObject(obj[key]);
-              }
-              else if(obj[key] !== null && typeof obj[key] !== 'undefined' && !obj[key].$_deferred) {
-                tmp[key] = obj[key];
-              }
-            }
-          }
-        }
-        return tmp;
-      };
-
-      var cleanObject = getCleanObject(this);
-
-      return JSON.stringify(cleanObject);
-
+      return JSON.stringify(this);
     };
 
     /**
@@ -752,6 +725,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       deferred = $q.defer();
       result.$promise = deferred.promise;
 
+      Object.defineProperty(result, '$fetching', { enumerable: false, writable: true, configurable: true });
+
       rootScopeSafeApply(function() {
         result.$fetching = true;
       });
@@ -788,6 +763,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       wakOptions.select = options && options.select || undefined;
 
       ngWakEntity.$promise = deferred.promise;
+
+      Object.defineProperty(ngWakEntity, '$fetching', { enumerable: false, writable: true, configurable: true });
+
       ngWakEntity.$fetching = true;
 
       wakOptions.onSuccess = function(event) {
@@ -841,7 +819,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
           writable: true //@todo rechange it to true on freeze (necessary when no $_entity assigned but $_key)
         });
         dataClass.getAttributes().forEach(function(attr) {
+
           if(attr.kind === 'relatedEntity') {
+
             Object.defineProperty(this, attr.name, {
               enumerable: true,
               configurable: true,
@@ -857,14 +837,21 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
                 }
               }
             });
+
           }
           else if(attr.kind === 'relatedEntities') {
+
             Object.defineProperty(this, attr.name, {
-              enumerable: true,
+              enumerable: !! this.$_entity,
               configurable: true,
               get: function() {
                 if(! this._related) {
-                  this._related = {};
+                  Object.defineProperty(this, '_related', {
+                    value: {},
+                    enumerable: false,
+                    writable: true,
+                    configurable: true
+                  });
                 }
 
                 if(this._related[attr.name]) {
@@ -1045,6 +1032,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
 
         var that = this;
 
+        Object.defineProperty(that, '$fetching', { enumerable: false, writable: true, configurable: true });
+
         rootScopeSafeApply(function() {
           that.$fetching = true;
         });
@@ -1056,7 +1045,17 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
             delete that.$_key;
             that.$fetching = false;
             event.result = that;
-            deferred.resolve(event);//@todo @warn make sure to pass correct entity inside resolve
+
+            // set enumerable property to true
+            that.$_dataClass.$_relatedAttributes.forEach(function(attr) {
+              if(attr.kind === 'relatedEntities') {
+                Object.defineProperty(that, attr.name, {
+                  enumerable: true
+                });
+              }
+            });
+
+            deferred.resolve(event);
           });
         };
         wakOptions.onError = function(event) {
@@ -1068,7 +1067,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         wakOptions.forceReload = typeof options.forceReload === 'undefined' ? true : options.forceReload;
 
         this.$_dataClass.getEntity(key, wakOptions);
-        //return the promise
         return deferred.promise;
       },
       //@todo check for regression according to changes
@@ -1123,7 +1121,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       }
 
       if(! ngEntity._related) {
-        ngEntity._related = {};
+        Object.defineProperty(ngEntity, '_related', {
+          value: {},
+          enumerable: false,
+          writable: true,
+          configurable: true
+        });
       }
 
       if(! ngEntity._related[attr]) {
@@ -1184,6 +1187,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         wakOptions.orderby = options.orderBy;
         console.warn("orderBy can't be change on a $fetch (nested query collection's cached on server side in some way)");
       }
+
+      Object.defineProperty(that, '$fetching', { enumerable: false, writable: true, configurable: true });
 
       // update $fetching ($apply needed)
       rootScopeSafeApply(function() {
