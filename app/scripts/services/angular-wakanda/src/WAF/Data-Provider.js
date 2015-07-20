@@ -718,7 +718,7 @@ WAF.DataStore.funcCaller = function(methodref, from, params, options)
 		entity = from;
 		dataClass = entity.getDataClass();
 		request.attributesRequested = [ methodref.name ];
-		request.resource = dataClass.getName() + '(';
+		request.resource = dataClass.getNameForRest() + '(';
 		var key = entity.getKey();
 		if (key != null)
 			request.resource += key;
@@ -733,7 +733,7 @@ WAF.DataStore.funcCaller = function(methodref, from, params, options)
 		else
 		{
 			request.attributesRequested = [ methodref.name ];
-			request.resource = dataClass.getName();
+			request.resource = dataClass.getNameForRest();
             request.filter = options.queryString;
 		}
 		request.savedQueryString = entityCollection._private.savedQuery;
@@ -749,7 +749,7 @@ WAF.DataStore.funcCaller = function(methodref, from, params, options)
 	{
 		dataClass = from;
         request.attributesRequested = [ methodref.name ];
-        request.resource = dataClass.getName();
+        request.resource = dataClass.getNameForRest();
 	}
 	
 	var pageSize = options.pageSize || 40;
@@ -908,10 +908,16 @@ WAF.DataStore.getCatalog = function(options, userData)
 	var alreadyDone = false;
 	var catResource = "$all";
 	priv.cacheRef = priv.cacheRef || options.cacheRef || false;
-	
+	var catname = "";
+	var catalogPrefix = null;
+	if (options.catalogName != null && typeof(options.catalogName) === 'string')
+	{
+			catname = options.catalogName+"/";
+			catalogPrefix = options.catalogName;
+	}
 	if (options.catalog != null)
 	{
-		if (typeof(options.catalog) == 'string')
+		if (typeof(options.catalog) === 'string')
 			catResource = options.catalog;
 		else
 			catResource = options.catalog.join(",");
@@ -936,7 +942,7 @@ WAF.DataStore.getCatalog = function(options, userData)
 			WAF.callHandler(false, null, event, options, userData);
 	}
 	else {
-		catResource = "$catalog/" + catResource;
+		catResource = "$catalog/" + catname + catResource;
 		
 		var request = new WAF.core.restConnect.restRequest(true);
 		
@@ -983,7 +989,7 @@ WAF.DataStore.getCatalog = function(options, userData)
 				if (dataStore[emName] == null) {
 					var collectionName = dataClassInfo.collectionName;
 					
-					var dataClass = new WAF.DataClass(dataClassInfo, dataStore);
+					var dataClass = new WAF.DataClass(dataClassInfo, dataStore, catalogPrefix);
 					priv.dataClasses[emName] = dataClass;
 					
 					if (collectionName != null) 
@@ -1010,7 +1016,7 @@ WAF.DataStore.getCatalog = function(options, userData)
 
 
 
-WAF.DataClass = function(dataClassInfo, dataStore)
+WAF.DataClass = function(dataClassInfo, dataStore, catalogPrefix)
 {
 	var dataClass = this,
         primaryKey = '';
@@ -1032,6 +1038,7 @@ WAF.DataClass = function(dataClassInfo, dataStore)
 		dataClassMethodRefs: {},
 		owner: dataClass,
 		dataStore: dataStore,
+		catalogPrefix: catalogPrefix,
 		cache: new WAF.EntityCache(),
 		refCache : new WAF.EntityRefCache(),
 		defaultTopSize : dataClassInfo.defaultTopSize,
@@ -1129,7 +1136,7 @@ WAF.DataClass.getEntityByURIOrKey = function(key, dataURI, options, userData)
 	}
 	else
 	{
-		request.resource = dataClass.getName()+ "("+key+")";
+		request.resource = dataClass.getNameForRest()+ "("+key+")";
 	}
 	request.autoExpand = options.autoExpand;
 	request.autoSubExpand = options.autoSubExpand;
@@ -1190,6 +1197,14 @@ WAF.DataClass.getName = function()
 	return this._private.className;	
 }
 
+
+WAF.DataClass.getNameForRest = function()
+{
+	var res = this._private.className;
+	if (this._private.catalogPrefix != null)
+		res = this._private.catalogPrefix + "/" + res;
+	return res;	
+}
 
 WAF.DataClass.getCollectionName = function()
 {
@@ -1385,7 +1400,7 @@ WAF.DataClass.distinctValues = function(attributeName, options, userData)
 	var request = new WAF.core.restConnect.restRequest(true);
             
 	//request.app = "";
-	request.resource = dataClass.getName();
+	request.resource = dataClass.getNameForRest();
 	//request.filter = '"'+queryString+'"';
 	request.filter = queryString;
 	request.skip = skip;
@@ -1450,7 +1465,7 @@ WAF.DataClass.query = function(queryString, options, userData)
 	{
 	    var request = new WAF.core.restConnect.restRequest(true);
 	    
-	    request.resource = dataClass.getName();
+	    request.resource = dataClass.getNameForRest();
 		
 	   	request.filter = priv.queryString;
 	    
@@ -1530,7 +1545,7 @@ WAF.DataClass.find = function(queryString, options, userData)
 
 	var request = new WAF.core.restConnect.restRequest(true);
 	
-	request.resource = dataClass.getName();
+	request.resource = dataClass.getNameForRest();
 	
 	request.autoExpand = options.autoExpand;
 	request.filterAttributes = options.filterAttributes;
@@ -1575,7 +1590,7 @@ WAF.DataClass.toArray = function(attributeList, options, userData)
 
 	var dataClass = this;
 	var request = new WAF.core.restConnect.restRequest(true);
-    request.resource = this.getName();
+    request.resource = this.getNameForRest();
 	    
     request.top = options.top || null;
 	request.skip = options.skip || null;
@@ -1976,7 +1991,7 @@ WAF.EntityCollection.fetchData = function(skip, top, options, userData)
     request.entityCollection = entityCollection;
     
     //request.app = "";
-    request.resource = priv.dataClass.getName();
+    request.resource = priv.dataClass.getNameForRest();
 	
 	if (dejaSet != null)
 	{
@@ -2774,7 +2789,7 @@ WAF.EntityCollection.toArray = function(attributeList, options, userData)
 
 	var request = new WAF.core.restConnect.restRequest(true);
     request.entityCollection = entityCollection; 
-    request.resource = priv.dataClass.getName();
+    request.resource = priv.dataClass.getNameForRest();
 	    
     request.top = options.top || priv.pageSize || 40;
 	request.skip = options.skip || null;
@@ -2831,7 +2846,7 @@ WAF.EntityCollection.distinctValues = function(attributeName, options, userData)
 	
 	var request = new WAF.core.restConnect.restRequest(true);
     request.entityCollection = entityCollection; 
-    request.resource = priv.dataClass.getName();
+    request.resource = priv.dataClass.getNameForRest();
 	    
  	request.addToSet = options.addToSet;
 	request.top = options.top || null;
@@ -2883,7 +2898,7 @@ WAF.EntityCollection.findKey = function(key, options, userData)
 	
 	var request = new WAF.core.restConnect.restRequest(true);
     request.entityCollection = entityCollection; 
-    request.resource = priv.dataClass.getName();
+    request.resource = priv.dataClass.getNameForRest();
 	    
  	request.addToSet = options.addToSet;
 	request.top = options.top || null;
@@ -2993,7 +3008,7 @@ WAF.EntityCollection.removeAllEntities = function(options, userData)
 
 	var request = new WAF.core.restConnect.restRequest(true);
     request.entityCollection = entityCollection; 
-    request.resource = priv.dataClass.getName();
+    request.resource = priv.dataClass.getNameForRest();
 	    
  	request.addToSet = options.addToSet;
 	request.params = priv.params;
@@ -3211,6 +3226,13 @@ WAF.EntityAttributeSimple.setRawValue = function(rawVal)
 	}
 	else
 		this.value = rawVal;
+
+	if (this.att.type === 'blob' || this.att.type === 'image')
+	{
+		this.unResolvedFile = null;
+		this.resolvedID = null;
+	}
+
 	delete this.oldValue;
 }
 
@@ -3890,7 +3912,7 @@ WAF.Entity._dolock = function(mustlock, options, userdata)
 	userData = resOp.userData;
 	options = resOp.options;
 	var dataClass = entity.getDataClass();
-	var dataClassName = dataClass.getName();
+	var dataClassName = dataClass.getNameForRest();
 	var key = entity.getKey();
 	
 	var request = new WAF.core.restConnect.restRequest(true);
@@ -3931,7 +3953,7 @@ WAF.Entity.remove = function(options, userData)
 	userData = resOp.userData;
 	options = resOp.options;
 	var dataClass = entity.getDataClass();
-	var dataClassName = dataClass.getName();
+	var dataClassName = dataClass.getNameForRest();
 	var key = entity.getKey();
 	
 	var request = new WAF.core.restConnect.restRequest(true);
@@ -3972,7 +3994,7 @@ WAF.Entity.save = function(options, userData)
 	userData = resOp.userData;
 	options = resOp.options;
 	var dataClass = entity.getDataClass();
-	var dataClassName = dataClass.getName();
+	var dataClassName = dataClass.getNameForRest();
 	
 	var refreshOnly = options.refreshOnly;
 	if (refreshOnly == null) 
@@ -4188,6 +4210,7 @@ WAF.DataClass.prototype.getDataStore = WAF.DataClass.getDataStore;
 WAF.DataClass.prototype.getCollectionName = WAF.DataClass.getCollectionName;
 WAF.DataClass.prototype.getDefaultTopSize = WAF.DataClass.getDefaultTopSize;
 WAF.DataClass.prototype.getName = WAF.DataClass.getName;
+WAF.DataClass.prototype.getNameForRest = WAF.DataClass.getNameForRest;
 WAF.DataClass.prototype.newCollection = WAF.DataClass.newCollection;
 WAF.DataClass.prototype.toArray = WAF.DataClass.toArray;
 WAF.DataClass.prototype.mustCacheRef = WAF.DataClass.mustCacheRef;
