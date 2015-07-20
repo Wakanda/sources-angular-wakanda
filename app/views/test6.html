@@ -28,7 +28,15 @@ td {
 }
 
 img {
-  max-width: 80px;
+    max-width: 60%;
+    margin-right: auto;
+    margin-left: auto;
+    display: block;
+}
+
+div button {
+    margin-top: 15px;
+    width: 80px;
 }
 
 </style>
@@ -55,12 +63,17 @@ img {
 
     <div class="emplyee" ng-show="employee">
         <h4>Employee : {{employee.firstName}} / {{employee.lastName}}</h3>
+
         <div>
             <input id="file" type="file">
         </div>
         <div>
-          <button ng-click="uploadFile()">upload</button>
+            <button ng-click="uploadFile()">upload</button>
         </div>
+        <div>
+            <button ng-click="employee.$save()">save</button>
+        </div>
+
         <div>
             <img src="{{employee.photo.uri}}" alt="employee photo">
         </div>
