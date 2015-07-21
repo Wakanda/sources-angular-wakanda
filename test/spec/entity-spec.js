@@ -233,6 +233,45 @@ describe('Connector/Entity:', function() {
     });
   });
 
+  describe('$toJSON() function', function() {   
+    it('should return the JSON of an entity', function() {   
+      var employeeJson = employee.$toJSON();    
+      expect(employeeJson).to.be.a('string');    
+      expect(JSON.parse(employeeJson)).to.be.an('object');    
+      expect(JSON.parse(employeeJson).ID).to.be.equal(employee.ID);    
+      var evalJson = eval('(' + JSON.stringify(employee) + ')');
+      expect(evalJson).to.be.deep.equal(JSON.parse(employeeJson));
+      expect(evalJson.length).to.be.equal(JSON.parse(employeeJson).length);
+    });  
+    it('should retrieve the id of a related entity', function() {   
+      var employeeJson = employee.$toJSON();  
+      var employeeJsonObject = JSON.parse(employeeJson);
+      expect(employeeJsonObject.employer).to.have.property('$_key');
+    });
+    it('should also retrieve the JSON of the related after fetch entity', function(done) {   
+      employee = employees[2];
+      employee.employer.$fetch().then(function() {
+        var employeeJson = employee.$toJSON();  
+        var employeeJsonObject = JSON.parse(employeeJson);
+        expect(employeeJsonObject.employer).to.not.have.property('$_key');
+        expect(employeeJsonObject.employer.ID).to.be.a('number');
+        done();
+      });
+    });  
+    it('should also retrieve the JSON of the related after fetch a related entity', function(done) {   
+      employee = employees[2];
+      employee.employer.$fetch().then(function() {
+        employee.employer.staff.$fetch().then(function() {
+          var employeeJson = employee.$toJSON();  
+          var employeeJsonObject = JSON.parse(employeeJson);
+          expect(employeeJsonObject.employer.staff).to.not.have.property('$_key');
+          expect(employeeJsonObject.employer.staff).to.be.an('array');
+          done();
+        });
+      });
+    });  
+  });
+
   describe('$_collection function', function() {
     it('should retrieve the collection of a query', function(done) {
       employees = $wakanda.$ds.Employee.$find({
@@ -242,6 +281,42 @@ describe('Connector/Entity:', function() {
           var findJson = employees.$_collection;
           expect(findJson).to.be.an('object');
           done();
+      });
+    });
+  });
+
+  describe('$fetch on related entity', function() {
+    it('should return undefined if not fetched', function(done) {
+      expect(employees[2].employer.ID).to.be.equal(undefined);
+      done();
+    });
+
+   it('should return a value', function(done) {
+     employees[2].employer.$fetch().then(function() {
+       expect(employees[2].employer.ID).to.not.equal(undefined);
+       done();
+     });
+   });
+  });
+
+  describe('setter on related entity', function() {
+    it('should update the related entity before and after $save', function(done) {
+      employee = employees[2];
+      var companies = $wakanda.$ds.Company.$find();
+      companies.$promise.then(function() {
+        var company = companies[0];
+
+        employee.employer.$fetch().then(function() {
+          expect(employee.employer.ID).to.not.equal(company.ID);
+
+          employee.employer = company;
+          expect(employee.employer.ID).to.be.equal(company.ID);
+
+          employee.$save().then(function() {
+            expect(employee.employer.ID).to.be.equal(company.ID);
+            done();
+          });
+        });
       });
     });
   });
