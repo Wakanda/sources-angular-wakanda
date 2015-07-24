@@ -862,14 +862,14 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
                 if(! this.$_entity) {
                   throw new Error("Can't get relatedEntities '" + attr.name + "' before fetching the entity, please use $fetch before !");
                 }
-                if(this.$_entity[attr.name].value.__ENTITIES) {
-                  result = this.$_entity[attr.name].value.__ENTITIES;
-                  result.$_isLoaded = true;
-                }
 
                 result.$_collection = this.$_entity[attr.name];
 
                 transform.addFrameworkMethodsToNestedCollection(result);
+
+                if(this.$_entity[attr.name].value.__ENTITIES) {
+                  result.$fetch();
+                }
 
                 this._related[attr.name] = result;
                 return result;
@@ -1178,7 +1178,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       wakOptions.skip = options.start = typeof options.start === 'undefined' ? (this.$query ? this.$query.start : 0) : options.start;
       wakOptions.top = options.pageSize = typeof options.pageSize === 'undefined' ? (this.$query ? this.$query.pageSize : DEFAULT_PAGESIZE_NESTED_COLLECTIONS) : options.pageSize;
 
-      if (options.select) {
+      if (options.select !== undefined) {
         wakOptions.autoExpand = options.select;
         console.warn("select can't be change on a $fetch (query collection's cached on server side in some way)");
       }
