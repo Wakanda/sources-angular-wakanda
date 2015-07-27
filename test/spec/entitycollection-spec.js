@@ -195,4 +195,33 @@ describe('Connector/EntityCollection:', function() {
       done();
     });
   });
+
+  describe('$toJSON() function', function() {
+    it('should retrieve the JSON of a collection', function(done) {
+      employees = $wakanda.$ds.Employee.$find({
+        pageSize: 10
+      });
+      employees.$promise.then(function() {
+        var employeesJson = employees.$toJSON();
+        expect(employeesJson).to.be.a('string');
+        expect(JSON.parse(employeesJson)).to.be.an('array');
+        expect(JSON.parse(employeesJson)[0].ID).to.be.equal(employees[0].ID);
+        var evalJson = eval('(' + JSON.stringify(employees) + ')');
+        expect(evalJson).to.be.deep.equal(JSON.parse(employeesJson));
+        expect(evalJson.length).to.be.equal(JSON.parse(employeesJson).length);
+        done();
+      });
+    });
+  });
+
+  describe('$find with selecting related entity and renlated entities', function() {
+    it('should fetch the related entities', function (done) {
+      employees = $wakanda.$ds.Employee.$find({ select: 'employer,employer.staff' });
+      employees.$promise.then(function() {
+        expect(employees[2].employer.staff.$isLoaded()).to.be.equal(true);
+        done();
+      });
+    });
+  });
+
 });
