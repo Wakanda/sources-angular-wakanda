@@ -5,6 +5,9 @@ Understand this module is still under development and the current releases are a
 
 The versions provided can be unstable, the features may not be finished. I'll try to keep this document up to date (it may not be completly accurate).
 
+##v0.4.4
+* define matching angularjs version (v1.2.6)
+
 ##v0.4.3
 * add `$find()` method on collections to create a sub-collection from an existing one.
 
