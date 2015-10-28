@@ -326,8 +326,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
                         console.error("userDataClassMethods.onError", "error", error);
                         defer.reject(error);
                     }
-                    //arguments: arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : [],
-                    //autoExpand: arguments[0] || ""
                 };
 
                 if (arguments.length > 0) {
@@ -337,7 +335,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
                   if (options.params) wakOptions.arguments = options.params;
                   if ("undefined" !== typeof options.pageSize) wakOptions.pageSize = options.pageSize;
                 }
-                console.log(wakOptions);
                 dataClass.callMethod(wakOptions);
                 return defer.promise;
             };
