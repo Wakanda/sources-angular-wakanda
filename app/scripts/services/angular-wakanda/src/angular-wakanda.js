@@ -306,28 +306,48 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       },
       createUserDefinedDataClassMethods: function(dataClass) {
         angular.forEach(dataClass.$dataClassMethods(), function(methodName) {
-          dataClass[methodName] = function() {
-            var defer = $q.defer();
-            dataClass.callMethod({
-              method: methodName,
-              onSuccess: function(event) {
-                defer.resolve(event);
-              },
-              onError: function(error) {
-                console.error('userDataClassMethods.onError','error', error);
-                defer.reject(error);
-              },
-              arguments: arguments.length > 0 ? Array.prototype.slice.call(arguments, 0) : []
-            });
-            return defer.promise;
-          };
-          dataClass[methodName + 'Sync'] = function() {
-            return dataClass.callMethod({
-              method: methodName,
-              sync: true,
-              arguments: arguments.length > 0 ? Array.prototype.slice.call(arguments, 0) : []
-            });
-          };
+            dataClass[methodName] = function() {
+                var defer = $q.defer();
+                var wakOptions = {
+                    method: methodName,
+                    onSuccess: function(event) {
+                      if (event.result instanceof WAF.EntityCollection) {
+                            var result = [];
+                            transform.wafEntityCollectionToNgWakEntityCollection(result, event.result, wakOptions);
+                            updateQueryInfos(result, result.$_collection._private.pageSize, 0);
+                            result.$fetching = false;
+                            event.result = result;
+                            defer.resolve(event);
+                        }else{
+                            defer.resolve(event);
+                        }
+                    },
+                    onError: function(error) {
+                        console.error("userDataClassMethods.onError", "error", error);
+                        defer.reject(error);
+                    }
+                    //arguments: arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : [],
+                    //autoExpand: arguments[0] || ""
+                };
+
+                if (arguments.length > 0) {
+                  var options = arguments[0];
+                  if (!options || "object" !== typeof options) options = {};
+                  if (options.select) wakOptions.autoExpand = options.select;
+                  if (options.params) wakOptions.arguments = options.params;
+                  if ("undefined" !== typeof options.pageSize) wakOptions.pageSize = options.pageSize;
+                }
+                console.log(wakOptions);
+                dataClass.callMethod(wakOptions);
+                return defer.promise;
+            };
+            dataClass[methodName + "Sync"] = function() {
+                return dataClass.callMethod({
+                    method: methodName,
+                    sync: true,
+                    arguments: arguments.length > 0 ? Array.prototype.slice.call(arguments, 0) : []
+                });
+            };
         });
       },
       wakandaUserDefinedMethodToPromisableMethods: function(method) {
