@@ -171,6 +171,12 @@
 					"scope": "public",
 					"type": "string",
 					"path": "employer.name"
+				},
+				{
+					"name": "photo",
+					"kind": "storage",
+					"scope": "public",
+					"type": "image"
 				}
 			],
 			"methods": [

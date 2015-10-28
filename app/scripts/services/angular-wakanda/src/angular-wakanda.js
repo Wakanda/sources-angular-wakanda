@@ -32,6 +32,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
      */
     $wakandaResult.init = function(catalog) {
       WAF.hostname = $wakandaConfig.getHostname();
+      //FIXME bug potentiel, si init appelé une deuxième fois avec un catalog différent !
+      console.log('>$wakanda init');
       var deferred = $q.defer();
       if (typeof catalog !== "string" || catalog === '*' || catalog === '') {
         catalog = null;
@@ -485,10 +487,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         return createNgWakEntity(new WAF.Entity(this, pojo || {}), { expend: true });
     };
 
-    var $$upload = function(file) {
-      console.log('$upload not yet implemented');
-    };
-
     /**
      *
      * @param {Array[NgWakEntity} resultSet (nested collection)
@@ -904,47 +902,94 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
                 }
               }
             });
+         } else if(attr.type === 'image') {
+           var attribute = this.$_entity[attr.name];
+            var value = {};
+            Object.defineProperty(this, attr.name, {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+                if(! attribute.resolvedID) {
+                  var val = attribute.getValue();
+                  if(val) {
+                    value.__deferred = angular.extend({}, val.__deferred);
+                  } else {
+                    delete value.__deferred;
+                  }
+                }
+                return value;
+              },
+              set: function(value) {
+                attribute.setValue(value);
+              }
+            });
+
+            // accessor to uri
+            Object.defineProperty(value, 'uri', {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+                return this.__deferred && this.__deferred.uri;
+              },
+              set: function(value) {
+                throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method or assign the value directly to the attribute.');
+              }
+            });
+
+            // upload file
+            value.$upload = function(file) {
+              var deferred = $q.defer(),
+                  wakOptions = {
+                    onSuccess: function(e) {
+                      deferred.resolve(e);
+                    },
+                    onError: function(e) {
+                     deferred.reject(e);
+                    },
+                    timeout: 300 // seconds
+                  };
+
+              if(file) {
+                attribute.setValue(file);
+              } else if(! attribute.unResolvedFile) {
+                throw new Error("there is no file to upload !");
+              }
+
+              attribute.resolveFile(wakOptions);
+
+              // just to test
+              var reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onloadend = function(e) {
+                if(! value.__deferred) {
+                  value.__deferred = {};
+                }
+                value.__deferred.uri = reader.result;
+              };
+
+              return deferred.promise;
+            };
+
           }
           //@warn specific case for object ? @warn check date types
-          else{
-            var descriptor = {
+          else {
+
+            Object.defineProperty(this, attr.name, {
               enumerable: true,
               configurable: true,
               get: function() {
                 if(this.$_entity) {
                   return this.$_entity[attr.name].getValue();
                 }
-              }
-            };
-
-            if(attr.type === 'image') {
-              descriptor.set = function(newValue) {
-                throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method to upload image.');
-              };
-            } else {
-              descriptor.set = function(newValue) {
+              },
+              set: function(newValue) {
                 if(this.$_entity) {
                   rootScopeSafeApply(function() {
                     this.$_entity[attr.name].setValue(newValue);
                   }.bind(this));
                 }
-              };
-            }
-            Object.defineProperty(this, attr.name, descriptor);
-
-            // accessor to uri
-            if(attr.type === 'image' && this[attr.name]) {
-              Object.defineProperty(this[attr.name], 'uri', {
-                enumerable: true,
-                configurable: true,
-                get: function() {
-                  return this.__deferred && this.__deferred.uri;
-                },
-                set: function(newValue) {
-                  throw new Error('Attribute ' + attr.name + ' is an image, your must use $upload method to upload image.');
-                }
-              });
-            }
+              }
+            });
           }
         }.bind(this));
       },
