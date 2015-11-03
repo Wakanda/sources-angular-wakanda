@@ -32,7 +32,7 @@ describe('Connector/EntityCollection:', function() {
   });
 
   beforeEach(function(done) {
-    employees = $wakanda.$ds.Employee.$find({
+    employees = $wakanda.$ds.Employee.$query({
       filter: 'lastName > :1 && salary > :2',
       params: ['a*', 60000],
       orderBy: 'firstName desc',
@@ -121,7 +121,7 @@ describe('Connector/EntityCollection:', function() {
 
   describe('$fetching variable', function() {
     it('should return fetching status', function (done) {
-      employees = $wakanda.$ds.Employee.$find();
+      employees = $wakanda.$ds.Employee.$query();
       expect(employees.$fetching).to.be.true;
       employees.$promise.then(function() {
         expect(employees.$fetching).to.be.false;
@@ -150,7 +150,7 @@ describe('Connector/EntityCollection:', function() {
 
   describe('$nextPage() function', function() {
     it('should retrieve more and different data', function (done) {
-        employees = $wakanda.$ds.Employee.$find({
+        employees = $wakanda.$ds.Employee.$query({
           pageSize: 10
         });
         employees.$promise.then(function() {
@@ -168,7 +168,7 @@ describe('Connector/EntityCollection:', function() {
 
   describe('$prevPage() function', function() {
     it('should retrieve more and different data', function (done) {
-      employees = $wakanda.$ds.Employee.$find({
+      employees = $wakanda.$ds.Employee.$query({
         pageSize: 10
       });
       employees.$promise.then(function() {
@@ -198,7 +198,7 @@ describe('Connector/EntityCollection:', function() {
 
   describe('$toJSON() function', function() {
     it('should retrieve the JSON of a collection', function(done) {
-      employees = $wakanda.$ds.Employee.$find({
+      employees = $wakanda.$ds.Employee.$query({
         pageSize: 10
       });
       employees.$promise.then(function() {
@@ -214,9 +214,9 @@ describe('Connector/EntityCollection:', function() {
     });
   });
 
-  describe('$find with selecting related entity and renlated entities', function() {
+  describe('$query with selecting related entity and renlated entities', function() {
     it('should fetch the related entities', function (done) {
-      employees = $wakanda.$ds.Employee.$find({ select: 'employer,employer.staff' });
+      employees = $wakanda.$ds.Employee.$query({ select: 'employer,employer.staff' });
       employees.$promise.then(function() {
         expect(employees[2].employer.staff.$isLoaded()).to.be.equal(true);
         done();
