@@ -175,8 +175,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         var dataClassName;
         //add some to prototype
         WAF.DataClass.prototype.$query = $$query;
-        WAF.DataClass.prototype.$find = $$find;
-        WAF.DataClass.prototype.$findOne = $$find;
+        WAF.DataClass.prototype.$find = $$findOne;
+        WAF.DataClass.prototype.$findOne = $$findOne;
         WAF.DataClass.prototype.$create = $$create;
 
         //looping through too much infos which were added before
@@ -751,7 +751,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       return result;
     };
 
-    var $$find = function(key, options) {
+    var $$findOne = function(key, options) {
       var wakOptions = {},
           deferred = $q.defer(),
           ngWakEntity = createNgWakEntity(new WAF.Entity(this, {}), { expend: true });
