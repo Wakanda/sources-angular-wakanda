@@ -32,7 +32,7 @@ describe('Connector/Entity:', function() {
   });
 
   beforeEach(function(done) {
-    employees = $wakanda.$ds.Employee.$find();
+    employees = $wakanda.$ds.Employee.$query();
     employees.$promise.then(function() {
       employee = employees[0];
       done();
@@ -50,6 +50,55 @@ describe('Connector/Entity:', function() {
     });
     it('should return an error if not found', function (done) {
       employee = ds.Employee.$findOne({filter: 'firstName = "abc"'}).$promise.should.be.rejected.then(function() {
+        done();
+      });
+    });
+    it('should provide $key method', function (done) {
+      expect(employee.ID).to.be.equal(parseInt(employee.$key()));
+      done();
+    });
+    it('should return undefined when no entity is defined', function (done) {
+      employee.$_entity = null;
+      expect(employee.$key()).to.be.undefined;
+      done();
+    });
+    it('should return key when no entity is defined but we have key', function (done) {
+      employee.$_entity = null;
+      employee.$_key = '123';
+      expect(employee.$key()).to.be.equal('123');
+      done();
+    });
+    it('should provide $stamp method', function (done) {
+      expect(employee.$stamp()).to.be.a('number');
+      done();
+    });
+    it('should return undefined when no entity is defined', function (done) {
+      employee.$_entity = null;
+      expect(employee.$stamp()).to.be.undefined;
+      done();
+    });
+    it('should provide $isNew method', function (done) {
+      expect(employee.$isNew()).to.be.a('boolean');
+      done();
+    });
+    it('should return undefined when no entity is defined', function (done) {
+      employee.$_entity = null;
+      expect(employee.$isNew()).to.be.undefined;
+      done();
+    });
+  });
+
+  describe('$find() function', function() {
+    it('should find an entity', function (done) {
+      var employee2 = ds.Employee.$find(employee.ID);
+      employee2.$promise.then(function() {
+        expect(employee2.ID).to.be.equal(parseInt(employee.ID));
+        expect(employee2.ID).to.be.equal(parseInt(employee2.$key()));
+        done();
+      });
+    });
+    it('should return an error if not found', function (done) {
+      employee = ds.Employee.$find({filter: 'firstName = "abc"'}).$promise.should.be.rejected.then(function() {
         done();
       });
     });
@@ -160,7 +209,7 @@ describe('Connector/Entity:', function() {
       var employeeToRemove = employees['0'];
       employees['0'].$remove().should.be.fulfilled.then(function(removeResult){
         expect(removeResult).to.be.an('object');
-        employees = $wakanda.$ds.Employee.$find();
+        employees = $wakanda.$ds.Employee.$query();
         employees.$promise.then(function() {
           expect(employees['0']).to.be.not.deep.equal(employeeToRemove);
           done();
@@ -233,48 +282,48 @@ describe('Connector/Entity:', function() {
     });
   });
 
-  describe('$toJSON() function', function() {   
-    it('should return the JSON of an entity', function() {   
-      var employeeJson = employee.$toJSON();    
-      expect(employeeJson).to.be.a('string');    
-      expect(JSON.parse(employeeJson)).to.be.an('object');    
-      expect(JSON.parse(employeeJson).ID).to.be.equal(employee.ID);    
+  describe('$toJSON() function', function() {
+    it('should return the JSON of an entity', function() {
+      var employeeJson = employee.$toJSON();
+      expect(employeeJson).to.be.a('string');
+      expect(JSON.parse(employeeJson)).to.be.an('object');
+      expect(JSON.parse(employeeJson).ID).to.be.equal(employee.ID);
       var evalJson = eval('(' + JSON.stringify(employee) + ')');
       expect(evalJson).to.be.deep.equal(JSON.parse(employeeJson));
       expect(evalJson.length).to.be.equal(JSON.parse(employeeJson).length);
-    });  
-    it('should retrieve the id of a related entity', function() {   
-      var employeeJson = employee.$toJSON();  
+    });
+    it('should retrieve the id of a related entity', function() {
+      var employeeJson = employee.$toJSON();
       var employeeJsonObject = JSON.parse(employeeJson);
       expect(employeeJsonObject.employer).to.have.property('$_key');
     });
-    it('should also retrieve the JSON of the related after fetch entity', function(done) {   
+    it('should also retrieve the JSON of the related after fetch entity', function(done) {
       employee = employees[2];
       employee.employer.$fetch().then(function() {
-        var employeeJson = employee.$toJSON();  
+        var employeeJson = employee.$toJSON();
         var employeeJsonObject = JSON.parse(employeeJson);
         expect(employeeJsonObject.employer).to.not.have.property('$_key');
         expect(employeeJsonObject.employer.ID).to.be.a('number');
         done();
       });
-    });  
-    it('should also retrieve the JSON of the related after fetch a related entity', function(done) {   
+    });
+    it('should also retrieve the JSON of the related after fetch a related entity', function(done) {
       employee = employees[2];
       employee.employer.$fetch().then(function() {
         employee.employer.staff.$fetch().then(function() {
-          var employeeJson = employee.$toJSON();  
+          var employeeJson = employee.$toJSON();
           var employeeJsonObject = JSON.parse(employeeJson);
           expect(employeeJsonObject.employer.staff).to.not.have.property('$_key');
           expect(employeeJsonObject.employer.staff).to.be.an('array');
           done();
         });
       });
-    });  
+    });
   });
 
   describe('$_collection function', function() {
     it('should retrieve the collection of a query', function(done) {
-      employees = $wakanda.$ds.Employee.$find({
+      employees = $wakanda.$ds.Employee.$query({
         pageSize: 5
       });
       employees.$promise.then(function(){
@@ -302,7 +351,7 @@ describe('Connector/Entity:', function() {
   describe('setter on related entity', function() {
     it('should update the related entity before and after $save', function(done) {
       employee = employees[2];
-      var companies = $wakanda.$ds.Company.$find();
+      var companies = $wakanda.$ds.Company.$query();
       companies.$promise.then(function() {
         var company = companies[0];
 

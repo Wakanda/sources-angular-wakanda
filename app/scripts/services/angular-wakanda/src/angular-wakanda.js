@@ -174,7 +174,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       wafDataClasses: function(dataStore) {
         var dataClassName;
         //add some to prototype
-        WAF.DataClass.prototype.$find = $$find;
+        WAF.DataClass.prototype.$query = $$query;
+        WAF.DataClass.prototype.$find = $$findOne;
         WAF.DataClass.prototype.$findOne = $$findOne;
         WAF.DataClass.prototype.$create = $$create;
 
@@ -341,7 +342,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
           //check if we are on an entity or a collection. The mode var will also be used as the name of the pointer later
           if(this instanceof NgWakEntityAbstract) {
             if(typeof this.$_entity === 'undefined' || !(this.$_entity instanceof WAF.Entity)) {
-              throw new Error('Calling user defined method on unfetched entity, please call $fetch before or retrieve data on $find');
+              throw new Error('Calling user defined method on unfetched entity, please call $fetch before or retrieve data on $query');
             }
             mode = '$_entity';
           }
@@ -444,7 +445,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       },
       addFrameworkMethodsToRootCollection: function(result) {
         result.$fetch = $$fetch;
-        result.$find = $$find.bind(result.$_collection);
+        result.$query = $$query.bind(result.$_collection);
         result.$add = $$add;
         result.$more = $$more;
         result.$nextPage = $$nextPage;
@@ -455,7 +456,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       //@todo adapt / wrap some of the method bellow for nested collections (since their management changed)
       addFrameworkMethodsToNestedCollection: function(result) {
         result.$fetch = $fetchRelatedEntities.bind(result);
-        result.$find = $$find.bind(result.$_collection);
+        result.$query = $$query.bind(result.$_collection);
         result.$more = $$more;
         result.$nextPage = $$nextPage;
         result.$prevPage = $$prevPage;
@@ -704,7 +705,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
      * @param {Object} options
      * @returns {Array[NgWakEntity]|NgWakEntity}
      */
-    var $$find = function(options) {
+    var $$query = function(options) {
       var wakOptions = {},
           result = [],
           deferred;
@@ -740,7 +741,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       };
       wakOptions.onError = function(event) {
         rootScopeSafeApply(function() {
-          console.error('$find > query > onError', event);
+          console.error('$query > query > onError', event);
           result.$fetching = false;
           deferred.reject(event);
         });
@@ -777,7 +778,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       };
       wakOptions.onError = function(event) {
         rootScopeSafeApply(function() {
-          console.error('$findOne > getEntity > error', event);
+          console.error('$find > getEntity > error', event);
           ngWakEntity.$fetching = false;
           deferred.reject(event);
         });
