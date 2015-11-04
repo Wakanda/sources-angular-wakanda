@@ -9,12 +9,12 @@
  */
 angular.module('angularWakandaFrontApp')
   .controller('CollectionFindCtrl', function ($scope, $wakanda) {
-    
+
     $scope.filterEmployees1 = 'employer.name="Calendar Sable Diffusing Ring"';
     $scope.filterEmployees2 = "salary>90000";
 
     $scope.launchFindEmployees1 = function(){
-      window.employees1 = $scope.employees1 = $wakanda.$ds.Employee.$find({
+      window.employees1 = $scope.employees1 = $wakanda.$ds.Employee.$query({
         pageSize : 10,
         select : 'employer',
         filter : $scope.filterEmployees1
@@ -25,7 +25,7 @@ angular.module('angularWakandaFrontApp')
     };
 
     $scope.launchFindEmployees2 = function(){
-      window.employees2 = $scope.employees2 = $scope.employees1.$find({
+      window.employees2 = $scope.employees2 = $scope.employees1.$query({
         filter : $scope.filterEmployees2,
         orderBy : 'salary desc'
       });
@@ -36,7 +36,7 @@ angular.module('angularWakandaFrontApp')
         employee.message = e.result;
       });
     };
-    
+
     $scope.launchFindEmployees1();
 
   });

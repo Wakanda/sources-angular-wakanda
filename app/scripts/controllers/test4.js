@@ -9,11 +9,11 @@
  */
 angular.module('angularWakandaFrontApp')
   .controller('Test4Ctrl', function ($scope, $wakanda) {
-    
+
     window.ds = $wakanda.$ds;
-    
+
     $scope.init = function(){
-      window.employees = this.employees = $wakanda.$ds.Employee.$find({
+      window.employees = this.employees = $wakanda.$ds.Employee.$query({
 //        select: 'employer.staff.employer',
 //        select: 'employer, employer.staff',
 //        select: 'employer',
@@ -21,7 +21,7 @@ angular.module('angularWakandaFrontApp')
         orderBy: 'ID desc'
       });
     };
-    
+
     /**
      * Creates an employee, assigning an employer to it in the $create method - then save employee
      * OK
@@ -36,7 +36,7 @@ angular.module('angularWakandaFrontApp')
         $scope.init();
       });
     };
-    
+
     /**
      * Creates an employee, assigning an employer to it via the related attribute - then save employee
      * Needs hack because the relatedAttribute isn't updated on the employee.$_entity pointer
@@ -52,7 +52,7 @@ angular.module('angularWakandaFrontApp')
         $scope.init();
       });
     };
-    
+
     /**
      * Updates an employee, changing its employer via the related attribute - then save employee
      * Needs hack because the relatedAttribute isn't updated on the employee.$_entity pointer
@@ -66,7 +66,7 @@ angular.module('angularWakandaFrontApp')
         $scope.init();
       });
     };
-    
+
     /**
      * Creates a new company, saves it
      * Creates an employee, assigning the employer via the $create method (same as addEmployee1)
@@ -87,7 +87,7 @@ angular.module('angularWakandaFrontApp')
         });
       });
     };
-    
+
     /**
      * Creates a new company, saves it
      * Creates an employee, assigning the employer via the .employer related attribute (same as addEmployee2)
@@ -109,7 +109,7 @@ angular.module('angularWakandaFrontApp')
         });
       });
     };
-    
+
     $scope.testForEachInCache = function(){
       var companies = [];
       var totalEmployees = 0;
@@ -159,6 +159,6 @@ angular.module('angularWakandaFrontApp')
             }
           });
     };
-    
+
     $scope.init();
   });
