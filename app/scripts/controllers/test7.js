@@ -7,12 +7,8 @@ angular.module('angularWakandaFrontApp')
 
   ds = $wakanda.$ds;
 
-  var e = $scope.employees = ds.Employee.$all({
-    pageSize: 3
+  $scope.employees = ds.Employee.$all({
+    pageSize: 10
   });
 
-  e.$promise.then(function (data) {
-    debugger;
-  })
-
-  }]);
+}]);
