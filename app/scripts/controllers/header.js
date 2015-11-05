@@ -16,6 +16,7 @@ angular.module('angularWakandaFrontApp')
                 {href: '/test4', text: 'Test4'},
                 {href: '/test5', text: 'Test5'},
                 {href: '/test6', text: 'Test6'},
+                {href: '/test7', text: 'Test7'},
                 {href: '/bug-test1', text: 'Bug Test1'},
                 {href: '/bug-test2', text: 'Bug Test2'},
                 {href: '/bug-test3', text: 'Bug Test3'},
