@@ -357,6 +357,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
           //prepare the promise
           deferred = $q.defer();
           that = this;
+          deferred.promise.$promise = deferred.promise;
           wakOptions.onSuccess = function(event) {
             rootScopeSafeApply(function() {
               deferred.resolve(event);
@@ -948,6 +949,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
                     },
                     timeout: 300 // seconds
                   };
+              deferred.promise.$promise = deferred.promise;
 
               if(file) {
                 attribute.setValue(file);
@@ -1019,6 +1021,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         var deferred, wakOptions = {}, that = this;
         //prepare the promise
         deferred = $q.defer();
+        deferred.promise.$promise = deferred.promise;
         wakOptions.onSuccess = function(event) {
           rootScopeSafeApply(function() {
             console.log('save.onSuccess', 'event', event);
@@ -1044,6 +1047,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         var deferred, wakOptions = {}, that = this;
         //prepare the promise
         deferred = $q.defer();
+        deferred.promise.$promise = deferred.promise;
         wakOptions.onSuccess = function(event) {
           rootScopeSafeApply(function() {
             console.log('remove.onSuccess', 'event', event);
@@ -1074,7 +1078,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         key = this.$key();
         //prepare the promise
         deferred = $q.defer();
-
+        deferred.promise.$promise = deferred.promise;
         var that = this;
 
         Object.defineProperty(that, '$fetching', { enumerable: false, writable: true, configurable: true });
@@ -1128,6 +1132,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         var deferred = $q.defer(),
           that = this;
         options = options || {};
+        deferred.promise.$promise = deferred.promise;
 
         if(! this.$_entity) {
           throw new Error("Can't $serverRefresh() without pointer, please $fetch() before.");
@@ -1218,6 +1223,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       options = options || {};
 
       deferred = $q.defer();
+      deferred.promise.$promise = deferred.promise;
 
       // prepare options
       debugger;
