@@ -39,55 +39,6 @@ describe('Connector/Entity:', function() {
     });
   });
 
-  describe('$findOne() function', function() {
-    it('should find an entity', function (done) {
-      var employee2 = ds.Employee.$findOne(employee.ID);
-      employee2.$promise.then(function() {
-        expect(employee2.ID).to.be.equal(parseInt(employee.ID));
-        expect(employee2.ID).to.be.equal(parseInt(employee2.$key()));
-        done();
-      });
-    });
-    it('should return an error if not found', function (done) {
-      employee = ds.Employee.$findOne({filter: 'firstName = "abc"'}).$promise.should.be.rejected.then(function() {
-        done();
-      });
-    });
-    it('should provide $key method', function (done) {
-      expect(employee.ID).to.be.equal(parseInt(employee.$key()));
-      done();
-    });
-    it('should return undefined when no entity is defined', function (done) {
-      employee.$_entity = null;
-      expect(employee.$key()).to.be.undefined;
-      done();
-    });
-    it('should return key when no entity is defined but we have key', function (done) {
-      employee.$_entity = null;
-      employee.$_key = '123';
-      expect(employee.$key()).to.be.equal('123');
-      done();
-    });
-    it('should provide $stamp method', function (done) {
-      expect(employee.$stamp()).to.be.a('number');
-      done();
-    });
-    it('should return undefined when no entity is defined', function (done) {
-      employee.$_entity = null;
-      expect(employee.$stamp()).to.be.undefined;
-      done();
-    });
-    it('should provide $isNew method', function (done) {
-      expect(employee.$isNew()).to.be.a('boolean');
-      done();
-    });
-    it('should return undefined when no entity is defined', function (done) {
-      employee.$_entity = null;
-      expect(employee.$isNew()).to.be.undefined;
-      done();
-    });
-  });
-
   describe('$find() function', function() {
     it('should find an entity', function (done) {
       var employee2 = ds.Employee.$find(employee.ID);
