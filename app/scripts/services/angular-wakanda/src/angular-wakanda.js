@@ -175,8 +175,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         var dataClassName;
         //add some to prototype
         WAF.DataClass.prototype.$query = $$query;
-        WAF.DataClass.prototype.$find = $$findOne;
-        WAF.DataClass.prototype.$findOne = $$findOne;
+        WAF.DataClass.prototype.$find = $$find;
         WAF.DataClass.prototype.$create = $$create;
         WAF.DataClass.prototype.$all = $$all;
 
@@ -499,11 +498,11 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
      * @returns {undefined}
      */
     var updateCollectionQueryInfos = function(resultSet, pageSize, start) {
-      if(typeof resultSet.$query === 'undefined') {
-        resultSet.$query = {};
+      if(typeof resultSet.$queryParams === 'undefined') {
+        resultSet.$queryParams = {};
       }
-      resultSet.$query.pageSize   = pageSize;
-      resultSet.$query.start      = start;
+      resultSet.$queryParams.pageSize   = pageSize;
+      resultSet.$queryParams.start      = start;
     };
 
     /**
@@ -515,12 +514,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
      * @returns {undefined}
      */
     var updateQueryInfos = function(resultSet, pageSize, start, filter) {
-      if(typeof resultSet.$query === 'undefined') {
-        resultSet.$query = {};
+      if(typeof resultSet.$queryParams === 'undefined') {
+        resultSet.$queryParams = {};
       }
-      resultSet.$query.pageSize   = pageSize;
-      resultSet.$query.start      = start;
-      resultSet.$query.filter     = filter ? filter : resultSet.$query.filter;
+      resultSet.$queryParams.pageSize   = pageSize;
+      resultSet.$queryParams.start      = start;
+      resultSet.$queryParams.filter     = filter ? filter : resultSet.$queryParams.filter;
     };
 
     /**
@@ -550,8 +549,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         throw new Error("select can't be change on a $fetch (query collection's cached on server side)");
       }
       //prepare options
-      skip = options.start = typeof options.start === 'undefined' ? this.$query.start : options.start;
-      top = options.pageSize = options.pageSize || this.$query.pageSize;
+      skip = options.start = typeof options.start === 'undefined' ? this.$queryParams.start : options.start;
+      top = options.pageSize = options.pageSize || this.$queryParams.pageSize;
       if (options.params) {
         wakOptions.params = options.params;
       }
@@ -614,9 +613,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
 
     var $$more = function() {
       var start, pageSize, totalCount, deferred;
-      if(typeof this.$query !== 'undefined') {
-        start = this.$query.start + this.$query.pageSize;
-        pageSize = this.$query.pageSize;
+      if(typeof this.$queryParams !== 'undefined') {
+        start = this.$queryParams.start + this.$queryParams.pageSize;
+        pageSize = this.$queryParams.pageSize;
         totalCount = this.$totalCount;
       }
       else{
@@ -644,9 +643,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
 
     var $$nextPage = function() {
       var start, pageSize, totalCount, deferred;
-      if(typeof this.$query !== 'undefined') {
-        start = this.$query.start + this.$query.pageSize;
-        pageSize = this.$query.pageSize;
+      if(typeof this.$queryParams !== 'undefined') {
+        start = this.$queryParams.start + this.$queryParams.pageSize;
+        pageSize = this.$queryParams.pageSize;
         totalCount = this.$totalCount;
       }
       else{
@@ -673,9 +672,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
 
     var $$prevPage = function() {
       var start, pageSize, deferred, noMore;
-      if(typeof this.$query !== 'undefined') {
-        start = this.$query.start - this.$query.pageSize;
-        pageSize = this.$query.pageSize;
+      if(typeof this.$queryParams !== 'undefined') {
+        start = this.$queryParams.start - this.$queryParams.pageSize;
+        pageSize = this.$queryParams.pageSize;
       }
       else{
         deferred = new $q.defer();
@@ -761,7 +760,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       return this.$query(options);
     };
 
-    var $$findOne = function(key, options) {
+    var $$find = function(key, options) {
       var wakOptions = {},
           deferred = $q.defer(),
           ngWakEntity = createNgWakEntity(new WAF.Entity(this, {}), { expend: true });
@@ -1231,8 +1230,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       deferred = $q.defer();
 
       // prepare options
-      wakOptions.skip = options.start = typeof options.start === 'undefined' ? (this.$query ? this.$query.start : 0) : options.start;
-      wakOptions.top = options.pageSize = typeof options.pageSize === 'undefined' ? (this.$query ? this.$query.pageSize : DEFAULT_PAGESIZE_NESTED_COLLECTIONS) : options.pageSize;
+      debugger;
+      wakOptions.skip = options.start = typeof options.start === 'undefined' ? (this.$queryParams ? this.$queryParams.start : 0) : options.start;
+      wakOptions.top = options.pageSize = typeof options.pageSize === 'undefined' ? (this.$queryParams ? this.$queryParams.pageSize : DEFAULT_PAGESIZE_NESTED_COLLECTIONS) : options.pageSize;
 
       if (options.select !== undefined) {
         wakOptions.autoExpand = options.select;

@@ -6,7 +6,7 @@ angular.module('angularWakandaFrontApp')
   .controller('Test5Ctrl', ['$scope','$wakanda',function ($scope, $wakanda) {
 
   ds = $wakanda.$ds;
-  products = $scope.products = ds.Product.$find({
+  products = $scope.products = ds.Product.$query({
     pageSize: 5,
     orderBy : 'name asc'
   });
