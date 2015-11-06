@@ -9,7 +9,7 @@ angular.module('angularWakandaFrontApp')
             if($route.current.params.employeeId){
               $scope.companies = ds.Company.$query({pageSize:100});
               $scope.companies.$promise.then(function(){
-                $scope.employee = employee = ds.Employee.$findOne($route.current.params.employeeId,{select:'employer'});
+                $scope.employee = employee = ds.Employee.$find($route.current.params.employeeId,{select:'employer'});
               });
             }
             else{
