@@ -51,13 +51,13 @@ describe('Connector/EntityCollection:', function() {
     });
   });
 
-  describe('$query variable', function() {
+  describe('$queryParams variable', function() {
     it('should have information about the query', function (done) {
-      expect(employees.$query.pageSize).to.be.a('number');
-      expect(employees.$query.pageSize).to.be.equal(5);
-      expect(employees.$query.start).to.be.a('number');
-      expect(employees.$query.start).to.be.equal(0);
-      expect(employees.$query.filter).to.be.defined;
+      expect(employees.$queryParams.pageSize).to.be.a('number');
+      expect(employees.$queryParams.pageSize).to.be.equal(5);
+      expect(employees.$queryParams.start).to.be.a('number');
+      expect(employees.$queryParams.start).to.be.equal(0);
+      expect(employees.$queryParams.filter).to.be.defined;
       done();
     });
   });

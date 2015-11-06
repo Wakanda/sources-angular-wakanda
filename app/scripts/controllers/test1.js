@@ -12,11 +12,11 @@ angular.module('angularWakandaFrontApp')
             $scope.extendView = function(extend){
                 $scope.extended = extend;
             };
-            
+
             $scope.show = function(tableName){
                 $scope.display = tableName;
             };
-            
+
             $scope.orderByOptions = [
                 {"label" : "none", "value" : "none"},
                 {"label" : "firstName asc", "value" : "firstName:asc"},
@@ -24,9 +24,9 @@ angular.module('angularWakandaFrontApp')
                 {"label" : "lastName asc", "value" : "lastName:asc"},
                 {"label" : "lastName desc", "value" : "lastName:desc"}
             ];
-            
+
             $scope.orderBy = $scope.orderByOptions[0];//init the select to none
-            
+
             var setOrderByFilterOnEmployeesFilteredFromCombo = function(comboValue){
                 var tmp;
                 if(comboValue.value === "none"){
@@ -38,47 +38,47 @@ angular.module('angularWakandaFrontApp')
                     $scope.employeesFilteredReverse = tmp[1] === "asc" ? false : true;
                 }
             };
-            
+
             $scope.$watch('orderBy',function(comboValue){
                 console.log('watch',comboValue);
                 setOrderByFilterOnEmployeesFilteredFromCombo(comboValue);
             });
-            
+
             //bellow : server requests
-            
+
             /** products */
-            
+
             $scope.productsQuery = 'name = "*"';
-            
+
             $scope.products = [];
-            
+
             $scope.$watch('productsQuery',function(query){
                 if(!query){
                     query = 'name = *';
                 }
-            
-                products = $scope.products = ds.Product.$find({
+
+                products = $scope.products = ds.Product.$query({
                     filter : query
                 });
                 products.$promise.then(function(event){
                     console.log(event);
                 });
-                
+
             });
-            
+
             /** employee */
-            
+
 //            $scope.employeeQuery = 'firstName = "*" and employer.name = "*"';
             $scope.employeeQuery = 'firstName = "*"';
-            
+
             $scope.employees = [];
             
             $scope.$watch('employeeQuery',function(query){
                 if(!query){
                     query = 'firstName = "*"';
                 }
-            
-                employees = $scope.employees = $scope.employeesFiltered = ds.Employee.$find({
+
+                employees = $scope.employees = $scope.employeesFiltered = ds.Employee.$query({
                     select : 'firstName, lastName, salary, employer',
 //                    select : 'firstName, lastName, salary',
                     filter : query,
@@ -90,7 +90,7 @@ angular.module('angularWakandaFrontApp')
                 employees.$promise.then(function(event){
                     console.log(event);
                 });
-                
+
             });
-            
+
         }]);

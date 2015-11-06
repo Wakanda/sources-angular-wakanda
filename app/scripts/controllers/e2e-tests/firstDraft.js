@@ -4,12 +4,12 @@ var ds, employees, company, products;
 
 angular.module('angularWakandaFrontApp')
   .controller('E2E.FirstDraftCtrl', ['$scope','$wakanda',function($scope,$wakanda) {
-      
+
       ds = $wakanda.getDatastore();
-      
+
       $scope.employees = [];
       $scope.products = [];
-            
+
       $scope.orderByOptions = [
         {"label" : "none", "value" : undefined},
         {"label" : "firstName asc", "value" : "firstName asc"},
@@ -22,7 +22,7 @@ angular.module('angularWakandaFrontApp')
         {"label" : "employer.name desc", "value" : "employer.name desc"}
       ];
       $scope.wak = {};
-      
+
       $scope.init = function(firstTime){
         console.log('init',$scope.wak.orderBy,$scope.wak.orderBy);
         if(firstTime === true){
@@ -30,7 +30,7 @@ angular.module('angularWakandaFrontApp')
           $scope.wak.staffOrderBy = $scope.orderByOptions[0];
           $scope.filter = "";
         }
-        employees = $scope.employees = ds.Employee.$find({
+        employees = $scope.employees = ds.Employee.$query({
           select : 'employer',
           pageSize : 10,
           orderBy : $scope.wak.orderBy.value,
@@ -38,29 +38,29 @@ angular.module('angularWakandaFrontApp')
         });
         company = $scope.company = null;
 
-        products = $scope.products = ds.Product.$find({
+        products = $scope.products = ds.Product.$query({
           orderBy: 'name asc'
         });
       };
-      
+
       $scope.applyFilter = function(keyCode){
         console.log('applyFilter',keyCode);
         if(keyCode === 13){
           $scope.init(false);
         }
       };
-      
+
       $scope.editEmployee = function(employee){
         window.scrollTo(0,document.body.clientHeight);
         $scope.currentEmployee = employee;
       };
-      
+
       $scope.saveEmployeeEdits = function(){
         $scope.currentEmployee.$save().then(function(){
           $scope.currentEmployee = null;
         });
       };
-      
+
       $scope.selectCompany = function(myCompany){
         console.log(myCompany,myCompany.staff, typeof myCompany.staff);
         if(typeof myCompany.staff === 'undefined'){
@@ -72,15 +72,15 @@ angular.module('angularWakandaFrontApp')
         console.log($scope.nestedCompanyLoadingError);
         company = $scope.company = myCompany;
       };
-      
+
       $scope.filterStaffOrderBy = function(option){
         if(option.value && option.value.indexOf("employer.name") > -1){
           return false;
         }
         return option;
       };
-      
+
       //init
       $scope.init(true);
-      
+
   }]);

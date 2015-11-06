@@ -10,11 +10,11 @@ angular.module('angularWakandaFrontApp')
             var myNewEmployeeCollection = [], myNewEmployeeTmp, myNewCompany, i;
 
             $scope.display = function () {
-              var a = $scope.employees = $wakanda.$ds.Employee.$find({
+              var a = $scope.employees = $wakanda.$ds.Employee.$query({
                 filter: 'firstName = _*',
                 select:'employer'
               });
-              var b = $scope.companies = $wakanda.$ds.Company.$find({
+              var b = $scope.companies = $wakanda.$ds.Company.$query({
                 filter: 'name = _*',
                 select: 'staff'//jump to employees collection
               });

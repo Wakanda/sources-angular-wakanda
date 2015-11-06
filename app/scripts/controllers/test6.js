@@ -7,7 +7,7 @@ angular.module('angularWakandaFrontApp')
 
   ds = $wakanda.$ds;
   $scope.employee = null;
-  employees = $scope.employees = ds.Employee.$find({
+  employees = $scope.employees = ds.Employee.$query({
     pageSize: 5,
     orderBy : 'firstName asc'
   });

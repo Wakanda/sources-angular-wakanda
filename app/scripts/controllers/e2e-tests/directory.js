@@ -4,15 +4,15 @@ var ds, employees, test;
 
 angular.module('angularWakandaFrontApp')
   .controller('E2E.DirectoryCtrl', ['$scope','$location','$wakanda','unitTestsHelpers',function($scope,$location,$wakanda,unitTestsHelpers) {
-      
+
       //this controller and its view are used for two routes
       $scope.standAlone = $location.url() !== '/e2e-tests/directory' ? true : false;
-      
+
       //only retrieve datastore in non standAlone mode
       if($scope.standAlone === false){
         ds = $wakanda.getDatastore();
       }
-      
+
       var setEmployees = function(){
         if($scope.standAlone){
           employees = $scope.employees = [
@@ -43,13 +43,13 @@ angular.module('angularWakandaFrontApp')
           ];
         }
         else{
-          employees = $scope.employees = ds.Employee.$find({
+          employees = $scope.employees = ds.Employee.$query({
             pageSize : 12,
             select : 'employer'
           });
         }
       };
-      
+
       var resetBelongsGroupInfo = function(){
         $scope.userBelongsTo = {
           Admin : null,
@@ -57,14 +57,14 @@ angular.module('angularWakandaFrontApp')
           Foo : null
         };
       };
-      
+
       $scope.init = function(){
         setEmployees();
         $scope.loggedInEmployee = null;
         $scope.currentLoggedInUser = {result: null};
         resetBelongsGroupInfo();
       };
-      
+
       $scope.login = function(employee){
         $wakanda.$login(employee.lastName,employee.firstName).then(function(result){
           console.log('login()','result',result);
@@ -84,7 +84,7 @@ angular.module('angularWakandaFrontApp')
           resetBelongsGroupInfo();
         });
       };
-      
+
       $scope.currentUserBelongsTo = function(group){
         $wakanda.$currentUserBelongsTo(group).then(function(result){
           console.log('currentUserBelongsTo("'+group+'")', 'result',result);
@@ -94,7 +94,7 @@ angular.module('angularWakandaFrontApp')
           $scope.userBelongsTo[group] = "error";
         });
       };
-      
+
       $scope.logout = function(){
         $wakanda.$logout().then(function(result){
           console.log('logout()','result',result);
@@ -104,7 +104,7 @@ angular.module('angularWakandaFrontApp')
           console.error('logout()','result',result);
         });
       };
-      
+
       $scope.currentUser = function(){
         $wakanda.$currentUser().then(function(result){
           console.log('currentUser()','result',result);
@@ -113,7 +113,7 @@ angular.module('angularWakandaFrontApp')
           console.error('currentUser()','result',result);
         });
       };
-      
+
       $scope.init();
-      
+
 }]);
