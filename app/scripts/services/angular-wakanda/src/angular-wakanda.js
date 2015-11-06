@@ -308,6 +308,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         angular.forEach(dataClass.$dataClassMethods(), function(methodName) {
           dataClass[methodName] = function() {
             var defer = $q.defer();
+            defer.promise.$promise = defer.promise;
             dataClass.callMethod({
               method: methodName,
               onSuccess: function(event) {
