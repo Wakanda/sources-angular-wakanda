@@ -20,13 +20,13 @@ angular.module('angularWakandaFrontApp')
       wakEntity.$save().$promise.then(function () {
         $scope.savingStatus = 'success';
       });
+    });
 
-      ds.Employee.lotsOfEmployees().$promise.then(function (event) {
-        var entities = event.result;
-        var wakEntities = $wakanda.$parsers.WAFCollectionToNgWakEntityCollection(entities);
+    ds.Employee.lotsOfEmployees().$promise.then(function (event) {
+      var entities = event.result;
+      var wakEntities = $wakanda.$parsers.WAFCollectionToNgWakEntityCollection(entities);
 
-        $scope.employees = wakEntities;
-      });
+      $scope.employees = wakEntities;
     });
 
   }]);
