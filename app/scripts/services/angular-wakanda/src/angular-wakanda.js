@@ -123,6 +123,20 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
     };
 
     /**
+    * Expose to the user parsers to transform WAF Entity or Collection to ngWakEntity or
+    * collection of ngWakEntity
+    @returns {object}
+    */
+    $wakandaResult.$parsers = {
+      WAFEntityToNgWakEntity: createNgWakEntity, //parameters: wafEntity, options
+      WAFCollectionToNgWakEntityCollection: function (wafEntityCollection, wakOptions) {
+        var collection = [];
+        transform.wafEntityCollectionToNgWakEntityCollection(collection, wafEntityCollection, wakOptions);
+        return collection;
+      }
+    };
+
+    /**
      * Private helper - call generic DataProvider methods and wrap them in promise
      * @param {Function} The async DataProvider's method to be called
      * @param Any parameters needed by the method wrapped
