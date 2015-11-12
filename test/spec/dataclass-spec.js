@@ -57,6 +57,23 @@ describe('Connector/Dataclass:', function() {
         done();
       });
     });
+
+    it('should return a promise on $promise property', function (done) {
+      employees = $wakanda.$ds.Employee.$query({
+        filter: 'lastName > :1 && salary > :2',
+        params: ['a*', 60000],
+        orderBy: 'firstName desc',
+        pageSize: 20
+      });
+
+      var promise = employees.$promise;
+      expect(employees).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
   });
 
   describe('dataClass.$name variable', function() {

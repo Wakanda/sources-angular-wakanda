@@ -40,6 +40,19 @@ describe('Connector/Entity:', function() {
   });
 
   describe('$find() function', function() {
+
+    it('should return a promise on $promise property', function (done) {
+      employee2 = ds.Employee.$find(employee.ID);
+
+      var promise = employee2.$promise;
+      expect(employee2).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
+
     it('should find an entity', function (done) {
       var employee2 = ds.Employee.$find(employee.ID);
       employee2.$promise.then(function() {
@@ -89,6 +102,19 @@ describe('Connector/Entity:', function() {
   });
 
   describe('$fetch() function', function() {
+
+    it('should return a promise on $promise property', function (done) {
+      var request = employee.$fetch({start: 1, params: ['a*', 5000]});
+
+      var promise = request.$promise;
+      expect(request).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
+
     it('should fetch the data', function (done) {
       employee.$fetch({ start: 1, params: ['a*', 5000] }).should.be.fulfilled.then(function(fetchResult){
         expect(fetchResult).to.be.an('object');
@@ -156,6 +182,20 @@ describe('Connector/Entity:', function() {
   });
 
   describe('$remove() function', function() {
+
+    it('should return a promise on $promise property', function (done) {
+      var employeeToRemove = employees[3]; //3 to avoid deleting the entity the will be deleted by the next test
+      var request = employeeToRemove.$remove();
+
+      var promise = request.$promise;
+      expect(request).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
+
     it('should remove an entity', function (done) {
       var employeeToRemove = employees['0'];
       employees['0'].$remove().should.be.fulfilled.then(function(removeResult){
@@ -181,6 +221,21 @@ describe('Connector/Entity:', function() {
   });
 
   describe('$save() function', function() {
+
+    it('should return a promise on $promise property', function (done) {
+      var newPerson = { firstName : "John", lastName : "Smith", salary: 90000 };
+      var person = $wakanda.$ds.Employee.$create( newPerson );
+      var request = person.$save();
+
+      var promise = request.$promise;
+      expect(request).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
+
     it('should save a created entity', function(done) {
       var newPerson = { firstName : "John", lastName : "Smith", salary: 90000 };
       var person = $wakanda.$ds.Employee.$create( newPerson );
@@ -212,6 +267,20 @@ describe('Connector/Entity:', function() {
   });
 
   describe('$serverRefresh() function', function() {
+
+    it('should return a promise on $promise property', function (done) {
+      employee.firstName = 'Geronima';
+      var request = employee.$serverRefresh()
+
+      var promise = request.$promise;
+      expect(request).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
+
     it('should act as serverRefresh', function(done) {
       employee.firstName = 'Geronima';
       employee.$serverRefresh().should.be.fulfilled.then(function(refreshResult){
@@ -297,6 +366,19 @@ describe('Connector/Entity:', function() {
        done();
      });
    });
+
+   it('should return a promise on $promise property', function (done) {
+     var request = employees[1].employer.$fetch();
+
+     var promise = request.$promise;
+     expect(request).to.have.property('$promise');
+     expect(promise.then).to.be.a('function');
+     expect(promise.catch).to.be.a('function');
+     expect(promise.finally).to.be.a('function');
+
+     done();
+   });
+
   });
 
   describe('setter on related entity', function() {
