@@ -35,6 +35,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       console.log('>$wakanda init');
 
       var deferred = $q.defer();
+      deferred.promise.$promise = deferred.promise;
       if (typeof catalog !== "string" || catalog === '*' || catalog === '') {
         catalog = null;
       }
