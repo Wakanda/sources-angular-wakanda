@@ -755,6 +755,11 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
 
     var $$all = function(options) {
       options = typeof(options) === 'object' && options || {};
+
+      if (options.filter) {
+        console.warn('filter parameter on options object is not allowed on calling $all() method. It will be ignored');
+      }
+
       options.filter  = null;
 
       return this.$query(options);
