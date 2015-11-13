@@ -177,6 +177,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         WAF.DataClass.prototype.$query = $$query;
         WAF.DataClass.prototype.$find = $$find;
         WAF.DataClass.prototype.$create = $$create;
+        WAF.DataClass.prototype.$all = $$all;
 
         //looping through too much infos which were added before
         //hint test for $* and _* properties when looping through arguments
@@ -445,6 +446,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       addFrameworkMethodsToRootCollection: function(result) {
         result.$fetch = $$fetch;
         result.$query = $$query.bind(result.$_collection);
+        result.$all = $$all.bind(result.$_collection);
         result.$add = $$add;
         result.$more = $$more;
         result.$nextPage = $$nextPage;
@@ -456,6 +458,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       addFrameworkMethodsToNestedCollection: function(result) {
         result.$fetch = $fetchRelatedEntities.bind(result);
         result.$query = $$query.bind(result.$_collection);
+        result.$all = $$all.bind(result.$_collection);
         result.$more = $$more;
         result.$nextPage = $$nextPage;
         result.$prevPage = $$prevPage;
@@ -748,6 +751,18 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
 
       this.query(options.filter || null, wakOptions);
       return result;
+    };
+
+    var $$all = function(options) {
+      options = typeof(options) === 'object' && options || {};
+
+      if (options.filter) {
+        console.warn('filter parameter on options object is not allowed on calling $all() method. It will be ignored');
+      }
+
+      options.filter  = null;
+
+      return this.$query(options);
     };
 
     var $$find = function(key, options) {
