@@ -1257,7 +1257,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       deferred.promise.$promise = deferred.promise;
 
       // prepare options
-      debugger;
       wakOptions.skip = options.start = typeof options.start === 'undefined' ? (this.$queryParams ? this.$queryParams.start : 0) : options.start;
       wakOptions.top = options.pageSize = typeof options.pageSize === 'undefined' ? (this.$queryParams ? this.$queryParams.pageSize : DEFAULT_PAGESIZE_NESTED_COLLECTIONS) : options.pageSize;
 
