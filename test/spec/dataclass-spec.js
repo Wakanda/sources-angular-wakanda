@@ -76,6 +76,33 @@ describe('Connector/Dataclass:', function() {
     });
   });
 
+  describe('$all() function', function () {
+
+    beforeEach(function () {
+      employees = $wakanda.$ds.Employee.$all({
+        pageSize: 50
+      });
+    });
+
+    it('should return all entities of the records found in the Model', function (done) {
+      employees.$promise.then(function () {
+        expect(employees).to.be.an('array');
+        expect(employees.length).to.be.a('number');
+        expect(employees.length).to.be.gt(0);
+        done();
+      });
+    });
+
+    it('should be paginated', function (done) {
+      employees.$promise.then(function () {
+        expect(employees.length).to.be.equal(50);
+        expect(employees.$nextPage).to.be.a('function');
+        expect(employees.$prevPage).to.be.a('function');
+        done();
+      });
+    });
+  });
+
   describe('dataClass.$name variable', function() {
     it('should return the name defined for the datastore class in the Model', function(done) {
       var collectionName = $wakanda.$ds.Employee.$name;
