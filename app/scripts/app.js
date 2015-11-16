@@ -154,6 +154,11 @@ angular.module('angularWakandaFrontApp', [
                       controller: 'Test7Ctrl',
                       resolve: routeResolver
                     })
+                    .when('/test8', {
+                      templateUrl: 'views/test8.html',
+                      controller: 'Test8Ctrl',
+                      resolve: routeResolver
+                    })
                     .when('/collection.find', {
                       templateUrl: 'views/collection.find.html',
                       controller: 'CollectionFindCtrl',

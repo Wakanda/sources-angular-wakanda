@@ -57,6 +57,23 @@ describe('Connector/Dataclass:', function() {
         done();
       });
     });
+
+    it('should return a promise on $promise property', function (done) {
+      employees = $wakanda.$ds.Employee.$query({
+        filter: 'lastName > :1 && salary > :2',
+        params: ['a*', 60000],
+        orderBy: 'firstName desc',
+        pageSize: 20
+      });
+
+      var promise = employees.$promise;
+      expect(employees).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
   });
 
   describe('$all() function', function () {
@@ -110,6 +127,18 @@ describe('Connector/Dataclass:', function() {
       expect(dataClassMethods).to.be.an('array');
       done();
     });
+
+    it('should return a promise on $promise property', function (done) {
+      var request = $wakanda.$ds.Employee.myDataClassMethod();
+      var promise = request.$promise;
+
+      expect(request).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
   });
 
   describe('dataClass.$collectionMethods() function', function() {
@@ -118,6 +147,20 @@ describe('Connector/Dataclass:', function() {
       expect(collectionMethods).to.be.an('array');
       $wakanda.$ds.Employee.myDataClassMethod('myDataClassMethod').then(function(e){
         expect(e.result).to.be.defined;
+        done();
+      });
+    });
+
+    it('should return a promise on $promise property', function (done) {
+      $wakanda.$ds.Employee.$query().$promise.then(function(event) {
+        var request = event.result.myCollectionMethod();
+        var promise = request.$promise;
+
+        expect(request).to.have.property('$promise');
+        expect(promise.then).to.be.a('function');
+        expect(promise.catch).to.be.a('function');
+        expect(promise.finally).to.be.a('function');
+
         done();
       });
     });
@@ -135,6 +178,19 @@ describe('Connector/Dataclass:', function() {
       var entityMethod = $wakanda.$ds.Employee.$entityMethods(entityMethods[0]);
       expect(entityMethod).to.be.an('array');
       done();
+    });
+    it('should return a promise on $promise property', function (done) {
+      $wakanda.$ds.Employee.$query().$promise.then(function(event) {
+        var request = event.result[0].myEntityMethod();
+        var promise = request.$promise;
+
+        expect(request).to.have.property('$promise');
+        expect(promise.then).to.be.a('function');
+        expect(promise.catch).to.be.a('function');
+        expect(promise.finally).to.be.a('function');
+
+        done();
+      });
     });
   });
 

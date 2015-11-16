@@ -19,6 +19,17 @@ describe('Connector/Initialize:', function() {
   });
 
   describe('init() function', function() {
+    it('should return a promise on $promise property', function (done) {
+      var request = $wakanda.init();
+      var promise = request.$promise;
+
+      expect(request).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
     it('should be defined and return a promise', function() {
       expect($wakanda.init).to.be.defined;
       expect($wakanda.init).to.be.a('function');
@@ -74,7 +85,7 @@ describe('Connector/Initialize:', function() {
         }
       }).should.notify(done);
     });
-    it('should have an alias $ds alias method', function(done) {  
+    it('should have an alias $ds alias method', function(done) {
       $wakanda.init().should.be.fulfilled.then(function (ds) {
         expect($wakanda.$ds).to.be.defined;
         expect($wakanda.$ds).to.be.deep.equal(ds);
