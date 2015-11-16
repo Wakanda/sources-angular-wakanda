@@ -128,9 +128,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
     * collection of ngWakEntity
     @returns {object}
     */
-    $wakandaResult.$parsers = {
-      WAFEntityToNgWakEntity: createNgWakEntity, //parameters: wafEntity, options
-      WAFCollectionToNgWakEntityCollection: function (wafEntityCollection, wakOptions) {
+    $wakandaResult.$transform = {
+      $objectToEntity: createNgWakEntity, //parameters: wafEntity, options
+      $objectToCollection: function (wafEntityCollection, wakOptions) {
         var collection = [];
         transform.wafEntityCollectionToNgWakEntityCollection(collection, wafEntityCollection, wakOptions);
         return collection;

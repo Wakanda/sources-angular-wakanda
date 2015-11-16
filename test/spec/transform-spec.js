@@ -1,4 +1,4 @@
-describe('Connector/Parsers :', function() {
+describe('Connector/Trasnform :', function() {
   var $wakanda, $rootScope, $q, unitTestsHelpers, intervalRef, ds;
 
   beforeEach(function() {
@@ -30,31 +30,31 @@ describe('Connector/Parsers :', function() {
     }
   });
 
-  describe('$parsers object', function () {
+  describe('$transform object', function () {
     it('should be defined', function (done) {
-      expect($wakanda).to.have.property('$parsers');
-      expect($wakanda.$parsers).to.be.an('object');
+      expect($wakanda).to.have.property('$transform');
+      expect($wakanda.$transform).to.be.an('object');
       done();
     });
 
-    it('should have WAFEntityToNgWakEntity method', function (done) {
-      expect($wakanda.$parsers).to.have.property('WAFEntityToNgWakEntity');
-      expect($wakanda.$parsers.WAFEntityToNgWakEntity).to.be.a('function');
+    it('should have $objectToEntity method', function (done) {
+      expect($wakanda.$transform).to.have.property('$objectToEntity');
+      expect($wakanda.$transform.$objectToEntity).to.be.a('function');
       done();
     });
 
-    it('should have WAFCollectionToNgWakEntityCollection method', function (done) {
-      expect($wakanda.$parsers).to.have.property('WAFCollectionToNgWakEntityCollection');
-      expect($wakanda.$parsers.WAFCollectionToNgWakEntityCollection).to.be.a('function');
+    it('should have $objectToCollection method', function (done) {
+      expect($wakanda.$transform).to.have.property('$objectToCollection');
+      expect($wakanda.$transform.$objectToCollection).to.be.a('function');
       done();
     });
   });
 
-  describe('WAFEntityToNgWakEntity function', function () {
+  describe('$objectToEntity function', function () {
     it('should return a ngWakEntity if provided WAF Entity', function (done) {
       ds.Employee.oneEmployee().$promise.then(function (event) {
         var wafEntity = event.result;
-        var ngEntity = $wakanda.$parsers.WAFEntityToNgWakEntity(wafEntity);
+        var ngEntity = $wakanda.$transform.$objectToEntity(wafEntity);
 
         expect(ngEntity.$fetch).to.be.a('function');
         expect(ngEntity.$isLoaded).to.be.a('function');
@@ -71,21 +71,21 @@ describe('Connector/Parsers :', function() {
 
     it('should throw an error if given an invalid object', function (done) {
       try {
-        $wakanda.$parsers.WAFEntityToNgWakEntity(null);
+        $wakanda.$transform.$objectToEntity(null);
       }
       catch (e) {
         expect(e).to.be.an.instanceof(Error);
       }
 
       try {
-        $wakanda.$parsers.WAFEntityToNgWakEntity([]);
+        $wakanda.$transform.$objectToEntity([]);
       }
       catch (e) {
         expect(e).to.be.an.instanceof(Error);
       }
 
       try {
-        $wakanda.$parsers.WAFEntityToNgWakEntity({});
+        $wakanda.$transform.$objectToEntity({});
       }
       catch (e) {
         expect(e).to.be.an.instanceof(Error);
@@ -94,12 +94,12 @@ describe('Connector/Parsers :', function() {
     });
   });
 
-  describe('WAFCollectionToNgWakEntityCollection', function() {
+  describe('$objectToCollection', function() {
 
     it('should return an array of ngWakEntity give an array of WAFEntity', function(done) {
       ds.Employee.lotsOfEmployees().$promise.then(function(event) {
         var wafCollection = event.result;
-        var wakEntities = $wakanda.$parsers.WAFCollectionToNgWakEntityCollection(wafCollection);
+        var wakEntities = $wakanda.$transform.$objectToCollection(wafCollection);
 
         expect(wakEntities).to.be.an('array');
         expect(wakEntities.$totalCount).to.be.equal(wafCollection.length);
@@ -121,7 +121,7 @@ describe('Connector/Parsers :', function() {
     it('should have a reference on WAF collection in $_collection', function(done) {
       ds.Employee.lotsOfEmployees().$promise.then(function(event) {
         var wafCollection = event.result;
-        var wakEntities = $wakanda.$parsers.WAFCollectionToNgWakEntityCollection(wafCollection);
+        var wakEntities = $wakanda.$transform.$objectToCollection(wafCollection);
 
         expect(wakEntities.$_collection).to.be.an('object');
         expect(wakEntities.$_collection).to.be.equal(wafCollection);
@@ -132,7 +132,7 @@ describe('Connector/Parsers :', function() {
     it('should have framework methods', function(done) {
       ds.Employee.lotsOfEmployees().$promise.then(function(event) {
         var wafCollection = event.result;
-        var wakEntities = $wakanda.$parsers.WAFCollectionToNgWakEntityCollection(wafCollection);
+        var wakEntities = $wakanda.$transform.$objectToCollection(wafCollection);
 
         expect(wakEntities.$fetch).to.be.a('function');
         expect(wakEntities.$query).to.be.a('function');
@@ -149,7 +149,7 @@ describe('Connector/Parsers :', function() {
     it('should have user defined methods', function (done) {
       ds.Employee.lotsOfEmployees().$promise.then(function(event) {
         var wafCollection = event.result;
-        var wakEntities = $wakanda.$parsers.WAFCollectionToNgWakEntityCollection(wafCollection);
+        var wakEntities = $wakanda.$transform.$objectToCollection(wafCollection);
 
         expect(wakEntities.myCollectionMethod).to.be.a('function');
         done();
