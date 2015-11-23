@@ -785,7 +785,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
     var $$find = function(key, options) {
       var wakOptions = {},
           deferred = $q.defer(),
-          ngWakEntity = createNgWakEntity(new WAF.Entity(this, {}), { expend: true });
+          ngWakEntity = createNgWakEntity(new WAF.Entity(this, {}));
 
       options = typeof(options) === 'object' && options || {};
 
