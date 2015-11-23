@@ -149,6 +149,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       var deferred,
           wakOptions = {};
       deferred = $q.defer();
+      deferred.promise.$promise = deferred.promise;
 
       wakOptions.onSuccess = function(event) {
         deferred.resolve({ result : event.result });
