@@ -149,6 +149,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       var deferred,
           wakOptions = {};
       deferred = $q.defer();
+      deferred.promise.$promise = deferred.promise;
 
       wakOptions.onSuccess = function(event) {
         deferred.resolve({ result : event.result });
@@ -576,6 +577,8 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
 
       //prepare the promise
       deferred = $q.defer();
+      deferred.promise.$promise = deferred.promise;
+
       that = this;
       //update $fteching ($apply needed)
       rootScopeSafeApply(function() {
@@ -645,6 +648,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       //@todo throw some kind of warning ?
       if(start >= totalCount) {
         deferred = new $q.defer();
+        deferred.promise.$promise = deferred.promise;
         deferred.resolve({
           noMore: true
         });
@@ -674,6 +678,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       //prevent asking for non existant pages
       if(start >= totalCount) {
         deferred = new $q.defer();
+        deferred.promise.$promise = deferred.promise;
         deferred.resolve({
           noMore: true
         });
@@ -695,6 +700,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       }
       else{
         deferred = new $q.defer();
+        deferred.promise.$promise = deferred.promise;
         deferred.reject(new Error("No collection fetched to $prevPage() on."));
         console.error("No collection fetched to $prevPage() on.");
         return deferred.promise;
