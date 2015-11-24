@@ -10,6 +10,7 @@ wakanda.provider("$wakandaConfig", function() {
       };
     };
     this.setHostname = function(_hostname) {
+      WAF.hostname = _hostname;
       hostname = _hostname;
     };
   });
@@ -31,7 +32,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
      * @returns {$q.promise}
      */
     $wakandaResult.init = function(catalog) {
-      WAF.hostname = $wakandaConfig.getHostname();
       console.log('>$wakanda init');
 
       var deferred = $q.defer();
