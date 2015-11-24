@@ -10,8 +10,8 @@
     "nosql",
     "ssjs"
   ],
-  "description": "[Experimental] Provides a full proxy of WakandaDB NoSQL DataModels with its relationships & methods in Angular",
-  "homepage": "http://www.wakanda.org/angular-wakanda/",
+  "description": "Provides a full proxy of WakandaDB NoSQL DataModels with its relationships & methods in Angular",
+  "homepage": "http://wakanda.github.io/angular-wakanda/",
   "main": "./angular-wakanda.min.js",
   "license": "MIT",
   "ignore": [],
