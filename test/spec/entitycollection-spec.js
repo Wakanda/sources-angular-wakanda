@@ -63,6 +63,17 @@ describe('Connector/EntityCollection:', function() {
   });
 
   describe('$fetch() function', function() {
+    it('should return a promise on $promise property', function (done) {
+      var request = employees.$fetch({ start: 1, params: ['a*', 5000] });
+      var promise = request.$promise;
+
+      expect(request).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
     it('should fetch the data', function (done) {
       employees.$fetch({ start: 1, params: ['a*', 5000] }).should.be.fulfilled.then(function(fetchResult){
         expect(fetchResult).to.be.an('object');
@@ -146,6 +157,17 @@ describe('Connector/EntityCollection:', function() {
         done();
       });
     });
+    it('should return a promise on $promise property', function (done) {
+      var request = employees.$more();
+      var promise = request.$promise;
+
+      expect(request).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
   });
 
   describe('$nextPage() function', function() {
@@ -163,6 +185,17 @@ describe('Connector/EntityCollection:', function() {
             done();
           });
         });
+    });
+    it('should return a promise on $promise property', function (done) {
+      var request = employees.$nextPage();
+      var promise = request.$promise;
+
+      expect(request).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
     });
   });
 
