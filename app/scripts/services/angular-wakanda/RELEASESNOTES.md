@@ -1,7 +1,7 @@
 angular-wakanda.js - release notes
 ===================================================
 
-##v0.5.0
+##v1.0.0
 * **Breaking change:** `dataClass.$find()` has been renamed to `dataClass.$query()`
 * **Breaking change:** `dataClass.$findOne()` has been rename to `dataClass.$find()`
 * **Breaking change:** `collection.$find()` has been renamed to `collection.$query()`
