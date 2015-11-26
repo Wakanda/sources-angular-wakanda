@@ -16,7 +16,7 @@ angular-wakanda.js - release notes
 * *Image* attribute type handling
 * Using getter and setter to read/update entity attributes
 * Bug fixes and API stabilization
-* Add Unit Test and End-to-end Test
+* Add Unit Test
 
 ##v0.4.4
 * define matching angularjs version (v1.2.6)
