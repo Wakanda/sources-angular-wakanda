@@ -38,7 +38,7 @@ And finally use the `$wakanda` injected service:
 ```javascript
 $wakanda.init().then(function (ds) {
 
-	$scope.contacts = ds.Contact.$find();
+	$scope.contacts = ds.Contact.$all();
 
 });
 ```
@@ -52,7 +52,7 @@ $wakanda.init().then(function (ds) {
 * [Source repo](https://github.com/Wakanda/sources-angular-wakanda)
 * [Github issues](https://github.com/Wakanda/wakanda-issues/labels/Angular-Wakanda)
 
-## License 
+## License
 
 *The MIT License*
 

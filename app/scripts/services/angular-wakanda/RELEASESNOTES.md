@@ -1,19 +1,22 @@
 angular-wakanda.js - release notes
 ===================================================
 
-##v0.5.0
+##v1.0.0
 * **Breaking change:** `dataClass.$find()` has been renamed to `dataClass.$query()`
 * **Breaking change:** `dataClass.$findOne()` has been rename to `dataClass.$find()`
 * **Breaking change:** `collection.$find()` has been renamed to `collection.$query()`
 * **Breaking change:** `collection.$query` has been renamed to `collection.$queryParams`
 * API standardization : all methods that return a promise also return a `$promise` object that contained this promise in order to have a more coherent API. Some methods has been renamed to have more coherence between Angular-Wakanda API and Wakanda Server API (see Breaking Changes).
 * Delete reference cache management
-* Add `$upload()` method on image type attribute
+* Add `$upload()` method on image attribute type
 * Add `dataClass.$all()` method
 * Add `$wakanda.$transform` helpers to transform a raw entity returned by server to a Angular-Wakanda entity
 * Add `$wakandaConfifProvider` to set Wakanda server hostname on application configuration
 * Add `entity.$serverRefresh()` method
-* *Image* type attribute handling
+* *Image* attribute type handling
+* Using getter and setter to read/update entity attributes
+* Bug fixes and API stabilization
+* Add Unit Test
 
 ##v0.4.4
 * define matching angularjs version (v1.2.6)
