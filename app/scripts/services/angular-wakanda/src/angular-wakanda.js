@@ -796,7 +796,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       options = typeof(options) === 'object' && options || {};
 
       wakOptions.forceReload = typeof options.forceReload === 'undefined' ? true : options.forceReload;
-      wakOptions.select = options && options.select || undefined;
+      wakOptions.autoExpand = options && options.select || undefined;
 
       ngWakEntity.$promise = deferred.promise;
 
