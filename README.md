@@ -1,23 +1,25 @@
-#angular-wakanda
+# angular-wakanda
 
 ![ angular-wakanda ](http://www.wakanda.org/sites/default/files/medias/128.png)
 
-Welcome to the **source repository** of the **angular-wakanda connector**. You'll find here the whole environment that lets us develop the connector.
+Welcome to the **source repository** of the **angular-wakanda connector**. You'll find here the whole environment to develop the connector.
 
 **If you only wish to retrieve the connector itself**, just get it from bower `bower install angular-wakanda` or from the publish repo [Wakanda/angular-wakanda](https://github.com/Wakanda/angular-wakanda).
 
 Please file your issues on this repo : [Wakanda/wakanda-issues](https://github.com/Wakanda/wakanda-issues/labels/Angular-Wakanda).
 
-##Included
+## Included
 
-* An angular application
-* A wakanda solution
+* angular-wakanda source code
+* An Angular application
+* A Wakanda solution
+* Test suites
 
-[Read more on wiki ...](https://github.com/Wakanda/sources-angular-wakanda/wiki/included)
+[Read more on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/included)
 
-##Setup
+## Setup
 
-###Prerequisites
+### Prerequisites
 
 * [Wakanda Server](http://www.wakanda.org/downloads)
 * [NodeJS](https://nodejs.org/download/)
@@ -27,9 +29,9 @@ Please file your issues on this repo : [Wakanda/wakanda-issues](https://github.c
 	* grunt (cli) : `npm install grunt-cli -g`
 	* protractor : `npm install protractor -g` (see [protractor doc](http://angular.github.io/protractor/#/) for more install infos)
 
-###Install
+### Install
 
-Once you've installed global dependencies (or if you already have them), execute the following steps to init your working environment (from the root of the repo) :
+Once you've installed global dependencies (or if you already have them), execute the following steps to init your working environment (from the root of the repo):
 
 ```shell
 $ npm install
@@ -39,9 +41,9 @@ $ cd ./app/scripts/services/angular-wakanda
 $ npm install
 ```
 
-[Full version on wiki ...](https://github.com/Wakanda/sources-angular-wakanda/wiki/project-setup#setup)
+[Read more on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/project-setup#setup)
 
-###Run
+### Run
 
 Open two Terminal tabs :
 
@@ -50,27 +52,25 @@ Open two Terminal tabs :
 
 [Full version on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/project-setup#run)
 
-###Test
+### Test
 
 [Read Test section on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/test)
 
-##Contributing
+## Contributing
 
 [Read Contributing section on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/contributing)
 
-##FAQ
+## FAQ
 
 [Read FAQ section on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/faq)
 
-##Resources
+## Resources
 
-* [Home page](http://www.wakanda.org/angular-wakanda/)
+* [Home page, documentation and tutorial](http://www.wakanda.org/angular-wakanda/)
 * [Bower publish repo](https://github.com/Wakanda/angular-wakanda)
-* [Connector tutorial](https://wakanda.github.io/NG-Wakanda-Pack)
-* [Connector Documentation](http://doc.wakanda.org/Wakanda/help/Title/en/page4419.html)
 * [Yeoman generator](https://www.npmjs.org/package/generator-angular-wakanda)
 
-## License 
+## License
 
 *The MIT License*
 
