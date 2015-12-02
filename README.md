@@ -1,6 +1,6 @@
 # angular-wakanda
 
-![ angular-wakanda ](http://www.wakanda.org/sites/default/files/medias/128.png)
+![ angular-wakanda ](https://wakanda.github.io/angular-wakanda/images/angular-wakanda.png)
 
 Welcome to the **source repository** of the **angular-wakanda connector**. You'll find here the whole environment to develop the connector.
 
@@ -66,9 +66,10 @@ Open two Terminal tabs :
 
 ## Resources
 
-* [Home page, documentation and tutorial](http://www.wakanda.org/angular-wakanda/)
+* [Home page, documentation and tutorial](https://wakanda.github.io/angular-wakanda/)
 * [Bower publish repo](https://github.com/Wakanda/angular-wakanda)
 * [Yeoman generator](https://www.npmjs.org/package/generator-angular-wakanda)
+* [Github issues](https://github.com/Wakanda/wakanda-issues/labels/Angular-Wakanda)
 
 ## License
 
