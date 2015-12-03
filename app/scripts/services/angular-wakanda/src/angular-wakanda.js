@@ -706,20 +706,27 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         return deferred.promise;
       }
       //prevent asking for non existant pages
+      deferred = new $q.defer();
+      deferred.promise.$promise = deferred.promise;
+
       if(start < 0) {
-        var deferred = new $q.defer();
-        deferred.promise.$promise = deferred.promise;
-        deferred.resolve({
-          noMore: true
-        });
-        return deferred.promise;
+        noMore = true;
+        start = 0;
       }
-      else {
-        return this.$fetch({
-          'start': start,
-          'pageSize': pageSize
-        })
-      }
+      this.$fetch({
+        'start': start,
+        'pageSize': pageSize
+      }).$promise.then(function (e) {
+        if (noMore === true) {
+          e.noMore = true;
+        }
+        deferred.resolve(e);
+      })
+      .catch(function (e) {
+        deferred.reject(e);
+      });
+
+      return deferred.promise;
     };
 
     var $$add = function() {
