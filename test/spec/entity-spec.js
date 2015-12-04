@@ -99,6 +99,26 @@ describe('Connector/Entity:', function() {
       expect(employee.$isNew()).to.be.undefined;
       done();
     });
+    it('should not expand related attribute without select option', function (done) {
+      ds.Employee.$find(employee.ID).$promise.then(function (e) {
+        var expandedEmployee = e.result;
+
+        expect(expandedEmployee).to.be.defined;
+        expect(expandedEmployee.employer).to.be.defined;
+        expect(expandedEmployee.employer.name).to.be.undefined;
+        done();
+      });
+    });
+    it('should expand keys given on select option', function (done) {
+      ds.Employee.$find(employee.ID, {select: 'employer'}).$promise.then(function (e) {
+        var expandedEmployee = e.result;
+
+        expect(expandedEmployee).to.be.defined;
+        expect(expandedEmployee.employer).to.be.defined;
+        expect(expandedEmployee.employer.name).to.be.defined;
+        done();
+      });
+    });
   });
 
   describe('$fetch() function', function() {

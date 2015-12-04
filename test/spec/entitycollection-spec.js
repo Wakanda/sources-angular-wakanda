@@ -219,6 +219,17 @@ describe('Connector/EntityCollection:', function() {
         });
       });
     });
+    it('should return a promise on $promise property', function (done) {
+      var request = employees.$prevPage();
+      var promise = request.$promise;
+
+      expect(request).to.have.property('$promise');
+      expect(promise.then).to.be.a('function');
+      expect(promise.catch).to.be.a('function');
+      expect(promise.finally).to.be.a('function');
+
+      done();
+    });
   });
 
   describe('$Entity variable', function() {
