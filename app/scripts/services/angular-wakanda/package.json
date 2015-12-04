@@ -1,13 +1,14 @@
 {
   "name": "angular-wakanda",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Connector between Wakanda Server and Angular Framework",
   "main": "angular-wakanda.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "BSD",
+  "author": "Wakanda SAS",
+  "repository": "Wakanda/angular-wakanda",
+  "license": "MIT",
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-concat-sourcemap": "~0.4.1",
