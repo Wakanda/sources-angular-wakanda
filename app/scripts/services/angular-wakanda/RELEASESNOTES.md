@@ -21,9 +21,6 @@ angular-wakanda.js - release notes
 ##v0.4.4
 * define matching angularjs version (v1.2.6)
 
-##v0.4.4
-* define matching angularjs version (v1.2.6)
-
 ##v0.4.3
 * add `$find()` method on collections to create a sub-collection from an existing one.
 
