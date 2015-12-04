@@ -1,15 +1,15 @@
 # angular-wakanda
 
-[![ angular-wakanda ](http://www.wakanda.org/sites/default/files/medias/128.png)](http://www.wakanda.org/angular-wakanda/)
+[![ angular-wakanda ](https://wakanda.github.io/angular-wakanda/images/angular-wakanda.png)](https://wakanda.github.io/angular-wakanda/)
 
 [![MIT Licensed](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](#license)
 
 
 *Wakanda® is a registered trademark of WAKANDA SAS in France and/or other countries. All other names mentioned may be trademarks or registered trademarks of their respective owners.*
 
-This repo is for distribution on `bower`. You can check out demos in the [NG-Wakanda-Pack](https://github.com/Wakanda/NG-Wakanda-Pack/) repository.
+This repo is for distribution on `bower` and `npm`. You can check out [10 minutes quickstart](http://wakanda.github.io/angular-wakanda/#/doc/quickstart) to learn how to user angular-wakanda.
 
-The sources for this module are in the main [sources-angular-wakanda](https://github.com/Wakanda/sources-angular-wakanda) repo. Please file pull requests against that repo and issues on this repo : [Wakanda/wakanda-issues](https://github.com/Wakanda/wakanda-issues/labels/Angular-Wakanda).
+The sources for this module are in the main [Wakanda/sources-angular-wakanda](https://github.com/Wakanda/sources-angular-wakanda) repo. Please file pull requests against that repo and issues on this repo : [Wakanda/wakanda-issues](https://github.com/Wakanda/wakanda-issues/labels/Angular-Wakanda).
 
 
 ## Install
@@ -18,6 +18,12 @@ Install with [bower](http://bower.io):
 
 ```shell
 bower install angular-wakanda
+```
+
+Or via npm
+
+```shell
+npm install angular-wakanda
 ```
 
 Add a `<script>` tag to your `index.html`:
@@ -33,26 +39,24 @@ Add `wakanda` as a dependency for your app:
 angular.module('myApp', ['wakanda']);
 ```
 
-And finally use the `$wakanda` injected service:
+And finally use the `$wakanda` injected factory:
 
 ```javascript
 $wakanda.init().then(function (ds) {
 
-	$scope.contacts = ds.Contact.$find();
+	$scope.contacts = ds.Contact.$all();
 
 });
 ```
 
 ## Resources
 
-* [Tutorial](https://wakanda.github.io/NG-Wakanda-Pack)
-* [Documentation](http://doc.wakanda.org/Wakanda/help/Title/en/page4419.html)
-* [Home page](http://www.wakanda.org/angular-wakanda/)
-* [Yeoman generator](https://www.npmjs.org/package/generator-angular-wakanda)
+* [Home page, documentation and tutorial](https://wakanda.github.io/angular-wakanda/)
 * [Source repo](https://github.com/Wakanda/sources-angular-wakanda)
+* [Yeoman generator](https://www.npmjs.org/package/generator-angular-wakanda)
 * [Github issues](https://github.com/Wakanda/wakanda-issues/labels/Angular-Wakanda)
 
-## License 
+## License
 
 *The MIT License*
 

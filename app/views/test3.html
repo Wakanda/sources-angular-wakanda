@@ -8,8 +8,7 @@
   </ul>
   <h4>employees from Employee (total : {{employees.$totalCount}}) <span ng-click="employees.$prevPage()">&leftarrow;</span> <span ng-click="employees.$nextPage()">&rightarrow;</span>  <img src="./images/ajax-loader.gif" ng-show="employees.$fetching"></h4>
   <ul>
-    <li ng-repeat="employee in employees" ng-click="displayPhoto(employee)">{{employee.firstName}} {{employee.lastName}} / {{employee.employer.name}}</li>
+    <li ng-repeat="employee in employees">{{employee.firstName}} {{employee.lastName}} / {{employee.employer.name}}</li>
     <li ng-click="employees.$more()">+++++++ more +++++++</li>
   </ul>
-  <img src="{{employeeImageSrc}}">
 </div>

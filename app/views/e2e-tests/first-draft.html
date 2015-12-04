@@ -13,12 +13,12 @@
     </ul>
     <h4>Infos</h4>
     <ul class="infos">
-      <li>employees.$query
+      <li>employees.$queryParams
         <ul>
-          <li>pageSize : <span class="query-page-size">{{employees.$query.pageSize}}</span></li>
-          <li>start : <span class="query-page-start">{{employees.$query.start}}</span></li>
-          <li>filter : <span class="query-page-filter">{{employees.$query.filter}}</span></li>
-          <li>select : <span class="query-page-select">{{employees.$query.select}}</span></li>
+          <li>pageSize : <span class="query-page-size">{{employees.$queryParams.pageSize}}</span></li>
+          <li>start : <span class="query-page-start">{{employees.$queryParams.start}}</span></li>
+          <li>filter : <span class="query-page-filter">{{employees.$queryParams.filter}}</span></li>
+          <li>select : <span class="query-page-select">{{employees.$queryParams.select}}</span></li>
         </ul>
       </li>
       <li>employees.$totalCount : <span class="total-count">{{employees.$totalCount}}</span></li>
@@ -43,6 +43,19 @@
       <li>Type any filter on employees (like <code>lastName=tr*</code>) <input type="text" ng-model="filter" ng-keyup="applyFilter($event.keyCode)"></li>
     </ul>
     <h4>Manipulating data</h4>
+
+    <div>
+      <h3>Product list</h3>
+      <ul class="products-list">
+       <li ng-repeat="product in products">
+         <span class="product-name">{{product.name}}</span>,
+         <span class="product-myboolean">{{product.myBoolean}}</span>,
+         <span class="product-spec-name">{{product.spec.name}}</span>,
+         <span class="product-photo-uri">{{product.photo.uri}}</span>,
+       </li>
+      </ul>
+    </div>
+
     <h5>Employee</h5>
     <form id="form-data-manipulation">
       <div class="form-group">
@@ -61,16 +74,16 @@
     <h3>Nested Company selected : <span class="company-name">{{company.name}}</span> - company.staff :</h3>
     <p ng-show="!company.staff.$isLoaded()" ng-click="company.staff.$fetch({pageSize:5})" class="load-nested-employees">Load employees of this company (lazy load)</p>
     <div ng-show="company.staff.$isLoaded()">
-      <ul>
+      <ul class="staff-list">
         <li ng-repeat="employee in company.staff"><span class="last-name">{{employee.lastName}}</span>, <span class="first-name">{{employee.firstName}}</span> - <span class="salary">{{employee.salary | currency}}</span></li>
       </ul>
       <h4>Infos</h4>
       <ul class="infos">
-        <li>company.staff.$query
+        <li>company.staff.$queryParams
           <ul>
-            <li>pageSize : <span class="query-page-size">{{company.staff.$query.pageSize}}</span></li>
-            <li>start : <span class="query-page-start">{{company.staff.$query.start}}</span></li>
-            <li>filter : <span class="query-page-filter">{{company.staff.$query.filter}}</span></li>
+            <li>pageSize : <span class="query-page-size">{{company.staff.$queryParams.pageSize}}</span></li>
+            <li>start : <span class="query-page-start">{{company.staff.$queryParams.start}}</span></li>
+            <li>filter : <span class="query-page-filter">{{company.staff.$queryParams.filter}}</span></li>
           </ul>
         </li>
         <li>company.staff.$totalCount : {{company.staff.$totalCount}}</li>

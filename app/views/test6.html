@@ -1,0 +1,82 @@
+<style>
+table {
+  border: 1px solid #ddd;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 20px;
+  background-color: transparent;
+  border-spacing: 0;
+  border-collapse: collapse;
+  box-sizing: border-box;
+}
+
+tr {
+  box-sizing: border-box;
+  border-color: inherit;
+  border: 1px solid #ddd;
+}
+
+td, th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  vertical-align: top;
+  border-top: 1px solid #ddd;
+}
+
+td {
+  cursor: pointer;
+}
+
+img {
+    max-width: 60%;
+    margin-right: auto;
+    margin-left: auto;
+    display: block;
+}
+
+div button {
+    margin-top: 15px;
+    width: 80px;
+}
+
+</style>
+
+<div class="container" ng-cloak>
+    <h3>Test 6</h3>
+    <p>Tests on handling image attribute</p>
+    <h4>
+        <span ng-click="employees.$prevPage()">&leftarrow;</span>
+        Employees
+        <span ng-click="employees.$nextPage()">&rightarrow;</span>
+        <img src="./images/ajax-loader.gif" ng-show="employees.$fetching">
+    </h4>
+    <table>
+        <tr>
+            <th>firstName</th>
+            <th>lastName</th>
+        </tr>
+        <tr ng-repeat="employee in employees" ng-click="selectEmployee(employee)">
+            <td>{{employee.firstName}}</td>
+            <td>{{employee.lastName}}</td>
+        </tr>
+    </table>
+
+    <div class="emplyee" ng-show="employee">
+        <h4>Employee : {{employee.firstName}} / {{employee.lastName}}</h3>
+
+        <div>
+            <input id="file" type="file">
+        </div>
+        <div>
+            <button ng-click="uploadFile()">upload</button>
+        </div>
+        <div>
+            <button ng-click="employee.$save()">save</button>
+        </div>
+
+        <div>
+            <img ng-src="{{employee.photo.uri}}" alt="employee photo">
+        </div>
+    </div>
+
+</div>

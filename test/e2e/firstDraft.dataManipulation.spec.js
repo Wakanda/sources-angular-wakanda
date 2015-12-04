@@ -20,6 +20,9 @@ describe("firstDraft test - data manipulation",function(){
       return el.findElement(by.className('employer-name')).getText();
     }
     
+    function getTextFromClassName(el, name) {
+      return el.findElement(by.className(name)).getText();
+    }
     beforeEach(function(){
       if(browser.getCurrentUrl().then(function(url){
         if(url.indexOf(urlToTest) === -1){
@@ -71,7 +74,18 @@ describe("firstDraft test - data manipulation",function(){
           expect(getEmployer(employees[9])).toBe('Earth Sable Andloging');
         });
       });
-      
+
+
+      it("> check object attribute and image attribute for product first row", function() {
+        browser.findElements(by.repeater("product in products")).then(function(products){
+          // name, spec and image
+          expect(getTextFromClassName(products[0], 'product-name')).toBe('apple');
+          expect(getTextFromClassName(products[0], 'product-spec-name')).toBe(getTextFromClassName(products[0], 'product-name'));
+          expect(getTextFromClassName(products[0], 'product-photo-uri')).toMatch(/^\/rest\/Product\(\d+\)\/photo\?\$imageformat=best\&\$version=\d+\&\$expand=photo$/);
+        });
+      });
+
+
       describe("> click on the first employee - and modify it", function(){
         
         beforeEach(function(){
@@ -107,7 +121,6 @@ describe("firstDraft test - data manipulation",function(){
           });
 
         });
-        
       });
 
     });

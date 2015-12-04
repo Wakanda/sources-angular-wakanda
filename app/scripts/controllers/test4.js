@@ -9,14 +9,19 @@
  */
 angular.module('angularWakandaFrontApp')
   .controller('Test4Ctrl', function ($scope, $wakanda) {
+
+    window.ds = $wakanda.$ds;
+
     $scope.init = function(){
-      this.employees = $wakanda.$ds.Employee.$find({
-        select: 'employer',
+      window.employees = this.employees = $wakanda.$ds.Employee.$query({
+//        select: 'employer.staff.employer',
+//        select: 'employer, employer.staff',
+//        select: 'employer',
         pageSize: 15,
         orderBy: 'ID desc'
       });
     };
-    
+
     /**
      * Creates an employee, assigning an employer to it in the $create method - then save employee
      * OK
@@ -31,7 +36,7 @@ angular.module('angularWakandaFrontApp')
         $scope.init();
       });
     };
-    
+
     /**
      * Creates an employee, assigning an employer to it via the related attribute - then save employee
      * Needs hack because the relatedAttribute isn't updated on the employee.$_entity pointer
@@ -47,7 +52,7 @@ angular.module('angularWakandaFrontApp')
         $scope.init();
       });
     };
-    
+
     /**
      * Updates an employee, changing its employer via the related attribute - then save employee
      * Needs hack because the relatedAttribute isn't updated on the employee.$_entity pointer
@@ -61,7 +66,7 @@ angular.module('angularWakandaFrontApp')
         $scope.init();
       });
     };
-    
+
     /**
      * Creates a new company, saves it
      * Creates an employee, assigning the employer via the $create method (same as addEmployee1)
@@ -82,7 +87,7 @@ angular.module('angularWakandaFrontApp')
         });
       });
     };
-    
+
     /**
      * Creates a new company, saves it
      * Creates an employee, assigning the employer via the .employer related attribute (same as addEmployee2)
@@ -104,6 +109,56 @@ angular.module('angularWakandaFrontApp')
         });
       });
     };
-    
+
+    $scope.testForEachInCache = function(){
+      var companies = [];
+      var totalEmployees = 0;
+      var wafCollection;
+      window.ds.Company.query('',{
+            autoExpand: 'staff',
+            onSuccess:function(e){
+              console.log('e',e);
+              wafCollection = e.result;
+
+              console.group('companies');
+                      wafCollection.forEachInCache({
+                onSuccess: function(e){
+                  var company = {
+                      "name": e.entity.name.getValue(),
+                      "staff" : [],
+                      "$_entity": e.entity
+                  };
+                  company.staff.$_collection = e.entity.staff.relEntityCollection;
+                  console.group('company',company.name,'length',e.entity.staff.relEntityCollection.length,'e',e);
+                  e.entity.staff.relEntityCollection.forEachInCache({
+                      onSuccess: function(e){
+                          var employee = {
+                              "firstName": e.entity.firstName.getValue(),
+                              "lastName": e.entity.lastName.getValue(),
+                              "$_entity": e.entity
+                          };
+                          console.log('employee',employee.firstName,employee.lastName,'e',e);
+                          totalEmployees++;
+                          company.staff.push(employee);
+                      },
+                      onError: function(e){
+                          console.warn(e);
+                      },
+                      first: 0,
+                      limit: 39
+                  });
+                  console.groupEnd();
+                  companies.push(company);
+                },
+                first: 0,
+                limit: 39
+              });
+              console.groupEnd();
+              console.log('companies',companies);
+              console.log('totalEmployees',totalEmployees);
+            }
+          });
+    };
+
     $scope.init();
   });
