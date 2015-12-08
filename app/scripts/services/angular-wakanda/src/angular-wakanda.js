@@ -949,12 +949,13 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
               }
             });
          } else if(attr.type === 'image') {
-           var attribute = this.$_entity[attr.name];
+            var that = this; 
             var value = {};
             Object.defineProperty(this, attr.name, {
               enumerable: true,
               configurable: true,
               get: function() {
+                var attribute = that.$_entity[attr.name];
                 if(! attribute.resolvedID) {
                   var val = attribute.getValue();
                   if(val) {
@@ -966,6 +967,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
                 return value;
               },
               set: function(value) {
+                var attribute = that.$_entity[attr.name];
                 attribute.setValue(value);
               }
             });
@@ -993,7 +995,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
                      deferred.reject(e);
                     },
                     timeout: 300 // seconds
-                  };
+                  },
+                  attribute = that.$_entity[attr.name];
+
               deferred.promise.$promise = deferred.promise;
 
               if(file) {
