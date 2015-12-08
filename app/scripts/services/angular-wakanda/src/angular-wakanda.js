@@ -949,7 +949,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
               }
             });
          } else if(attr.type === 'image') {
-            var that = this; 
+            var that = this;
             var value = {};
             Object.defineProperty(this, attr.name, {
               enumerable: true,
@@ -1207,6 +1207,32 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
 
         this.$_entity.serverRefresh(wakOptions);
         return deferred.promise;
+      },
+      toJSON: function () {
+        var ret = {};
+
+        for (var i = 0; i < this.$_dataClass._private.attributes.length; i++) {
+          var attrMeta = this.$_dataClass._private.attributes[i];
+          var attr = this.$_entity[attrMeta.name];
+
+          switch(attrMeta.kind) {
+            case 'relatedEntity':
+              if (attr.relEntity) {
+                ret[attrMeta.name] = this[attrMeta.name];
+              }
+              else if (attr.relKey) {
+                ret[attrMeta.name] = {ID: parseInt(attr.relKey)};
+              }
+              else {
+                ret[attrMeta.name] = undefined;
+              }
+            break;
+            default:
+              ret[attrMeta.name] = this[attrMeta.name];
+          }
+        }
+
+        return ret;
       }
     };
 

@@ -335,15 +335,17 @@ describe('Connector/Entity:', function() {
     it('should retrieve the id of a related entity', function() {
       var employeeJson = employee.$toJSON();
       var employeeJsonObject = JSON.parse(employeeJson);
-      expect(employeeJsonObject.employer).to.have.property('$_key');
+      console.error("\n\n", employee);
+      console.error("\n\n", employeeJsonObject);
+      expect(employeeJsonObject.employer.ID).to.be.a('number');
     });
     it('should also retrieve the JSON of the related after fetch entity', function(done) {
       employee = employees[2];
       employee.employer.$fetch().then(function() {
         var employeeJson = employee.$toJSON();
         var employeeJsonObject = JSON.parse(employeeJson);
-        expect(employeeJsonObject.employer).to.not.have.property('$_key');
         expect(employeeJsonObject.employer.ID).to.be.a('number');
+        expect(employeeJsonObject.employer.name).to.be.a('string');
         done();
       });
     });
@@ -353,7 +355,6 @@ describe('Connector/Entity:', function() {
         employee.employer.staff.$fetch().then(function() {
           var employeeJson = employee.$toJSON();
           var employeeJsonObject = JSON.parse(employeeJson);
-          expect(employeeJsonObject.employer.staff).to.not.have.property('$_key');
           expect(employeeJsonObject.employer.staff).to.be.an('array');
           done();
         });
