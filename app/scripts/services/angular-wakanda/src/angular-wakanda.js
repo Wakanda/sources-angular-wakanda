@@ -1217,6 +1217,13 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
 
           switch(attrMeta.kind) {
             case 'relatedEntity':
+              /**
+               * If $_key is present, the related entity is not fetched.
+               * - if it's a string, we have a key, so there is a related entity
+               * - if it's null, no entity is link to this one, so we return a null
+               *
+               * In other cases, we have a fetched entity, so we return it entirely.
+               */
               if (typeof this[attrMeta.name].$_key === 'string') {
                 ret[attrMeta.name] = {ID: parseInt(attr.relKey)};
               }
