@@ -1217,14 +1217,14 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
 
           switch(attrMeta.kind) {
             case 'relatedEntity':
-              if (attr.relEntity) {
-                ret[attrMeta.name] = this[attrMeta.name];
-              }
-              else if (attr.relKey) {
+              if (typeof this[attrMeta.name].$_key === 'string') {
                 ret[attrMeta.name] = {ID: parseInt(attr.relKey)};
               }
+              else if (this[attrMeta.name].$_key === null) {
+                ret[attrMeta.name] = null;
+              }
               else {
-                ret[attrMeta.name] = undefined;
+                ret[attrMeta.name] = this[attrMeta.name];
               }
             break;
             default:

@@ -333,10 +333,8 @@ describe('Connector/Entity:', function() {
       expect(evalJson.length).to.be.equal(JSON.parse(employeeJson).length);
     });
     it('should retrieve the id of a related entity', function() {
-      var employeeJson = employee.$toJSON();
+      var employeeJson = employees[2].$toJSON();
       var employeeJsonObject = JSON.parse(employeeJson);
-      console.error("\n\n", employee);
-      console.error("\n\n", employeeJsonObject);
       expect(employeeJsonObject.employer.ID).to.be.a('number');
     });
     it('should also retrieve the JSON of the related after fetch entity', function(done) {
