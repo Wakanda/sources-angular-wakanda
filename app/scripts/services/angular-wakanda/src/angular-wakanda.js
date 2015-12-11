@@ -1021,17 +1021,41 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
               return deferred.promise;
             };
 
-          }
-          //@warn specific case for object ? @warn check date types
-          else {
+          } else if(attr.type === 'object' && attr.kind === 'storage') {
+
+            //Store object attributes to compare them when saving (wakanda-issues #6)
+            //Storing only a stringified version to avoid reference comparison on $save method
+            if (!(typeof this.$_objectAttributesOriginalValueStr === 'object')) {
+              this.$_objectAttributesOriginalValueStr = {};
+            }
+            this.$_objectAttributesOriginalValueStr[attr.name] = JSON.stringify(this.$_entity[attr.name].getValue());;
 
             Object.defineProperty(this, attr.name, {
               enumerable: true,
               configurable: true,
               get: function() {
+                  if (this.$_entity) {
+                    return this.$_entity[attr.name].getValue();
+                  }
+              },
+              set: function(newValue) {
                 if(this.$_entity) {
-                  return this.$_entity[attr.name].getValue();
+                  rootScopeSafeApply(function() {
+                    this.$_entity[attr.name].setValue(newValue);
+                  }.bind(this));
                 }
+              }
+            });
+          }
+          //@warn check date types
+          else {
+            Object.defineProperty(this, attr.name, {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+                  if (this.$_entity) {
+                    return this.$_entity[attr.name].getValue();
+                  }
               },
               set: function(newValue) {
                 if(this.$_entity) {
@@ -1066,6 +1090,17 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         if(!this.$_entity) {
           throw new Error("Can't $save() without pointer, please $fetch() before.");//@todo is is the right way ?
         }
+
+        var _this = this;
+        this.$_dataClass.getAttributes().forEach(function (attr) {
+          //Touching non-touched object attributes if the existing object has been modified (but not erased by a new object)
+          if (attr.type === 'object' && attr.kind === 'storage' && _this.$_entity[attr.name].isTouched() === false) {
+            if (_this.$_objectAttributesOriginalValueStr[attr.name] !== JSON.stringify(_this.$_entity[attr.name].value)) {
+              _this.$_entity[attr.name].touch();
+            }
+          }
+        });
+
         console.group('$save');
         var deferred, wakOptions = {}, that = this;
         //prepare the promise
