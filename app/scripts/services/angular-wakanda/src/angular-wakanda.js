@@ -1024,22 +1024,17 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
           } else if(attr.type === 'object' && attr.kind === 'storage') {
 
             //Store object attributes to compare them when saving (wakanda-issues #6)
+            //Storing only a stringified version to avoid reference comparison on $save method
             if (!(typeof this.$_objectAttributesOriginalValueStr === 'object')) {
               this.$_objectAttributesOriginalValueStr = {};
             }
-            this.$_objectAttributesOriginalValueStr[attr.name] = undefined;
+            this.$_objectAttributesOriginalValueStr[attr.name] = JSON.stringify(this.$_entity[attr.name].getValue());;
 
             Object.defineProperty(this, attr.name, {
               enumerable: true,
               configurable: true,
               get: function() {
                   if (this.$_entity) {
-
-                    if (this.$_objectAttributesOriginalValueStr[attr.name] === undefined) {
-                      //Storing only a stringified version to avoid reference comparison on $save method
-                      this.$_objectAttributesOriginalValueStr[attr.name] = JSON.stringify(this.$_entity[attr.name].getValue());
-                    }
-
                     return this.$_entity[attr.name].getValue();
                   }
               },
