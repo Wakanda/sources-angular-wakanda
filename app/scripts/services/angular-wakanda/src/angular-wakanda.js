@@ -1021,18 +1021,13 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
               return deferred.promise;
             };
 
-          }
-          //@warn specific case for object ? @warn check date types
-          else {
+          } else if(attr.type === 'object' && attr.kind === 'storage') {
 
             //Store object attributes to compare them when saving (wakanda-issues #6)
-            var isObjAttrType = attr.type === 'object' && attr.kind === 'storage';
-            if (isObjAttrType) {
-              if (!(typeof this.$_objectAttributesOriginalValueStr === 'object')) {
-                this.$_objectAttributesOriginalValueStr = {};
-              }
-              this.$_objectAttributesOriginalValueStr[attr.name] = undefined;
+            if (!(typeof this.$_objectAttributesOriginalValueStr === 'object')) {
+              this.$_objectAttributesOriginalValueStr = {};
             }
+            this.$_objectAttributesOriginalValueStr[attr.name] = undefined;
 
             Object.defineProperty(this, attr.name, {
               enumerable: true,
@@ -1040,11 +1035,30 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
               get: function() {
                   if (this.$_entity) {
 
-                    if (isObjAttrType && this.$_objectAttributesOriginalValueStr[attr.name] === undefined) {
+                    if (this.$_objectAttributesOriginalValueStr[attr.name] === undefined) {
                       //Storing only a stringified version to avoid reference comparison on $save method
                       this.$_objectAttributesOriginalValueStr[attr.name] = JSON.stringify(this.$_entity[attr.name].getValue());
                     }
 
+                    return this.$_entity[attr.name].getValue();
+                  }
+              },
+              set: function(newValue) {
+                if(this.$_entity) {
+                  rootScopeSafeApply(function() {
+                    this.$_entity[attr.name].setValue(newValue);
+                  }.bind(this));
+                }
+              }
+            });
+          }
+          //@warn check date types
+          else {
+            Object.defineProperty(this, attr.name, {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+                  if (this.$_entity) {
                     return this.$_entity[attr.name].getValue();
                   }
               },
