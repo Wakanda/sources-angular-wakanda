@@ -284,6 +284,24 @@ describe('Connector/Entity:', function() {
         done();
       }
     });
+    it('should successfuly update an object attribute', function (done) {
+      ds.Product.$all().$promise.then(function (e) {
+        var product = e.result[0];
+
+        product.spec = {foo: 'bar'};
+        product.$save().$promise.then(function () {
+          expect(product.spec).to.be.an('object');
+          expect(product.spec.foo).to.be.equal('bar');
+
+          product.spec.baz = 1136;
+          product.$save().$promise.then(function () {
+            expect(product.spec).to.be.an('object');
+            expect(product.spec.baz).to.be.equal(1136);
+            done();
+          });
+        });
+      })
+    });
   });
 
   describe('$serverRefresh() function', function() {
