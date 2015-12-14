@@ -5,6 +5,7 @@
   "devDependencies": {
     "chai": "^3.0.0",
     "chai-as-promised": "^5.1.0",
+    "codecov.io": "^0.1.6",
     "grunt": "~0.4.1",
     "grunt-autoprefixer": "~0.4.0",
     "grunt-bower-install": "~0.7.0",
@@ -37,6 +38,7 @@
     "karma-chrome-launcher": "^0.2.0",
     "karma-coffee-preprocessor": "^0.2.1",
     "karma-coverage": "^0.4.2",
+    "karma-env-preprocessor": "^0.1.1",
     "karma-fixture": "^0.2.5",
     "karma-html-reporter": "^0.2.6",
     "karma-html2js-preprocessor": "^0.1.0",
@@ -63,13 +65,13 @@
     "node": ">=0.8.0"
   },
   "scripts": {
-    "test": "echo please use \\\"npm run e2e-test\\\" or \\\"npm run unit-test\\\" \\(even \\\"npm run e2e-test-wak\\\" if you want to launch e2e test on your wakanda server after a \\\"grunt wakCopy\\\"\\)",
+    "test": "./node_modules/karma/bin/karma start karma.conf.js",
     "e2e-test": "protractor protractor.conf.js --verbose --run-spec",
     "e2e-test-all": "protractor protractor.conf.js --verbose --run-spec --run-tool",
     "e2e-test-tool": "protractor protractor.conf.js --verbose --run-tool",
     "e2e-test-wak": "protractor protractor.conf.js --verbose --run-spec --test-wak",
     "e2e-test-wak-all": "protractor protractor.conf.js --verbose --run-spec --run-tool --test-wak",
     "e2e-test-wak-tool": "protractor protractor.conf.js --verbose --run-tool --test-wak",
-    "unit-test": "karma start"
+    "unit-test": "./node_modules/karma/bin/karma start karma.conf.js"
   }
 }
