@@ -41,6 +41,30 @@ describe('Connector/Dataclass:', function() {
       expect(person.salary).to.be.equal(newPerson.salary);
       person.$save().should.notify(done);
     });
+
+    it('should link a related entity to newly created one if passed on parameter', function (done) {
+      ds.Company.$all().$promise.then(function (e) {
+        var company = e.result[0];
+
+        var newEmployee = ds.Employee.$create({
+          firstName: 'Jonh',
+          lastName: 'Smith',
+          salary: 68000,
+          employer: company
+        });
+
+        newEmployee.$save().$promise.then(function () {
+          expect(newEmployee).to.be.an('object');
+          expect(newEmployee.firstName).to.be.equal('Jonh');
+          expect(newEmployee.lastName).to.be.equal('Smith');
+          expect(newEmployee.salary).to.be.equal(68000);
+          expect(newEmployee.employer).to.be.an('object');
+          expect(newEmployee.employer.ID).to.be.equal(company.ID);
+          
+          done();
+        })
+      });
+    });
   });
 
   describe('$query() function', function() {

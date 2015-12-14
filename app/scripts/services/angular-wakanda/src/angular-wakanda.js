@@ -504,9 +504,32 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
      * @argument {Object} pojo Simple JS object matching the dataclass representation
      * @returns {NgWakEntity}
      */
-    var $$create = function(pojo) {
-        return createNgWakEntity(new WAF.Entity(this, pojo || {}), { expend: true });
-    };
+     var $$create = function(pojo) {
+         //Removing related attributes from pojo to avoid creation attempt on WAF side
+         //We will affect them to the entity when it's created
+         var i;
+         var relatedAttributes = {};
+
+         for (i = 0; i < this.$_relatedAttributes.length; i++) {
+           var attr = this.$_relatedAttributes[i];
+
+           if (pojo.hasOwnProperty(attr.name) && pojo[attr.name] !== undefined) {
+             relatedAttributes[attr.name] = pojo[attr.name];
+             delete pojo[attr.name];
+           }
+         }
+
+         var entity = createNgWakEntity(new WAF.Entity(this, pojo || {}), {
+             expend: true
+         });
+
+         var keys = Object.keys(relatedAttributes);
+         for (i = 0; i < keys.length; i++) {
+           entity[keys[i]] = relatedAttributes[keys];
+         }
+
+         return entity;
+     };
 
     /**
      *
