@@ -2,7 +2,15 @@
 // http://karma-runner.github.io/0.12/config/configuration-file.html
 
 module.exports = function(config) {
-  var wakandaApp = require('./wakandaApp.json');
+
+  var wakandaApp;
+  if (process.env.CI === "true" && process.env.TRAVIS === "true") {
+    wakandaApp = require('./wakandaApp.ci.json');
+  }
+  else {
+    wakandaApp = require('./wakandaApp.json');
+  }
+
   config.set({
     // base path, that will be used to resolve files and exclude
     basePath: '',
@@ -14,6 +22,10 @@ module.exports = function(config) {
       'coverage',
       'html'
     ],
+
+    coverageReporter: {
+      reporters: [{type: 'lcov'}]
+    },
 
     // testing framework to use (jasmine/mocha/qunit/...)
     frameworks: [
@@ -58,7 +70,7 @@ module.exports = function(config) {
       'test/spec/services/unitTestsPolyfill.js',
       'test/spec/*-spec.js'
     ],
-    
+
     proxies:  {
       '/rest': 'http://'+wakandaApp.host+':'+wakandaApp.port+'/rest',
       '/unit-tests': 'http://'+wakandaApp.host+':'+wakandaApp.port+'/unit-tests'
@@ -76,7 +88,8 @@ module.exports = function(config) {
     coverageReporter: {
       reporters: [
         {type: 'cobertura', subdir: '.', dir: './reports/coverage/'},
-        {type: 'html', subdir: '.', dir: './reports/html/'}
+        {type: 'html', subdir: '.', dir: './reports/html/'},
+        {type: 'lcov'}
       ]
     },
     htmlReporter: {

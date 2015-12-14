@@ -1,0 +1,5 @@
+{
+    "host" : "http://ci.server.com",
+    "port" : 80,
+    "wakWebFolder" : "./WakandaBaseSolution/Contacts/Contacts/WebFolder/"
+}

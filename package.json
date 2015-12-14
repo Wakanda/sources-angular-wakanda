@@ -72,6 +72,7 @@
     "e2e-test-wak": "protractor protractor.conf.js --verbose --run-spec --test-wak",
     "e2e-test-wak-all": "protractor protractor.conf.js --verbose --run-spec --run-tool --test-wak",
     "e2e-test-wak-tool": "protractor protractor.conf.js --verbose --run-tool --test-wak",
-    "unit-test": "./node_modules/karma/bin/karma start karma.conf.js"
+    "unit-test": "./node_modules/karma/bin/karma start karma.conf.js",
+    "codecov": "cat coverage/*/lcov.info | codecov"
   }
 }
