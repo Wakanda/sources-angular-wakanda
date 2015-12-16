@@ -1,6 +1,12 @@
 angular-wakanda.js - release notes
 ===================================================
 
+##V1.0.2
+* Fix issue with image upload
+* Fix issue with $toJSON method
+* Fix issue with with object attribute update on entity
+* Fix entity creation with related entity on $create parameter
+
 ##v1.0.1
 * Correct license in package.json
 * Add repository in package.json
