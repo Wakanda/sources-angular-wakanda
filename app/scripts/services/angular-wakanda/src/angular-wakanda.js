@@ -1236,6 +1236,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
       },
       $toJSON: $$toJSON,
       $serverRefresh: function(options) {
+        console.warn('$serverRefresh is deprecated and will be removed on the next release. Please do not use it.');
         var deferred = $q.defer(),
           that = this;
         options = options || {};
