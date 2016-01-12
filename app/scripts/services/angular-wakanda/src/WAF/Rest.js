@@ -23,8 +23,8 @@
 
 
 
-/** 
- * The Rest module is part of the Core and Native composite modules 
+/**
+ * The Rest module is part of the Core and Native composite modules
  * and implements the classes for connecting to the Wakanda through Rest.
  *
  * @class WAF.core.restConnect
@@ -173,7 +173,7 @@ WAF.core.restConnect.getXMLHttpRequest = function ()
   */
 WAF.core.restConnect.restRequest = function(connectionMode)
 {
-    
+
     /**
      * connectionMode
      *
@@ -208,7 +208,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default ""
      **/
 	this.hostname = "";
-    
+
     /**
      * app
      *
@@ -217,7 +217,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default ""
      **/
 	this.app = WAF.config.pattern;
-    
+
     /**
      * service
      *
@@ -226,7 +226,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default "rest"
      **/
 	this.service = WAF.core.restConnect.defaultService;
-    
+
     /**
      * resource
      *
@@ -235,7 +235,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default ""
      **/
 	this.resource = "";
-    
+
     /**
      * attributesRequested
      *
@@ -244,7 +244,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default undefined
      **/
 	this.attributesRequested = undefined;
-    
+
     /**
      * keys
      *
@@ -255,7 +255,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 	this.keys = [];
 
 	// Query String
-    
+
     /**
      * expand
      *
@@ -264,7 +264,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default []
      **/
 	this.expand = [];
-    
+
     /**
      * orderby
      *
@@ -273,7 +273,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default []
      **/
 	this.orderby = [];
-    
+
     /**
      * skip
      *
@@ -282,7 +282,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default null
      **/
 	this.skip = null;
-    
+
     /**
      * top
      *
@@ -291,7 +291,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default null
      **/
 	this.top = null;
-    
+
     /**
      * filter
      *
@@ -300,7 +300,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default null
      **/
 	this.filter = null;
-    
+
     /**
      * method
      *
@@ -309,7 +309,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default null
      **/
 	this.method = null;
-    
+
     /**
      * metadata
      *
@@ -319,7 +319,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      **/
 	this.metadata = null;
 
-    
+
     /**
      * handler
      *
@@ -328,7 +328,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default null
      **/
 	this.handler = null;
-    
+
     /**
      * postdata
      *
@@ -339,7 +339,8 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 	this.postdata = null;
 
 	this.postAFile = false;
-    
+	this.postAPict = false;
+
     /**
      * queryPlan
      *
@@ -348,9 +349,9 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default null
      **/
 	this.queryPlan = null;
-	
+
 	this.progressInfo = null;
-    
+
     /**
      * distinct
      *
@@ -359,7 +360,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
      * @default false
      **/
 	this.distinct = false;
-    
+
     /**
      * refreshOnly
      *
@@ -577,60 +578,63 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 		if (this.refreshOnly)
 		{
 			queryString+=(!deja$?"$refresh=":"&$refresh=")+this.refreshOnly;
-			deja$=true;		
+			deja$=true;
 		}
 		// $atOnce
 		if (this.atOnce)
 		{
 			queryString+=(!deja$?"$atOnce=":"&$atOnce=")+this.atOnce;
-			deja$=true;		
+			deja$=true;
 		}
 		// $rawPict
 		if (this.postAFile)
 		{
-			queryString+=(!deja$?"$rawPict=true":"&$rawPict=true");
-			deja$=true;		
+			if (this.postAPict)
+				queryString+=(!deja$?"$rawPict=true":"&$rawPict=true");
+			else
+				queryString+=(!deja$?"$binary=true":"&$binary=true");
+			deja$=true;
 		}
 		// $retainPositions
 		if (this.retainPositions)
 		{
 			queryString+=(!deja$?"$retainPositions=":"&$retainPositions=")+this.retainPositions;
-			deja$=true;		
+			deja$=true;
 		}
 		// $removeFromSet
 		if (this.removeAtPos != null)
 		{
 			queryString+=(!deja$?"$removeFromSet=":"&$removeFromSet=")+this.removeAtPos;
-			deja$=true;		
+			deja$=true;
 		}
 		if (this.removeReferenceOnly != null)
 		{
 			queryString+=(!deja$?"$removeRefOnly=":"&$removeRefOnly=")+this.removeReferenceOnly;
-			deja$=true;		
+			deja$=true;
 		}
 		// $attributes
 		if (this.filterAttributes != null)
 		{
 			queryString+=(!deja$?"$attributes=":"&$attributes=")+encodeURIComponent(this.filterAttributes);
-			deja$=true;	
-		}		
+			deja$=true;
+		}
 		// $addToSet
 		if (this.addToSet != null)
 		{
 			queryString+=(!deja$?"$addToSet=":"&$addToSet=")+encodeURIComponent("'"+JSON.stringify(this.addToSet)+"'");
-			deja$=true;	
+			deja$=true;
 		}
 		// $fromSel
 		if (this.fromSelection != null)
 		{
 			queryString+=(!deja$?"$fromSel=":"&$fromSel=")+encodeURIComponent("'"+JSON.stringify(this.fromSelection)+"'");
-			deja$=true;	
+			deja$=true;
 		}
 		// $keepSel
 		if (this.keepSelection != null)
 		{
 			queryString+=(!deja$?"$keepSel=":"&$keepSel=")+encodeURIComponent("'"+JSON.stringify(this.keepSelection)+"'");
-			deja$=true;	
+			deja$=true;
 		}
 		// $orderby
 		if (this.orderby)
@@ -652,8 +656,8 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 		if (this.subOrderby != null)
 		{
 			queryString+=(!deja$?"$subOrderby=":"&$subOrderby=")+encodeURIComponent(this.subOrderby);
-			deja$=true;	
-		}				
+			deja$=true;
+		}
 		// $expand
 		if (this.attributesExpanded != undefined)
 		{
@@ -683,7 +687,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 				queryString += expandString;
 			}
 		}
-		
+
 		if (this.autoExpand != null && this.autoExpand != "")
 		{
 			if (!deja$)
@@ -697,7 +701,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 				deja$ = true;
 				queryString += this.autoExpand;
 		}
-		
+
 		if (this.autoSubExpand != null && this.autoSubExpand != "")
 		{
 			if (!deja$)
@@ -748,7 +752,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 		}
 
 		this.http_request.parent = this;
-		
+
 		if (options && options.generateRESTRequestOnly)
 		{
 			return url;
@@ -762,7 +766,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 					handler(this.parent);
 				};
 			}
-	
+
 			try
 			{
 				if (this.fullURL)
@@ -770,7 +774,7 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 					url = this.fullURL;
 				}
 				this.http_request.open(command, url, this.connectionMode);
-	
+
 				if (this.postdata)
 				{
 					if (this.postAFile)
@@ -778,19 +782,19 @@ WAF.core.restConnect.restRequest = function(connectionMode)
 					else
 						this.http_request.setRequestHeader('Content-Type', 'application/json');
 				}
-	
+
 				this.http_request.setRequestHeader('If-Modified-Since', 'Thu, 1 Jan 1970 00:00:00 GMT'); // due to IE9 caching XHR
 				this.http_request.setRequestHeader('Cache-Control', 'no-cache'); // due to IE9 caching XHR
-	
+
 				this.http_request.send(this.postdata);
-	
+
 				if (!this.connectionMode)
 				{
 					handler(this.http_request);
 				}
-	
+
 				return true;
-	
+
 			} catch (e)
 			{
 	            // TODO log the error
