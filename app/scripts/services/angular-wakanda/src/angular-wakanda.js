@@ -393,10 +393,17 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
             method.apply(this[mode], thatArguments);
           }
           else{
-            if(!this.$_collection) {
+
+            var applyTo = this[mode];
+            if (this instanceof WAF.EntityCollection) {
+              applyTo = this;
+              this._callWithEm = true;
+            }
+
+            if(!this.$_collection && !(this instanceof WAF.EntityCollection)) {
               throw new Error("Couldn't call user defined method on collection because no pointer on this collection");
             }
-            method.apply(this[mode], thatArguments);//@todo maybe not on this[mode] ?...
+            method.apply(applyTo, thatArguments);
           }
           return deferred.promise;
         };
@@ -446,6 +453,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         else if(root === false) {
           if(typeof result.$_collection !== 'undefined' && result.$_collection.relEntityCollection !== 'undefined') {
             dataClass = result.$_collection.relEntityCollection;
+            dataClass._private.entityCollectionMethods = {};
+            for (var m in dataClass._private.methods) {
+              if (dataClass._private.methods.hasOwnProperty(m)) {
+                dataClass._private.entityCollectionMethods[m] = dataClass[m];
+              }
+            }
           }
         }
         //if couldn(t retrieve the dataClass (there may not be always a pointer alredy) - return the object untouched
@@ -456,7 +469,12 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         userDefinedEntityCollectionMethods = prepareHelpers.createUserDefinedEntityCollectionMethods(dataClass);
         for(var methodName in userDefinedEntityCollectionMethods) {
           if(userDefinedEntityCollectionMethods.hasOwnProperty(methodName)) {
-            result[methodName] = userDefinedEntityCollectionMethods[methodName];
+            if (root === true) {
+              result[methodName] = userDefinedEntityCollectionMethods[methodName];
+            }
+            else {
+              result[methodName] = userDefinedEntityCollectionMethods[methodName].bind(result.$_collection.relEntityCollection);
+            }
           }
         }
         return result;
@@ -938,6 +956,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
                 result.$_collection = this.$_entity[attr.name];
 
                 transform.addFrameworkMethodsToNestedCollection(result);
+                transform.addUserDefinedMethodsToCollection(result, false);
 
                 if(this.$_entity[attr.name].value.__ENTITIES) {
                   result.$fetch();

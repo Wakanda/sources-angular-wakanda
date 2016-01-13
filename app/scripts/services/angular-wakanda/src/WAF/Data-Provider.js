@@ -745,8 +745,19 @@ WAF.DataStore.funcCaller = function(methodref, from, params, options)
 	{
 		entityCollection = from;
 		dataClass = entityCollection.getDataClass();
-		if (entityCollection._private.dataURI != null)
-			request.dataURI = entityCollection._private.dataURI + "/" + methodref.name;
+		if (entityCollection._private.dataURI != null) {
+			var qsMethod;
+
+			if (entityCollection._callWithEm === true) {
+				qsMethod = "&$emMethod=" + methodref.name;
+				delete entityCollection._callWithEm;
+			}
+			else {
+				qsMethod = "/" + methodref.name
+			}
+
+			request.dataURI = entityCollection._private.dataURI + qsMethod;
+		}
 		else
 		{
 			request.attributesRequested = [ methodref.name ];
