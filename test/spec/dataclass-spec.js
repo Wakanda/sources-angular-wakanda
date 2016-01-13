@@ -4,16 +4,21 @@ describe('Connector/Dataclass:', function() {
   employees, employee,
   ds;
 
+  before(function () {
+    module('unitTestsHelpersModule');
+    inject(function (_unitTestsHelpers_) {
+      unitTestsHelpers = _unitTestsHelpers_;
+      unitTestsHelpers.db.reset(false);
+    });
+  });
+
   beforeEach(function() {
     if(!$wakanda) {
       module('wakanda');
-      module('unitTestsHelpersModule');
-      inject(function(_$rootScope_, _$wakanda_, _$q_, _unitTestsHelpers_) {
+      inject(function(_$rootScope_, _$wakanda_, _$q_) {
           $q = _$q_;
           $rootScope = _$rootScope_;
           $wakanda = _$wakanda_;
-          unitTestsHelpers = _unitTestsHelpers_;
-          unitTestsHelpers.db.reset(false);
           // https://github.com/domenic/chai-as-promised/issues/68
           intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
       });
@@ -60,7 +65,7 @@ describe('Connector/Dataclass:', function() {
           expect(newEmployee.salary).to.be.equal(68000);
           expect(newEmployee.employer).to.be.an('object');
           expect(newEmployee.employer.ID).to.be.equal(company.ID);
-          
+
           done();
         })
       });
