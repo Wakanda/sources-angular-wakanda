@@ -450,7 +450,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
             dataClass = result.$_collection.getDataClass();
           }
         }
-        else if(root === false) {
+        else if(root === false && result.$_collection.relEntityCollection !== null) {
           if(typeof result.$_collection !== 'undefined' && result.$_collection.relEntityCollection !== 'undefined') {
             dataClass = result.$_collection.relEntityCollection;
             dataClass._private.entityCollectionMethods = {};
