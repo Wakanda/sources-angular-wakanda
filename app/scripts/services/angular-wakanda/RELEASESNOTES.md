@@ -1,6 +1,11 @@
 angular-wakanda.js - release notes
 ===================================================
 
+##V1.0.3
+* $serverRefresh is now deprecated, a warning is displayed on console at each call
+* Update dataProvider to latest version
+* Optimize some unit test that were too slow
+
 ##V1.0.2
 * Fix issue with image upload
 * Fix issue with $toJSON method
