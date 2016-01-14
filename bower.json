@@ -1,6 +1,6 @@
 {
   "name": "angular-wakanda-front",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "dependencies": {
     "angular": "1.2.6",
     "json3": "~3.2.6",
