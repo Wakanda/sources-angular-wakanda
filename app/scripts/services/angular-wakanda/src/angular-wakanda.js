@@ -771,11 +771,6 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
         wakOptions.autoExpand = options.select;
       }
 
-      if (options.filter) {
-        options.filter = options.filter.replace(/'/g, '\\u0027');
-        options.filter = options.filter.replace(/"/g, '\\u0022');
-      }
-
       ['params', 'orderBy', 'pageSize'].forEach(function(opt) {
         if(options[opt] !== undefined) {
           wakOptions[opt] = options[opt];
