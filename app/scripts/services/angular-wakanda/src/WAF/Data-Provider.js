@@ -745,8 +745,19 @@ WAF.DataStore.funcCaller = function(methodref, from, params, options)
 	{
 		entityCollection = from;
 		dataClass = entityCollection.getDataClass();
-		if (entityCollection._private.dataURI != null)
-			request.dataURI = entityCollection._private.dataURI + "/" + methodref.name;
+		if (entityCollection._private.dataURI != null) {
+			var qsMethod;
+
+			if (entityCollection._callWithEm === true) {
+				qsMethod = "&$emMethod=" + methodref.name;
+				delete entityCollection._callWithEm;
+			}
+			else {
+				qsMethod = "/" + methodref.name
+			}
+
+			request.dataURI = entityCollection._private.dataURI + qsMethod;
+		}
 		else
 		{
 			request.attributesRequested = [ methodref.name ];
@@ -1946,7 +1957,9 @@ WAF.EntityCollection.manageData = function(rawResult, init) {
         entityCollection.length = rawResult.__COUNT;
         priv.ready = true;
         priv.loadedElemsLength = entityCollection.length;
-        priv.dataURI = rawResult.__ENTITYSET;
+				if (/^\/rest\/\w+\/\$entityset\/[A-Z0-9]+(\?.*)?$/i.test(rawResult.__ENTITYSET)) {
+					priv.dataURI = rawResult.__ENTITYSET;
+				}
         if (priv.autoSubExpand != null) {
             priv.autoExpand = priv.autoSubExpand;
             priv.autoSubExpand = null;
@@ -3585,7 +3598,7 @@ WAF.EntityAttributeRelatedSet.setRawValue = function(rawVal)
 WAF.EntityAttributeRelatedSet.getValue = function(options, userData)
 {
 	if (options == null) // in that case we just want the related entity set if it was already computed
-		return this.relEntityCollection;
+			return this.relEntityCollection;
 	else
 	{
 		var resOp = WAF.tools.handleArgs(arguments, 0);
