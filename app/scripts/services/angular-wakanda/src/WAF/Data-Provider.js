@@ -723,6 +723,7 @@ WAF.DataStore.funcCaller = function(methodref, from, params, options)
 	var entity = null;
 	var dataClass = null;
 	var entityCollection = null;
+	var method = null;
 
 	var jsonargs = JSON.stringify(params);
 	if (callWithGet)
@@ -750,7 +751,12 @@ WAF.DataStore.funcCaller = function(methodref, from, params, options)
 
 			if (entityCollection._callWithEm === true) {
 				qsMethod = "&$emMethod=" + methodref.name;
+				method = 'subentityset';
 				delete entityCollection._callWithEm;
+
+				if (entityCollection._private.dataURI.indexOf('?') === -1) {
+					qsMethod = '?' + qsMethod;
+				}
 			}
 			else {
 				qsMethod = "/" + methodref.name
@@ -782,7 +788,7 @@ WAF.DataStore.funcCaller = function(methodref, from, params, options)
 
 	var pageSize = options.pageSize || 40;
 	request.top = pageSize;
-	request.method = "entityset";
+	request.method = method || "entityset";
 	request.timeout = 300;
 	request.addToSet = options.addToSet;
 

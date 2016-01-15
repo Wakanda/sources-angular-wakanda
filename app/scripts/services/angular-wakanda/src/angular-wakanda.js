@@ -953,6 +953,10 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
                 transform.addFrameworkMethodsToNestedCollection(result);
                 transform.addUserDefinedMethodsToCollection(result, false);
 
+                if (this.$_entity[attr.name].relEntityCollection && this.$_entity[attr.name].value.__ENTITYSET) {
+                  this.$_entity[attr.name].relEntityCollection._private.dataURI = this.$_entity[attr.name].value.__ENTITYSET;
+                }
+
                 if(this.$_entity[attr.name].value.__ENTITIES) {
                   result.$fetch();
                 }
@@ -1426,6 +1430,9 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
           updateCollectionQueryInfos(that, options.pageSize, options.start);
           that.$totalCount = e.entityCollection.length;
           that.$fetching = false;
+
+          transform.addUserDefinedMethodsToCollection(that, false);
+
           deferred.resolve(that);
         });
       };
