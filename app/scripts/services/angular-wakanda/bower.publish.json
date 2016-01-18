@@ -16,6 +16,6 @@
   "license": "MIT",
   "ignore": [],
   "dependencies": {
-    "angular": "1.2.6"
+    "angular": "ˆ1.2.6"
   }
 }
