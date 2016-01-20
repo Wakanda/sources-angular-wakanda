@@ -10,7 +10,7 @@ angular.module('angularWakandaFrontApp')
     $scope.employer = 'loading...';
     ds.Employee.oneEmployee().$promise.then(function (event) {
       var entity = event.result;
-      var wakEntity = $wakanda.$parsers.WAFEntityToNgWakEntity(entity);
+      var wakEntity = $wakanda.$transform.$objectToEntity(entity);
 
       wakEntity.employer.$fetch().$promise.then(function () {
         $scope.employer = wakEntity.employer.name;
@@ -24,7 +24,7 @@ angular.module('angularWakandaFrontApp')
 
     ds.Employee.lotsOfEmployees().$promise.then(function (event) {
       var entities = event.result;
-      var wakEntities = $wakanda.$parsers.WAFCollectionToNgWakEntityCollection(entities);
+      var wakEntities = $wakanda.$transform.$objectToCollection(entities);
 
       $scope.employees = wakEntities;
     });
