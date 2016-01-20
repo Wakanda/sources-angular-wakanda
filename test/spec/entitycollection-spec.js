@@ -268,4 +268,61 @@ describe('Connector/EntityCollection:', function() {
     });
   });
 
+  describe('user defined collection methods', function () {
+    it('should be defined for root collections', function (done) {
+      var employees = ds.Employee.$all().$promise.then(function (e) {
+        expect(e.result.myCollectionMethod).to.be.a('function');
+        done();
+      })
+    });
+
+    it('should be defined for expanded collections', function (done) {
+      ds.Company.$query({pageSize: 3, select: 'staff'}).$promise.then(function (e) {
+        var companies = e.result;
+        expect(companies[0].staff.myCollectionMethod).to.be.a('function');
+        done();
+      });
+    });
+
+    it('should be defined for fetched collections', function (done) {
+      ds.Company.$query().$promise.then(function (e) {
+        var company = e.result[0];
+        company.staff.$fetch().$promise.then(function () {
+          expect(company.staff.myCollectionMethod).to.be.a('function');
+          done();
+        });
+      });
+    });
+
+    it('should return the right value for root collections', function (done) {
+      ds.Employee.$query({filter: 'salary > 95000'}).$promise.then(function (e) {
+        e.result.myCollectionMethod().$promise.then(function (ee) {
+          expect(ee.result).to.be.equal("Hello from collection employee ! There is " + e.result.$totalCount + " items on the collection.");
+          done();
+        });
+      });
+    });
+
+    it('should return the right value for expanded collections', function (done) {
+      ds.Company.$query({pageSize: 3, select: 'staff'}).$promise.then(function (e) {
+        var company = e.result[0];
+        company.staff.myCollectionMethod().$promise.then(function (ee) {
+          expect(ee.result).to.be.equal("Hello from collection employee ! There is " + company.staff.$totalCount + " items on the collection.");
+          done();
+        });
+      });
+    });
+
+    it('should return the right value for fetched collections', function (done) {
+      ds.Company.$query({pageSize: 3}).$promise.then(function (e) {
+        var company = e.result[0];
+        company.staff.$fetch().$promise.then(function () {
+          company.staff.myCollectionMethod().$promise.then(function (ee) {
+            expect(ee.result).to.be.equal("Hello from collection employee ! There is " + company.staff.$totalCount + " items on the collection.");
+            done();
+          });
+        });
+      });
+    });
+  });
 });
