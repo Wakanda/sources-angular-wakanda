@@ -527,6 +527,7 @@ wakanda.factory('$wakanda', ['$q', '$rootScope', '$http', '$wakandaConfig', func
          //We will affect them to the entity when it's created
          var i;
          var relatedAttributes = {};
+         pojo = pojo || {};
 
          for (i = 0; i < this.$_relatedAttributes.length; i++) {
            var attr = this.$_relatedAttributes[i];
