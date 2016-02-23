@@ -1,6 +1,14 @@
 angular-wakanda.js - release notes
 ===================================================
 
+##V1.0.4
+* Fix a bug when calling `$create` without argument
+* Collection user defined methods are now available on every collections (queried, fetched and expanded)
+* Correct `angular` dependency on `bower.json` to avoid conflict on angular version
+* Update dataProvider to latest version
+* Wakanda Solution: correct authentication issue when stopping/reloading server
+* Example application, page `test8` correct invalid calls to `$transform` methods
+
 ##V1.0.3
 * $serverRefresh is now deprecated, a warning is displayed on console at each call
 * Update dataProvider to latest version
