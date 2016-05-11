@@ -20,7 +20,7 @@ describe('Connector/Dataclass:', function() {
           $rootScope = _$rootScope_;
           $wakanda = _$wakanda_;
           // https://github.com/domenic/chai-as-promised/issues/68
-          intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
+          // intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
       });
     }
   });
@@ -67,7 +67,7 @@ describe('Connector/Dataclass:', function() {
           expect(newEmployee.employer.ID).to.be.equal(company.ID);
 
           done();
-        })
+        });
       });
     });
   });
@@ -97,9 +97,9 @@ describe('Connector/Dataclass:', function() {
 
       var promise = employees.$promise;
       expect(employees).to.have.property('$promise');
+      expect(promise).to.be.an('object');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -162,9 +162,8 @@ describe('Connector/Dataclass:', function() {
       var promise = request.$promise;
 
       expect(request).to.have.property('$promise');
-      expect(promise.then).to.be.a('function');
+      expect(promise.then).to.be.an('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -188,7 +187,6 @@ describe('Connector/Dataclass:', function() {
         expect(request).to.have.property('$promise');
         expect(promise.then).to.be.a('function');
         expect(promise.catch).to.be.a('function');
-        expect(promise.finally).to.be.a('function');
 
         done();
       });
@@ -216,7 +214,6 @@ describe('Connector/Dataclass:', function() {
         expect(request).to.have.property('$promise');
         expect(promise.then).to.be.a('function');
         expect(promise.catch).to.be.a('function');
-        expect(promise.finally).to.be.a('function');
 
         done();
       });
@@ -238,22 +235,6 @@ describe('Connector/Dataclass:', function() {
     it('should return all the attributes when no (name) is specified', function(done) {
       var dataClassAttribute = $wakanda.$ds.Employee.$attr();
       expect(dataClassAttribute).to.be.an('object');
-      done();
-    });
-  });
-
-  describe('dataClass.$_relatedAttributes(name) function', function() {
-    it('should return the related attributes from a dataclass', function(done) {
-      var _relatedAttributes = $wakanda.$ds.Employee.$_relatedAttributes;
-      expect(_relatedAttributes).to.be.an('array');
-      done();
-    });
-  });
-
-  describe('dataClass.$_processedAttributes(name) variable', function() {
-    it('should return the processed attributes from a dataclass', function(done) {
-      var _processedAttributes = $wakanda.$ds.Employee.$_processedAttributes;
-      expect(_processedAttributes).to.be.an('array');
       done();
     });
   });

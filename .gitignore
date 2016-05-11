@@ -1,31 +1,21 @@
-node_modules
-dist
-.tmp
-*.swp
-.sass-cache
-app/bower_components
-app/scripts/services/angular-wakanda/publish
-app/scripts/services/angular-wakanda/publish.zip
-/nbproject/private/
-/nbproject
-wakandaApp.json
-reports/*
-coverage/
-
-WakandaBaseSolution/Contacts/Contacts Solution/breakpoints.json
-WakandaBaseSolution/Contacts/Contacts Solution/*.waPreferences
-WakandaBaseSolution/Contacts/Contacts Solution/*.cacheUAG
-WakandaBaseSolution/Contacts/Contacts Solution/Logs/*.txt
-WakandaBaseSolution/Contacts/Contacts/DataFolder/*
-WakandaBaseSolution/Contacts/Contacts/Logs/*
-WakandaBaseSolution/Contacts/Contacts/*.Match
-WakandaBaseSolution/Contacts/Contacts/*.waSym
-WakandaBaseSolution/Contacts/Contacts/*.waSymData
-!WakandaBaseSolution/Contacts/Contacts/WebFolder/index.html
-!WakandaBaseSolution/Contacts/Contacts/WebFolder/.htaccess
-WakandaBaseSolution/Contacts/Contacts/WebFolder/*
+node_modules/
+bower_components/
+*~
+.DS_Store
+reports/
 npm-debug.log
-/published-connector/
-WakandaBaseSolution/Contacts/Contacts Solution/Directory.WakTDef
-app/scripts/services/angular-wakanda/angular-wakanda.debug.min.js
-app/scripts/services/angular-wakanda/angular-wakanda.debug.min.js.map
+publish/
+
+wakanda-solution/Contacts/Contacts Solution/breakpoints.json
+wakanda-solution/Contacts/Contacts Solution/*.waPreferences
+wakanda-solution/Contacts/Contacts Solution/*.cacheUAG
+wakanda-solution/Contacts/Contacts Solution/Logs/*.txt
+wakanda-solution/Contacts/Contacts/DataFolder/*
+wakanda-solution/Contacts/Contacts/Logs/*
+wakanda-solution/Contacts/Contacts/*.Match
+wakanda-solution/Contacts/Contacts/*.waSym
+wakanda-solution/Contacts/Contacts/*.waSymData
+!wakanda-solution/Contacts/Contacts/WebFolder/index.html
+!wakanda-solution/Contacts/Contacts/WebFolder/.htaccess
+wakanda-solution/Contacts/Contacts/WebFolder/*
+wakanda-solution/Contacts/Contacts Solution/Directory.WakTDef

@@ -4,78 +4,98 @@
 
 Welcome to the **source repository** of the **angular-wakanda connector**. You'll find here the whole environment to develop the connector.
 
-**If you only wish to retrieve the connector itself**, just get it from bower `bower install angular-wakanda` or from the publish repo [Wakanda/angular-wakanda](https://github.com/Wakanda/angular-wakanda).
+**If you only wish to retrieve the connector itself**, just get it from bower `bower install angular-wakanda`, npm `npm install angular-wakanda` or from the publish repo [Wakanda/angular-wakanda](https://github.com/Wakanda/angular-wakanda).
 
 Please file your issues on this repo : [Wakanda/wakanda-issues](https://github.com/Wakanda/wakanda-issues/labels/Angular-Wakanda).
 
 ## Included
 
 * angular-wakanda source code
-* An Angular application
+* An example angular application
 * A Wakanda solution
 * Test suites
 
-[Read more on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/included)
-
 ## Setup
 
-### Prerequisites
+Install development dependencies through npm.
 
-* [Wakanda Server](http://www.wakanda.org/downloads)
-* [NodeJS](https://nodejs.org/download/)
-* Java (only for e2e testing)
-* Following global node modules :
-	* bower : `npm install bower -g`
-	* grunt (cli) : `npm install grunt-cli -g`
-	* protractor : `npm install protractor -g` (see [protractor doc](http://angular.github.io/protractor/#/) for more install infos)
-
-### Install
-
-Once you've installed global dependencies (or if you already have them), execute the following steps to init your working environment (from the root of the repo):
-
-```shell
-$ npm install
-$ bower install
-$ grunt initConfig
-$ cd ./app/scripts/services/angular-wakanda
-$ npm install
+```bash
+npm install
 ```
-
-[Read more on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/project-setup#setup)
 
 ### Run
 
-Open two Terminal tabs :
+1. Launch the Wakanda Solution contained on `wakanda-solution` directory with Wakanda Studio, or directly
+with `wakanda-server` executable (available on Wakanda installation directory).
+2. `npm run serve`
 
-1. Launch the Wakanda Solution with your Wakanda Server : `/Users/path/to/your/wakanda/server/Wakanda\ Enterprise\ Server.app/Contents/MacOS/Wakanda\ Enterprise\ Server WakandaBaseSolution/Contacts/Contacts\ Solution/Contacts.waSolution`
-2. Launch the dev server : `grunt serve`
+It will serve an example application on `http://localhost:9092` with a watcher
+that rebuilds the connector on every modification on source code.
 
-[Full version on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/project-setup#run)
+All requests to `/rest` are automatically proxied to Wakanda Server on port 8081.
+
+### Build
+
+If you only want to build the connector, launch:
+
+```bash
+npm run build
+```
+
+Files will be generated on `dist/` directory.
 
 ### Test
 
-[Read Test section on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/test)
+Launch the Wakanda solution stored on `wakanda-solution` directory and start the server. Then launch
+the Karma unit test suite, it will automatically proxy requests on REST API
+to Wakanda Server (on port 8081).
 
-## Contributing
+```bash
+npm run karma
+```
 
-[Read Contributing section on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/contributing)
+## Prepare a new release
 
-## FAQ
+- Change version number on `package.json` and `bower.json`
+- Complete `RELEASESNOTES.md` with the new version changelog
+- If needed, edit template files on `publish-templates` directory
 
-[Read FAQ section on wiki](https://github.com/Wakanda/sources-angular-wakanda/wiki/faq)
+Then:
+
+```bash
+gulp publish
+```
+
+It will build the connector, clone the actual `Wakanda/angular-wakanda` repo into `publish`
+directory, then copy all needed files into it.
+
+Then, move into the repo, prepare your commit, then push (you may have to push into a fork and make a pull request).
+
+```bash
+cd publish
+git status
+
+
+# You might need to do somme git add
+
+git commit -m "Bump to v1.2.3"
+
+# You might add another remote (like a fork) with git remote add
+
+git push [remote] master
+```
 
 ## Resources
 
 * [Home page, documentation and tutorial](https://wakanda.github.io/angular-wakanda/)
-* [Bower publish repo](https://github.com/Wakanda/angular-wakanda)
-* [Yeoman generator](https://www.npmjs.org/package/generator-angular-wakanda)
+* [Publish repo](https://github.com/Wakanda/angular-wakanda)
 * [Github issues](https://github.com/Wakanda/wakanda-issues/labels/Angular-Wakanda)
 
 ## License
 
 *The MIT License*
 
-Copyright (c) 2015 Wakanda S.A.S.
+Copyright (c) 2016 Wakanda S.A.S.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

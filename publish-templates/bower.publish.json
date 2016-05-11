@@ -1,0 +1,21 @@
+{
+  "name": "angular-wakanda",
+  "version": "<%=version%>",
+  "keywords": [
+    "angular",
+    "angular.js",
+    "angularjs",
+    "wakanda",
+    "wakandadb",
+    "nosql",
+    "ssjs"
+  ],
+  "description": "Use your Wakanda backend with Angular",
+  "homepage": "http://wakanda.github.io/angular-wakanda/",
+  "main": "./angular-wakanda.min.js",
+  "license": "MIT",
+  "ignore": [],
+  "dependencies": {
+    "angular": "^1.2.6"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "angular-wakanda",
+  "version": "<%=version%>",
+  "description": "Use your Wakanda backend with Angular",
+  "main": "angular-wakanda.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Wakanda SAS",
+  "repository": "Wakanda/angular-wakanda",
+  "license": "MIT"
+}

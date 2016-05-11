@@ -1,0 +1,12 @@
+<ul>
+  <li ng-repeat="c in companies">
+    {{c.name}}, {{c.staff.length}} employees<br />
+    <ul>
+      <li ng-repeat="e in c.staff">
+        {{e.ID}}: {{e.firstName}} ({{e.employer.name}})
+      </li>
+    </ul>
+  </li>
+</ul>
+<span ng-click="companies.$prevPage()">prev</span> -
+<span ng-click="companies.$nextPage()">next</span>
