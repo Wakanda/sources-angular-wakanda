@@ -15,7 +15,7 @@ describe('Connector/Entity:', function() {
           unitTestsHelpers = _unitTestsHelpers_;
           unitTestsHelpers.db.reset(false);
           // https://github.com/domenic/chai-as-promised/issues/68
-          intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
+          // intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
       });
     }
   });
@@ -48,7 +48,6 @@ describe('Connector/Entity:', function() {
       expect(employee2).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -62,9 +61,14 @@ describe('Connector/Entity:', function() {
       });
     });
     it('should return an error if not found', function (done) {
-      employee = ds.Employee.$find({filter: 'firstName = "abc"'}).$promise.should.be.rejected.then(function() {
+      // employee = ds.Employee.$find(-404).$promise.should.be.rejected.then(function() {
+      //   done();
+      // });
+      ds.Employee.$find(-404).$promise.catch(function (e) {
+        expect(e).to.be.defined;
         done();
       });
+      $rootScope.$apply();
     });
     it('should provide $key method', function (done) {
       expect(employee.ID).to.be.equal(parseInt(employee.$key()));
@@ -73,12 +77,6 @@ describe('Connector/Entity:', function() {
     it('should return undefined when no entity is defined', function (done) {
       employee.$_entity = null;
       expect(employee.$key()).to.be.undefined;
-      done();
-    });
-    it('should return key when no entity is defined but we have key', function (done) {
-      employee.$_entity = null;
-      employee.$_key = '123';
-      expect(employee.$key()).to.be.equal('123');
       done();
     });
     it('should provide $stamp method', function (done) {
@@ -90,22 +88,13 @@ describe('Connector/Entity:', function() {
       expect(employee.$stamp()).to.be.undefined;
       done();
     });
-    it('should provide $isNew method', function (done) {
-      expect(employee.$isNew()).to.be.a('boolean');
-      done();
-    });
-    it('should return undefined when no entity is defined', function (done) {
-      employee.$_entity = null;
-      expect(employee.$isNew()).to.be.undefined;
-      done();
-    });
     it('should not expand related attribute without select option', function (done) {
       ds.Employee.$find(employee.ID).$promise.then(function (e) {
         var expandedEmployee = e.result;
 
         expect(expandedEmployee).to.be.defined;
         expect(expandedEmployee.employer).to.be.defined;
-        expect(expandedEmployee.employer.name).to.be.undefined;
+        expect(expandedEmployee.employer.name).to.be.null;
         done();
       });
     });
@@ -121,6 +110,19 @@ describe('Connector/Entity:', function() {
     });
   });
 
+  describe('$isNew() function', function () {
+    it('should be defined', function () {
+      expect(employee.$isNew).to.be.a('function');
+    });
+    it('should return true if the entity is created and not saved', function () {
+      var entity = ds.Employee.$create();
+      expect(entity.$isNew()).to.be.true;
+    });
+    it('should return false if the entity come from the server', function () {
+      expect(employee.$isNew()).to.be.false;
+    });
+  });
+
   describe('$fetch() function', function() {
 
     it('should return a promise on $promise property', function (done) {
@@ -130,7 +132,6 @@ describe('Connector/Entity:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -194,10 +195,15 @@ describe('Connector/Entity:', function() {
     });
   });
 
-  describe('$isLoaded() function', function() {
-    it('should return the status of a query', function (done) {
-      expect(employee.$isLoaded()).to.be.true;
-      done();
+  describe('$isDeferred() function', function() {
+    it('should be defined', function () {
+      expect(employee.$isDeferred).to.be.a('function');
+    });
+    it('should return false if the entity is fetched', function () {
+      expect(employee.$isDeferred()).to.be.false;
+    });
+    it('should return true is the entity is deferred', function () {
+      expect(employee.employer.$isDeferred()).to.be.true;
     });
   });
 
@@ -211,18 +217,17 @@ describe('Connector/Entity:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
 
     it('should remove an entity', function (done) {
-      var employeeToRemove = employees['0'];
-      employees['0'].$remove().should.be.fulfilled.then(function(removeResult){
+      var employeeToRemove = employees[0];
+      employees[0].$remove().should.be.fulfilled.then(function(removeResult){
         expect(removeResult).to.be.an('object');
         employees = $wakanda.$ds.Employee.$query();
         employees.$promise.then(function() {
-          expect(employees['0']).to.be.not.deep.equal(employeeToRemove);
+          expect(employees[0]).to.be.not.equal(employeeToRemove);
           done();
         });
       });
@@ -251,7 +256,6 @@ describe('Connector/Entity:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -261,7 +265,7 @@ describe('Connector/Entity:', function() {
       var person = $wakanda.$ds.Employee.$create( newPerson );
       person.$save().should.be.fulfilled.then(function(saveResult) {
         expect(saveResult).to.be.an('object');
-        expect(person.firstName).to.be.equal(saveResult.entity.firstName.value);
+        expect(person.firstName).to.be.equal(newPerson.firstName);
         done();
       });
     });
@@ -269,7 +273,7 @@ describe('Connector/Entity:', function() {
       employee.firstName = 'Geronimo';
       employee.$save().should.be.fulfilled.then(function(saveResult) {
         expect(saveResult).to.be.an('object');
-        expect(saveResult.entity.firstName.value).to.be.equal('Geronimo');
+        expect(employee.firstName).to.be.equal('Geronimo');
         done();
       });
     });
@@ -304,42 +308,6 @@ describe('Connector/Entity:', function() {
     });
   });
 
-  describe('$serverRefresh() function', function() {
-
-    it('should return a promise on $promise property', function (done) {
-      employee.firstName = 'Geronima';
-      var request = employee.$serverRefresh()
-
-      var promise = request.$promise;
-      expect(request).to.have.property('$promise');
-      expect(promise.then).to.be.a('function');
-      expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
-
-      done();
-    });
-
-    it('should act as serverRefresh', function(done) {
-      employee.firstName = 'Geronima';
-      employee.$serverRefresh().should.be.fulfilled.then(function(refreshResult){
-        expect(refreshResult).to.be.an('object');
-        expect(refreshResult.entity.firstName.value).to.be.equal('Geronima');
-        done();
-      });
-    });
-    it('should return an error if not found', function (done) {
-      employee.firstName = 'Geronimo';
-      employee.$_entity = null;
-      try {
-        employee.$serverRefresh();
-        Assert.Fail();
-      } catch (Exception) {
-        expect(Exception).to.be.an.instanceof(Error);
-        done();
-      }
-    });
-  });
-
   describe('$toJSON() function', function() {
     it('should return the JSON of an entity', function() {
       var employeeJson = employee.$toJSON();
@@ -350,14 +318,14 @@ describe('Connector/Entity:', function() {
       expect(evalJson).to.be.deep.equal(JSON.parse(employeeJson));
       expect(evalJson.length).to.be.equal(JSON.parse(employeeJson).length);
     });
-    it('should retrieve the id of a related entity', function() {
-      var employeeJson = employees[2].$toJSON();
-      var employeeJsonObject = JSON.parse(employeeJson);
-      expect(employeeJsonObject.employer.ID).to.be.a('number');
-    });
+
     it('should also retrieve the JSON of the related after fetch entity', function(done) {
-      employee = employees[2];
-      employee.employer.$fetch().then(function() {
+      ds.Employee.$query({
+        filter: 'employer.ID > 0',
+        pageSize: 1,
+        select: 'employer'
+      }).$promise.then(function (e) {
+        var employee = e.result[0];
         var employeeJson = employee.$toJSON();
         var employeeJsonObject = JSON.parse(employeeJson);
         expect(employeeJsonObject.employer.ID).to.be.a('number');
@@ -392,8 +360,8 @@ describe('Connector/Entity:', function() {
   });
 
   describe('$fetch on related entity', function() {
-    it('should return undefined if not fetched', function(done) {
-      expect(employees[2].employer.ID).to.be.equal(undefined);
+    it('should return null if not fetched', function(done) {
+      expect(employees[2].employer.ID).to.be.null;
       done();
     });
 
@@ -411,7 +379,6 @@ describe('Connector/Entity:', function() {
      expect(request).to.have.property('$promise');
      expect(promise.then).to.be.a('function');
      expect(promise.catch).to.be.a('function');
-     expect(promise.finally).to.be.a('function');
 
      done();
    });
@@ -440,4 +407,72 @@ describe('Connector/Entity:', function() {
     });
   });
 
+  describe('$recompute method', function () {
+
+    var product;
+    beforeEach(function (done) {
+      ds.Product.$query({pageSize: 1}).$promise.then(function (e) {
+        product = e.result[0];
+        done();
+      });
+    });
+
+    it('should be defined', function () {
+      expect(product.$recompute).to.be.a('function');
+    });
+
+    it('should return a promise', function () {
+      var p = product.$recompute();
+      expect(p).to.be.defined;
+      expect(p.then).to.be.a('function');
+      expect(p.catch).to.be.a('function');
+    });
+
+    it('should return a promise on $promise property', function () {
+      var p = product.$recompute().$promise;
+      expect(p).to.be.defined;
+      expect(p.then).to.be.a('function');
+      expect(p.catch).to.be.a('function');
+    });
+
+    it('should edit the entity in place', function () {
+      var entity = ds.Product.$create();
+      return entity.$recompute().$promise.then(function (e) {
+        expect(e.result).to.be.equal(entity);
+      });
+    });
+
+    it('should fire init event for a newly created entity', function () {
+      var entity = ds.Product.$create();
+      return entity.$recompute().$promise.then(function () {
+        expect(entity.myBoolean).to.be.true;
+      });
+    });
+
+    it('should fire clientrefresh event for a newly created entity', function () {
+      var entity = ds.Product.$create();
+      return entity.$recompute().$promise.then(function () {
+        expect(entity.name).to.be.equal('Unnamed product');
+      });
+    });
+
+    it('should fire clientrefresh event for an already saved entity', function () {
+      product.name = null;
+      return product.$recompute().$promise.then(function () {
+        expect(product.name).to.be.equal('Unnamed product');
+      });
+    });
+
+    it('should not cause any trouble to saving after being called', function () {
+      var oldStamp = product.$stamp();
+
+      product.name = null;
+      return product.$recompute().$promise.then(function () {
+        return product.$save().$promise.then(function () {
+          expect(product.$stamp()).to.be.above(oldStamp);
+          expect(product.name).to.be.equal('Unnamed product');
+        });
+      });
+    });
+  });
 });

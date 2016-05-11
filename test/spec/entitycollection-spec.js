@@ -15,7 +15,7 @@ describe('Connector/EntityCollection:', function() {
           unitTestsHelpers = _unitTestsHelpers_;
           unitTestsHelpers.db.reset(false);
           // https://github.com/domenic/chai-as-promised/issues/68
-          intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
+          // intervalRef = setInterval(function(){ $rootScope.$apply(); }, 1);
       });
     }
   });
@@ -57,7 +57,6 @@ describe('Connector/EntityCollection:', function() {
       expect(employees.$queryParams.pageSize).to.be.equal(5);
       expect(employees.$queryParams.start).to.be.a('number');
       expect(employees.$queryParams.start).to.be.equal(0);
-      expect(employees.$queryParams.filter).to.be.defined;
       done();
     });
   });
@@ -70,7 +69,6 @@ describe('Connector/EntityCollection:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -108,45 +106,6 @@ describe('Connector/EntityCollection:', function() {
         done();
       });
     });
-    it('should work in replace mode', function (done) {
-      employees.$fetch({ start: 1, params: ['a*', 5000] },'replace').should.be.fulfilled.then(function(fetchResult){
-        expect(fetchResult).to.be.an('object');
-        done();
-      });
-    });
-    it('should work in append mode', function (done) {
-      employees.$fetch({ start: 1, params: ['a*', 5000] },'append').should.be.fulfilled.then(function(fetchResult){
-        expect(fetchResult).to.be.an('object');
-        done();
-      });
-    });
-    it('should throw an error with unknown modes', function (done) {
-      try {
-        employees.$fetch({ start: 1 }, 'geronimoMode');
-      } catch (Exception) {
-        expect(Exception).to.be.an.instanceof(Error);
-        done();
-      }
-    });
-  });
-
-  describe('$fetching variable', function() {
-    it('should return fetching status', function (done) {
-      employees = $wakanda.$ds.Employee.$query();
-      expect(employees.$fetching).to.be.true;
-      employees.$promise.then(function() {
-        expect(employees.$fetching).to.be.false;
-        done();
-      });
-    });
-  });
-
-  describe('$isLoaded() function', function() {
-    it('should return the status of a query', function (done) {
-      employees.$fetch('employer');
-      expect(employees['0'].employer.$isLoaded()).to.be.false;
-      done();
-    });
   });
 
   describe('$more() function', function() {
@@ -164,7 +123,6 @@ describe('Connector/EntityCollection:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -193,7 +151,6 @@ describe('Connector/EntityCollection:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -226,17 +183,17 @@ describe('Connector/EntityCollection:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
   });
 
-  describe('$Entity variable', function() {
-    it('should return a $Entity object', function (done) {
-      var Entity = $wakanda.$ds.Employee.$Entity;
-      expect(Entity).to.be.an('object');
-      done();
+  describe('$query with selecting related entity and related entities', function() {
+    it('should fetch the related entities', function (done) {
+      $wakanda.$ds.Employee.$query({ select: 'employer.staff' }).$promise.then(function(e) {
+        expect(e.result[2].employer.staff[0].firstName).to.be.a('string');
+        done();
+      });
     });
   });
 
@@ -250,19 +207,6 @@ describe('Connector/EntityCollection:', function() {
         expect(employeesJson).to.be.a('string');
         expect(JSON.parse(employeesJson)).to.be.an('array');
         expect(JSON.parse(employeesJson)[0].ID).to.be.equal(employees[0].ID);
-        var evalJson = eval('(' + JSON.stringify(employees) + ')');
-        expect(evalJson).to.be.deep.equal(JSON.parse(employeesJson));
-        expect(evalJson.length).to.be.equal(JSON.parse(employeesJson).length);
-        done();
-      });
-    });
-  });
-
-  describe('$query with selecting related entity and renlated entities', function() {
-    it('should fetch the related entities', function (done) {
-      employees = $wakanda.$ds.Employee.$query({ select: 'employer,employer.staff' });
-      employees.$promise.then(function() {
-        expect(employees[2].employer.staff.$isLoaded()).to.be.equal(true);
         done();
       });
     });
@@ -322,6 +266,38 @@ describe('Connector/EntityCollection:', function() {
             done();
           });
         });
+      });
+    });
+
+    it('should return an entity if the method returns one', function (done) {
+      ds.Employee.oneEmployee().$promise.then(function (e) {
+
+        var ngEntity = e.result;
+
+        expect(ngEntity.$fetch).to.be.a('function');
+        expect(ngEntity.$isNew).to.be.a('function');
+        expect(ngEntity.$key).to.be.a('function');
+        expect(ngEntity.$remove).to.be.a('function');
+        expect(ngEntity.$save).to.be.a('function');
+        expect(ngEntity.$stamp).to.be.a('function');
+        expect(ngEntity.$toJSON).to.be.a('function');
+        done();
+      });
+    });
+
+    it('should return a collection if the method returns one', function (done) {
+      ds.Employee.lotsOfEmployees().$promise.then(function (e) {
+        var ngCollection = e.result;
+
+        expect(ngCollection).to.be.an('array');
+
+        expect(ngCollection.$fetch).to.be.a('function');
+        expect(ngCollection.$more).to.be.a('function');
+        expect(ngCollection.$nextPage).to.be.a('function');
+        expect(ngCollection.$prevPage).to.be.a('function');
+        expect(ngCollection.$totalCount).to.be.a('number');
+        expect(ngCollection.$toJSON).to.be.a('function');
+        done();
       });
     });
   });

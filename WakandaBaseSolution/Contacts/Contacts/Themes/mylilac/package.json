@@ -1,1 +1,0 @@
-﻿{    "name": "mylilac",    "author": "Tophfgdfe",    "copyright": "",    "studio": {        "label": "mylilac",        "mobile": "false"    },    "version": "1.0.0",    "loadDependencies": [{        "id": "mylilac/mylilac.css",        "path": "THEMES_CUSTOM"    }],    "type": "custom"}

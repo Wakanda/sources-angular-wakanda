@@ -56,18 +56,15 @@ describe('Connector/Trasnform :', function() {
   });
 
   describe('$objectToEntity function', function () {
-    it('should return a ngWakEntity if provided WAF Entity', function (done) {
+    it('should return a NgEntity if provided an Entity', function (done) {
       ds.Employee.oneEmployee().$promise.then(function (event) {
-        var wafEntity = event.result;
-        var ngEntity = $wakanda.$transform.$objectToEntity(wafEntity);
+        var entity = event.result;
+        var ngEntity = $wakanda.$transform.$objectToEntity(entity);
 
         expect(ngEntity.$fetch).to.be.a('function');
-        expect(ngEntity.$isLoaded).to.be.a('function');
-        expect(ngEntity.$isNew).to.be.a('function');
         expect(ngEntity.$key).to.be.a('function');
         expect(ngEntity.$remove).to.be.a('function');
         expect(ngEntity.$save).to.be.a('function');
-        expect(ngEntity.$serverRefresh).to.be.a('function');
         expect(ngEntity.$stamp).to.be.a('function');
         expect(ngEntity.$toJSON).to.be.a('function');
         done();
@@ -101,62 +98,55 @@ describe('Connector/Trasnform :', function() {
 
   describe('$objectToCollection', function() {
 
-    it('should return an array of ngWakEntity give an array of WAFEntity', function(done) {
+    it('should return a NgCollection if given a Collection', function(done) {
       ds.Employee.lotsOfEmployees().$promise.then(function(event) {
-        var wafCollection = event.result;
-        var wakEntities = $wakanda.$transform.$objectToCollection(wafCollection);
+        var collection = event.result;
+        var ngCollection = $wakanda.$transform.$objectToCollection(collection);
 
-        expect(wakEntities).to.be.an('array');
-        expect(wakEntities.$totalCount).to.be.equal(wafCollection.length);
+        expect(ngCollection.$totalCount).to.be.equal(ngCollection.$_collection._count);
 
-        var ngEntity = wakEntities[0];
+        var ngEntity = ngCollection[0];
         expect(ngEntity.$fetch).to.be.a('function');
-        expect(ngEntity.$isLoaded).to.be.a('function');
-        expect(ngEntity.$isNew).to.be.a('function');
         expect(ngEntity.$key).to.be.a('function');
         expect(ngEntity.$remove).to.be.a('function');
         expect(ngEntity.$save).to.be.a('function');
-        expect(ngEntity.$serverRefresh).to.be.a('function');
         expect(ngEntity.$stamp).to.be.a('function');
         expect(ngEntity.$toJSON).to.be.a('function');
         done();
       });
     });
 
-    it('should have a reference on WAF collection in $_collection', function(done) {
+    it('should have a reference on collection in $_collection', function(done) {
       ds.Employee.lotsOfEmployees().$promise.then(function(event) {
-        var wafCollection = event.result;
-        var wakEntities = $wakanda.$transform.$objectToCollection(wafCollection);
+        var collection = event.result;
+        var ngCollection = $wakanda.$transform.$objectToCollection(collection);
 
-        expect(wakEntities.$_collection).to.be.an('object');
-        expect(wakEntities.$_collection).to.be.equal(wafCollection);
+        expect(ngCollection.$_collection).to.be.an('object');
         done();
       });
     });
 
     it('should have framework methods', function(done) {
       ds.Employee.lotsOfEmployees().$promise.then(function(event) {
-        var wafCollection = event.result;
-        var wakEntities = $wakanda.$transform.$objectToCollection(wafCollection);
+        var collection = event.result;
+        var ngCollection = $wakanda.$transform.$objectToCollection(collection);
 
-        expect(wakEntities.$fetch).to.be.a('function');
-        expect(wakEntities.$query).to.be.a('function');
-        expect(wakEntities.$add).to.be.a('function');
-        expect(wakEntities.$more).to.be.a('function');
-        expect(wakEntities.$nextPage).to.be.a('function');
-        expect(wakEntities.$prevPage).to.be.a('function');
-        expect(wakEntities.$totalCount).to.be.a('number');
-        expect(wakEntities.$toJSON).to.be.a('function');
+        expect(ngCollection.$fetch).to.be.a('function');
+        expect(ngCollection.$more).to.be.a('function');
+        expect(ngCollection.$nextPage).to.be.a('function');
+        expect(ngCollection.$prevPage).to.be.a('function');
+        expect(ngCollection.$totalCount).to.be.a('number');
+        expect(ngCollection.$toJSON).to.be.a('function');
         done();
       });
     });
 
     it('should have user defined methods', function (done) {
       ds.Employee.lotsOfEmployees().$promise.then(function(event) {
-        var wafCollection = event.result;
-        var wakEntities = $wakanda.$transform.$objectToCollection(wafCollection);
+        var collection = event.result;
+        var ngCollection = $wakanda.$transform.$objectToCollection(collection);
 
-        expect(wakEntities.myCollectionMethod).to.be.a('function');
+        expect(ngCollection.myCollectionMethod).to.be.a('function');
         done();
       });
     });

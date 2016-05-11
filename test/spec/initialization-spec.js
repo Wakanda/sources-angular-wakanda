@@ -29,9 +29,7 @@ describe('Connector/Initialize:', function() {
       var promise = request.$promise;
 
       expect(request).to.have.property('$promise');
-      expect(promise.then).to.be.a('function');
-      expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
+      expect(promise).to.be.a('promise');
 
       done();
     });

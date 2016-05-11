@@ -35,7 +35,6 @@ describe('Connector/Authentication:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -66,7 +65,6 @@ describe('Connector/Authentication:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -84,7 +82,6 @@ describe('Connector/Authentication:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -111,7 +108,6 @@ describe('Connector/Authentication:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
@@ -124,9 +120,12 @@ describe('Connector/Authentication:', function() {
     });
     it('promise should return user-info if user is logged', function (done) {
       $wakanda.init().then(function(){
-        $wakanda.$loginByPassword('LUHEJI','HARRY').should.be.fulfilled.then(function(loginResult){
+        $wakanda.$loginByPassword('bar','bar').should.be.fulfilled.then(function(loginResult){
           $wakanda.$currentUser().should.be.fulfilled.then(function (user) {
-            expect(user.result).to.be.deep.equal(WAF.directory.currentUser());
+            expect(user.result).to.be.an('object');
+            expect(user.result.userName).to.be.a('string');
+            expect(user.result.fullName).to.be.a('string');
+            expect(user.result.ID).to.be.a('string');
             $wakanda.$logout().should.be.fulfilled.should.notify(done);
           });
         });
@@ -146,21 +145,10 @@ describe('Connector/Authentication:', function() {
       expect(request).to.have.property('$promise');
       expect(promise.then).to.be.a('function');
       expect(promise.catch).to.be.a('function');
-      expect(promise.finally).to.be.a('function');
 
       done();
     });
-    /*
-    FAILING DUE UNKNOWN REASONS
-    it('promise should return true if user belongs to specified group', function (done) {
-      $wakanda.$loginByPassword('LUHEJI','HARRY').should.be.fulfilled.then(function(loginResult){
-        $wakanda.$currentUserBelongsTo('Employee').should.be.fulfilled.then(function (groupResult) {
-          expect(groupResult.result).to.be.true;
-          $wakanda.$logout().should.be.fulfilled.should.notify(done);
-        });
-      });
-    });
-    */
+
     it('promise should return false if user doesnt belongs to specified group', function (done) {
       $wakanda.$loginByPassword('LUHEJI','HARRY').should.be.fulfilled.then(function(loginResult){
         $wakanda.$currentUserBelongsTo('Admin').should.be.fulfilled.then(function (groupResult) {
