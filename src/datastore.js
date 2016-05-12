@@ -56,6 +56,7 @@ wakanda.factory('datastoreFactory', ['$q', 'dataclassFactory', 'dsStorage', 'wak
   };
 
   dsFactory.getDataStore = function() {
+    console.warn('$wakanda.getDataStore() and $wakanda.$ds are deprecated. Use $wakanda.init() instead.');
     if (!ds) {
       throw new Error('The Datastore isn\'t initialized please execute $wakanda.init(catalog) before you run your app.');
     }
