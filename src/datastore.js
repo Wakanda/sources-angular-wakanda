@@ -1,22 +1,7 @@
 var wakanda = angular.module('wakanda');
 
-wakanda.provider('dsStorage', function () {
-  var ds;
-
-  this.$get = function () {
-    return {
-      setDataStore: function (_ds) {
-        ds = _ds;
-      },
-      getNgDataClass: function (dcName) {
-        return ds ? ds[dcName] : null;
-      }
-    };
-  };
-});
-
-wakanda.factory('datastoreFactory', ['$q', 'dataclassFactory', 'dsStorage', 'wakandaClient',
-  function ($q, dataclassFactory, dsStorage, wakandaClient) {
+wakanda.factory('datastoreFactory', ['$q', 'dataclassFactory', 'wakandaClient',
+  function ($q, dataclassFactory, wakandaClient) {
     var dsFactory = {};
     var ds = null;
 
@@ -52,7 +37,6 @@ wakanda.factory('datastoreFactory', ['$q', 'dataclassFactory', 'dsStorage', 'wak
 
           _dsMap[hashCatalogName(catalog)] = dataClasses;
 
-          dsStorage.setDataStore(dataClasses);
           return dataClasses;
         });
       }
