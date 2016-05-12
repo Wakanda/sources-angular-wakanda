@@ -4,12 +4,19 @@ wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory',
   function ($q, entityFactory, collectionFactory, dsStorage, rootScopeSafeApply, wakandaClient) {
     var dcFactory = {};
 
-    function NgDataClass(dataClass) {
+    function NgDataClass(dataClass, catalog) {
       Object.defineProperty(this, '$_dataClass', {
         enumerable: false,
         configurable: false,
         writable: false,
         value: dataClass
+      });
+
+      Object.defineProperty(this, '$_catalog', {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: catalog
       });
 
       this.$name            = dataClass.name;
@@ -196,8 +203,8 @@ wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory',
       return ngDataClass.$_dataClass.methods[type];
     }
 
-    dcFactory.createNgDataClass = function (dataClass) {
-      return new NgDataClass(dataClass);
+    dcFactory.createNgDataClass = function (dataClass, catalog) {
+      return new NgDataClass(dataClass, catalog);
     }
 
     return dcFactory;
