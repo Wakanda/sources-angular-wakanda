@@ -32,7 +32,7 @@ describe('Connector/EntityCollection:', function() {
   });
 
   beforeEach(function(done) {
-    employees = $wakanda.$ds.Employee.$query({
+    employees = ds.Employee.$query({
       filter: 'lastName > :1 && salary > :2',
       params: ['a*', 60000],
       orderBy: 'firstName desc',
@@ -130,7 +130,7 @@ describe('Connector/EntityCollection:', function() {
 
   describe('$nextPage() function', function() {
     it('should retrieve more and different data', function (done) {
-        employees = $wakanda.$ds.Employee.$query({
+        employees = ds.Employee.$query({
           pageSize: 10
         });
         employees.$promise.then(function() {
@@ -158,7 +158,7 @@ describe('Connector/EntityCollection:', function() {
 
   describe('$prevPage() function', function() {
     it('should retrieve more and different data', function (done) {
-      employees = $wakanda.$ds.Employee.$query({
+      employees = ds.Employee.$query({
         pageSize: 10
       });
       employees.$promise.then(function() {
@@ -190,7 +190,7 @@ describe('Connector/EntityCollection:', function() {
 
   describe('$query with selecting related entity and related entities', function() {
     it('should fetch the related entities', function (done) {
-      $wakanda.$ds.Employee.$query({ select: 'employer.staff' }).$promise.then(function(e) {
+      ds.Employee.$query({ select: 'employer.staff' }).$promise.then(function(e) {
         expect(e.result[2].employer.staff[0].firstName).to.be.a('string');
         done();
       });
@@ -199,7 +199,7 @@ describe('Connector/EntityCollection:', function() {
 
   describe('$toJSON() function', function() {
     it('should retrieve the JSON of a collection', function(done) {
-      employees = $wakanda.$ds.Employee.$query({
+      employees = ds.Employee.$query({
         pageSize: 10
       });
       employees.$promise.then(function() {

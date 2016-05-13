@@ -32,7 +32,7 @@ describe('Connector/Entity:', function() {
   });
 
   beforeEach(function(done) {
-    employees = $wakanda.$ds.Employee.$query();
+    employees = ds.Employee.$query();
     employees.$promise.then(function() {
       employee = employees[0];
       done();
@@ -225,7 +225,7 @@ describe('Connector/Entity:', function() {
       var employeeToRemove = employees[0];
       employees[0].$remove().should.be.fulfilled.then(function(removeResult){
         expect(removeResult).to.be.an('object');
-        employees = $wakanda.$ds.Employee.$query();
+        employees = ds.Employee.$query();
         employees.$promise.then(function() {
           expect(employees[0]).to.be.not.equal(employeeToRemove);
           done();
@@ -249,7 +249,7 @@ describe('Connector/Entity:', function() {
 
     it('should return a promise on $promise property', function (done) {
       var newPerson = { firstName : "John", lastName : "Smith", salary: 90000 };
-      var person = $wakanda.$ds.Employee.$create( newPerson );
+      var person = ds.Employee.$create( newPerson );
       var request = person.$save();
 
       var promise = request.$promise;
@@ -262,7 +262,7 @@ describe('Connector/Entity:', function() {
 
     it('should save a created entity', function(done) {
       var newPerson = { firstName : "John", lastName : "Smith", salary: 90000 };
-      var person = $wakanda.$ds.Employee.$create( newPerson );
+      var person = ds.Employee.$create( newPerson );
       person.$save().should.be.fulfilled.then(function(saveResult) {
         expect(saveResult).to.be.an('object');
         expect(person.firstName).to.be.equal(newPerson.firstName);
@@ -348,7 +348,7 @@ describe('Connector/Entity:', function() {
 
   describe('$_collection function', function() {
     it('should retrieve the collection of a query', function(done) {
-      employees = $wakanda.$ds.Employee.$query({
+      employees = ds.Employee.$query({
         pageSize: 5
       });
       employees.$promise.then(function(){
@@ -388,7 +388,7 @@ describe('Connector/Entity:', function() {
   describe('setter on related entity', function() {
     it('should update the related entity before and after $save', function(done) {
       employee = employees[2];
-      var companies = $wakanda.$ds.Company.$query();
+      var companies = ds.Company.$query();
       companies.$promise.then(function() {
         var company = companies[0];
 

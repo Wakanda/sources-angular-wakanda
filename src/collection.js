@@ -1,7 +1,7 @@
 var wakanda = angular.module('wakanda');
 
-wakanda.factory('collectionFactory', ['$injector', '$q', 'dsStorage', 'rootScopeSafeApply', 'wakandaClient',
-  function ($injector, $q, dsStorage, rootScopeSafeApply, wakandaClient) {
+wakanda.factory('collectionFactory', ['$injector', '$q', 'rootScopeSafeApply', 'wakandaClient',
+  function ($injector, $q, rootScopeSafeApply, wakandaClient) {
     var collectionFactory = {};
 
     function _decorate(ngCollection, ngDataClass) {
@@ -184,7 +184,7 @@ wakanda.factory('collectionFactory', ['$injector', '$q', 'dsStorage', 'rootScope
                 var result = res;
 
                 if (wakandaClient.helper.isEntity(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
+                  var ngDataClass = ngCollection.$_dataClass.$_catalog[res._dataClass.name];
                   if (ngDataClass) {
                     var entityFactory = $injector.get('entityFactory');
                     result = entityFactory.createNgEntity(ngDataClass);
@@ -192,7 +192,7 @@ wakanda.factory('collectionFactory', ['$injector', '$q', 'dsStorage', 'rootScope
                   }
                 }
                 else if (wakandaClient.helper.isCollection(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
+                  var ngDataClass = ngCollection.$_dataClass.$_catalog[res._dataClass.name];
                   if (ngDataClass) {
                     result = collectionFactory.createNgCollection(ngDataClass)
                     result.$_collection = res;
