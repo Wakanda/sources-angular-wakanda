@@ -1,4 +1,4 @@
-//angular-wakanda.js - v1.1.0 - 2016-05-11
+//angular-wakanda.js - v1.1.0 - 2016-05-13
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -5362,8 +5362,8 @@ wakanda.provider('$wakandaConfig', ['wakandaClient', function(wakandaClient) {
 
 var wakanda = angular.module('wakanda');
 
-wakanda.factory('collectionFactory', ['$injector', '$q', 'dsStorage', 'rootScopeSafeApply', 'wakandaClient',
-  function ($injector, $q, dsStorage, rootScopeSafeApply, wakandaClient) {
+wakanda.factory('collectionFactory', ['$injector', '$q', 'rootScopeSafeApply', 'wakandaClient',
+  function ($injector, $q, rootScopeSafeApply, wakandaClient) {
     var collectionFactory = {};
 
     function _decorate(ngCollection, ngDataClass) {
@@ -5546,7 +5546,7 @@ wakanda.factory('collectionFactory', ['$injector', '$q', 'dsStorage', 'rootScope
                 var result = res;
 
                 if (wakandaClient.helper.isEntity(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
+                  var ngDataClass = ngCollection.$_dataClass.$_catalog[res._dataClass.name];
                   if (ngDataClass) {
                     var entityFactory = $injector.get('entityFactory');
                     result = entityFactory.createNgEntity(ngDataClass);
@@ -5554,7 +5554,7 @@ wakanda.factory('collectionFactory', ['$injector', '$q', 'dsStorage', 'rootScope
                   }
                 }
                 else if (wakandaClient.helper.isCollection(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
+                  var ngDataClass = ngCollection.$_dataClass.$_catalog[res._dataClass.name];
                   if (ngDataClass) {
                     result = collectionFactory.createNgCollection(ngDataClass)
                     result.$_collection = res;
@@ -5626,16 +5626,23 @@ wakanda.factory('collectionFactory', ['$injector', '$q', 'dsStorage', 'rootScope
 
 var wakanda = angular.module('wakanda');
 
-wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory', 'dsStorage', 'rootScopeSafeApply', 'wakandaClient',
-  function ($q, entityFactory, collectionFactory, dsStorage, rootScopeSafeApply, wakandaClient) {
+wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory', 'rootScopeSafeApply', 'wakandaClient',
+  function ($q, entityFactory, collectionFactory, rootScopeSafeApply, wakandaClient) {
     var dcFactory = {};
 
-    function NgDataClass(dataClass) {
+    function NgDataClass(dataClass, catalog) {
       Object.defineProperty(this, '$_dataClass', {
         enumerable: false,
         configurable: false,
         writable: false,
         value: dataClass
+      });
+
+      Object.defineProperty(this, '$_catalog', {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: catalog
       });
 
       this.$name            = dataClass.name;
@@ -5755,16 +5762,16 @@ wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory',
                 var result = res;
 
                 if (wakandaClient.helper.isEntity(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
-                  if (ngDataClass) {
-                    result = entityFactory.createNgEntity(ngDataClass);
+                  var targetDataClass = ngDataClass.$_catalog[res._dataClass.name];
+                  if (targetDataClass) {
+                    result = entityFactory.createNgEntity(targetDataClass);
                     result.$_entity = res;
                   }
                 }
                 else if (wakandaClient.helper.isCollection(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
-                  if (ngDataClass) {
-                    result = collectionFactory.createNgCollection(ngDataClass);
+                  var targetDataClass = ngDataClass.$_catalog[res._dataClass.name];
+                  if (targetDataClass) {
+                    result = collectionFactory.createNgCollection(targetDataClass);
                     result.$_collection = res;
                     collectionFactory.addEntities(result, res.entities);
                   }
@@ -5822,8 +5829,8 @@ wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory',
       return ngDataClass.$_dataClass.methods[type];
     }
 
-    dcFactory.createNgDataClass = function (dataClass) {
-      return new NgDataClass(dataClass);
+    dcFactory.createNgDataClass = function (dataClass, catalog) {
+      return new NgDataClass(dataClass, catalog);
     }
 
     return dcFactory;
@@ -5831,54 +5838,49 @@ wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory',
 
 var wakanda = angular.module('wakanda');
 
-wakanda.provider('dsStorage', function () {
-  var ds;
-
-  this.$get = function () {
-    return {
-      setDataStore: function (_ds) {
-        ds = _ds;
-      },
-      getNgDataClass: function (dcName) {
-        return ds ? ds[dcName] : null;
-      }
-    };
-  };
-});
-
-wakanda.factory('datastoreFactory', ['$q', 'dataclassFactory', 'dsStorage', 'wakandaClient',
-  function ($q, dataclassFactory, dsStorage, wakandaClient) {
+wakanda.factory('datastoreFactory', ['$q', 'dataclassFactory', 'wakandaClient',
+  function ($q, dataclassFactory, wakandaClient) {
     var dsFactory = {};
-    var ds;
+    var ds = null;
+
+    var _dsMap = {};
 
     dsFactory.init = function(catalogStr) {
       var catalog;
       var promise;
 
-      if (!ds) {
-        if (typeof catalogStr !== "string" || catalogStr === '*' || catalogStr === '') {
-          catalog = undefined;
-        } else {
-          catalog = catalogStr.split(',');
-        }
 
+      if (typeof catalogStr !== "string" || catalogStr === '*' || catalogStr === '') {
+        catalog = undefined;
+      } else {
+        catalog = catalogStr.split(',');
+      }
+
+      var cachedCatalog = _dsMap[hashCatalogName(catalog)];
+
+      if (!cachedCatalog) {
         promise = wakandaClient.getCatalog(catalog).then(function(_ds) {
           var dataClasses = {};
 
           for (var dcName in _ds) {
             if (_ds.hasOwnProperty(dcName)) {
-              dataClasses[dcName] = dataclassFactory.createNgDataClass(_ds[dcName]);
+              dataClasses[dcName] = dataclassFactory.createNgDataClass(_ds[dcName], dataClasses);
             }
           }
 
-          ds = dataClasses;
-          dsStorage.setDataStore(dataClasses);
+          //Will be deleted at the same time that $wakanda.$ds and $wakanda.getDataStore
+          if (!ds) {
+            ds = dataClasses;
+          }
+
+          _dsMap[hashCatalogName(catalog)] = dataClasses;
+
           return dataClasses;
         });
       }
       else {
         deferred = $q.defer();
-        deferred.resolve(ds);
+        deferred.resolve(cachedCatalog);
         promise = deferred.promise;
       }
       promise.$promise = promise;
@@ -5887,10 +5889,15 @@ wakanda.factory('datastoreFactory', ['$q', 'dataclassFactory', 'dsStorage', 'wak
   };
 
   dsFactory.getDataStore = function() {
+    console.warn('$wakanda.getDataStore() and $wakanda.$ds are deprecated. Use $wakanda.init() instead.');
     if (!ds) {
       throw new Error('The Datastore isn\'t initialized please execute $wakanda.init(catalog) before you run your app.');
     }
     return ds;
+  }
+
+  function hashCatalogName(catalog) {
+    return JSON.stringify(catalog || '*');
   }
 
   return dsFactory;
@@ -5999,8 +6006,8 @@ wakanda.factory('directoryFactory', ['$q', 'rootScopeSafeApply', 'wakandaClient'
 
 var wakanda = angular.module('wakanda');
 
-wakanda.factory('entityFactory', ['$injector', '$q', 'dsStorage', 'mediaFactory', 'rootScopeSafeApply', 'wakandaClient',
-  function ($injector, $q, dsStorage, mediaFactory, rootScopeSafeApply, wakandaClient) {
+wakanda.factory('entityFactory', ['$injector', '$q', 'mediaFactory', 'rootScopeSafeApply', 'wakandaClient',
+  function ($injector, $q, mediaFactory, rootScopeSafeApply, wakandaClient) {
     var entityFactory = {};
 
     //Entity class for Angular-Wakanda connector
@@ -6019,6 +6026,13 @@ wakanda.factory('entityFactory', ['$injector', '$q', 'dsStorage', 'mediaFactory'
         configurable: false,
         writable: true,
         value: {}
+      });
+
+      Object.defineProperty(this, '$_dataClass', {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: ngDataClass
       });
 
       //Creating property accessors for the entity
@@ -6194,17 +6208,17 @@ wakanda.factory('entityFactory', ['$injector', '$q', 'dsStorage', 'mediaFactory'
                 var result = res;
 
                 if (wakandaClient.helper.isEntity(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
-                  if (ngDataClass) {
-                    result = entityFactory.createNgEntity(ngDataClass);
+                  var targetDataClass = ngDataClass.$_catalog[res._dataClass.name];
+                  if (targetDataClass) {
+                    result = entityFactory.createNgEntity(targetDataClass);
                     result.$_entity = res;
                   }
                 }
                 else if (wakandaClient.helper.isCollection(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
-                  if (ngDataClass) {
+                  var targetDataClass = ngDataClass.$_catalog[res._dataClass.name];
+                  if (targetDataClass) {
                     var collectionFactory = $injector.get('collectionFactory');
-                    result = collectionFactory.createNgCollection(ngDataClass);
+                    result = collectionFactory.createNgCollection(targetDataClass);
                     result.$_collection = res;
                     collectionFactory.addEntities(result, res.entities);
                   }
@@ -6237,7 +6251,7 @@ wakanda.factory('entityFactory', ['$injector', '$q', 'dsStorage', 'mediaFactory'
 
           if (this.$_entity[attr.name]) {
             if (!ngEntity.$_relatedAttributes[attr.name]) {
-              var ngDataClass = dsStorage.getNgDataClass(attr.type);
+              var ngDataClass = ngEntity.$_dataClass.$_catalog[attr.type];
               var relatedNgEntity = new NgEntity(ngDataClass);
 
               relatedNgEntity.$_entity = ngEntity.$_entity[attr.name];
@@ -6278,7 +6292,7 @@ wakanda.factory('entityFactory', ['$injector', '$q', 'dsStorage', 'mediaFactory'
 
           if (this.$_entity[attr.name]) {
             if (!ngEntity.$_relatedAttributes[attr.name]) {
-              var ngDataClass = dsStorage.getNgDataClass(attr.entityType);
+              var ngDataClass = ngEntity.$_dataClass.$_catalog[attr.entityType];
               var collectionFactory = $injector.get('collectionFactory');
               var ngCollection = collectionFactory.createNgCollection(ngDataClass);
 
