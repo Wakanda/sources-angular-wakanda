@@ -39,7 +39,7 @@ describe('Connector/Dataclass:', function() {
   describe('$create() function', function() {
     it('should return the name defined for the datastore class in the Model', function(done) {
       var newPerson = { firstName : "John", lastName : "Smith", salary: 90000 };
-      var person = $wakanda.$ds.Employee.$create( newPerson );
+      var person = ds.Employee.$create( newPerson );
       expect(person).to.be.a('object');
       expect(person.firstName).to.be.equal(newPerson.firstName);
       expect(person.lastName).to.be.equal(newPerson.lastName);
@@ -74,7 +74,7 @@ describe('Connector/Dataclass:', function() {
 
   describe('$query() function', function() {
     it('should return the Entity collection of the records found in the Model', function(done) {
-      employees = $wakanda.$ds.Employee.$query({
+      employees = ds.Employee.$query({
         filter: 'lastName > :1 && salary > :2',
         params: ['a*', 60000],
         orderBy: 'firstName desc',
@@ -88,7 +88,7 @@ describe('Connector/Dataclass:', function() {
     });
 
     it('should return a promise on $promise property', function (done) {
-      employees = $wakanda.$ds.Employee.$query({
+      employees = ds.Employee.$query({
         filter: 'lastName > :1 && salary > :2',
         params: ['a*', 60000],
         orderBy: 'firstName desc',
@@ -108,7 +108,7 @@ describe('Connector/Dataclass:', function() {
   describe('$all() function', function () {
 
     beforeEach(function () {
-      employees = $wakanda.$ds.Employee.$all({
+      employees = ds.Employee.$all({
         pageSize: 50
       });
     });
@@ -134,7 +134,7 @@ describe('Connector/Dataclass:', function() {
 
   describe('dataClass.$name variable', function() {
     it('should return the name defined for the datastore class in the Model', function(done) {
-      var collectionName = $wakanda.$ds.Employee.$name;
+      var collectionName = ds.Employee.$name;
       expect(collectionName).to.be.a('string');
       expect(collectionName).to.be.equal('Employee');
       done();
@@ -143,7 +143,7 @@ describe('Connector/Dataclass:', function() {
 
   describe('dataClass.$collectionName variable', function() {
     it('should return the name defined for the collection of the datastore class in the Model', function(done) {
-      var collectionName = $wakanda.$ds.Employee.$collectionName;
+      var collectionName = ds.Employee.$collectionName;
       expect(collectionName).to.be.a('string');
       expect(collectionName).to.be.equal('EmployeeCollection');
       done();
@@ -152,13 +152,13 @@ describe('Connector/Dataclass:', function() {
 
   describe('dataClass.$dataClassMethods() function', function() {
     it('should return the dataclass\'s datastore class methods whose scope is public', function(done) {
-      var dataClassMethods = $wakanda.$ds.Employee.$dataClassMethods();
+      var dataClassMethods = ds.Employee.$dataClassMethods();
       expect(dataClassMethods).to.be.an('array');
       done();
     });
 
     it('should return a promise on $promise property', function (done) {
-      var request = $wakanda.$ds.Employee.myDataClassMethod();
+      var request = ds.Employee.myDataClassMethod();
       var promise = request.$promise;
 
       expect(request).to.have.property('$promise');
@@ -171,16 +171,16 @@ describe('Connector/Dataclass:', function() {
 
   describe('dataClass.$collectionMethods() function', function() {
     it('should return the collection\'s datastore class methods whose scope is public', function(done) {
-      var collectionMethods = $wakanda.$ds.Employee.$collectionMethods();
+      var collectionMethods = ds.Employee.$collectionMethods();
       expect(collectionMethods).to.be.an('array');
-      $wakanda.$ds.Employee.myDataClassMethod('myDataClassMethod').then(function(e){
+      ds.Employee.myDataClassMethod('myDataClassMethod').then(function(e){
         expect(e.result).to.be.defined;
         done();
       });
     });
 
     it('should return a promise on $promise property', function (done) {
-      $wakanda.$ds.Employee.$query().$promise.then(function(event) {
+      ds.Employee.$query().$promise.then(function(event) {
         var request = event.result.myCollectionMethod();
         var promise = request.$promise;
 
@@ -195,19 +195,19 @@ describe('Connector/Dataclass:', function() {
 
   describe('dataClass.$entityMethods() function', function() {
     it('should return the dataclass\'s entity methods whose scope is public', function(done) {
-      var entityMethods = $wakanda.$ds.Employee.$entityMethods();
+      var entityMethods = ds.Employee.$entityMethods();
       expect(entityMethods).to.be.an('array');
       done();
     });
     it('should return a specific dataclass\'s entity method whose scope is public', function(done) {
-      var entityMethods = $wakanda.$ds.Employee.$entityMethods();
+      var entityMethods = ds.Employee.$entityMethods();
       expect(entityMethods).to.be.an('array');
-      var entityMethod = $wakanda.$ds.Employee.$entityMethods(entityMethods[0]);
+      var entityMethod = ds.Employee.$entityMethods(entityMethods[0]);
       expect(entityMethod).to.be.an('array');
       done();
     });
     it('should return a promise on $promise property', function (done) {
-      $wakanda.$ds.Employee.$query().$promise.then(function(event) {
+      ds.Employee.$query().$promise.then(function(event) {
         var request = event.result[0].myEntityMethod();
         var promise = request.$promise;
 
@@ -222,18 +222,18 @@ describe('Connector/Dataclass:', function() {
 
   describe('dataClass.$attr(name) function', function() {
     it('should return an attribute from a dataclass', function(done) {
-      var dataClassAttribute = $wakanda.$ds.Employee.$attr('firstName');
+      var dataClassAttribute = ds.Employee.$attr('firstName');
       expect(dataClassAttribute).to.be.an('object');
       expect(dataClassAttribute.name).to.be.equal('firstName');
       done();
     });
     it('should return an null when attribute from a dataclass is not found', function(done) {
-      var dataClassAttribute = $wakanda.$ds.Employee.$attr('geronimo');
+      var dataClassAttribute = ds.Employee.$attr('geronimo');
       expect(dataClassAttribute).to.be.null;
       done();
     });
     it('should return all the attributes when no (name) is specified', function(done) {
-      var dataClassAttribute = $wakanda.$ds.Employee.$attr();
+      var dataClassAttribute = ds.Employee.$attr();
       expect(dataClassAttribute).to.be.an('object');
       done();
     });
