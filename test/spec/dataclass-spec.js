@@ -103,6 +103,17 @@ describe('Connector/Dataclass:', function() {
 
       done();
     });
+
+    it('should be able to handle Date object on params option', function (done) {
+
+      var dateStr = "2016-05-16T13:00:00.447Z";
+      var date = new Date(dateStr);
+
+      ds.Product.$query({filter: 'born < :1', params: [date]}).$promise.then(function (e) {
+        expect(e.result).to.be.an('array');
+        done();
+      });
+    });
   });
 
   describe('$all() function', function () {
