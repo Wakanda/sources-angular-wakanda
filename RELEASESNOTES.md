@@ -4,9 +4,10 @@ angular-wakanda.js - release notes
 ## v1.1.1
 
 * Correct `$wakanda.init()` issue when calling it multiple times with different parameters, resulting on always returning the first fetched catalog
+* `$wakanda.$ds` and `$wakanda.getDataStore()` are now deprecated in favor of `$wakanda.init()` method
 * Remove actions on entities are now performed with `POST` HTTP verb instead of `GET`
 * Fix issue when passing `Date` objects on `params` attribute of `$query` options parameter
-* Update Wakanda-Client dependency to v0.3.2
+* Update Wakanda-Client dependency to version `0.3.2`
 
 ## v1.1.0
 
