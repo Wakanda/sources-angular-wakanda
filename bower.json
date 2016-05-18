@@ -1,6 +1,6 @@
 {
   "name": "sources-angular-wakanda",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Source repository of Angular-Wakanda connector",
   "main": "src/angular-wakanda.js",
   "authors": [
