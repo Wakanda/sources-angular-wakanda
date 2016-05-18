@@ -65,8 +65,23 @@ describe('Connector/Initialize:', function() {
         }).should.notify(done);
       })
     });
+
+    it('should return different catalogs if called with different parameters', function (done) {
+      $wakanda.init().$promise.then(function (fullDs) {
+        $wakanda.init('Product').$promise.then(function (partialDs1) {
+          expect(fullDs).not.to.be.deep.equal(partialDs1);
+
+          $wakanda.init('Employee, Company').$promise.then(function (partialDs2) {
+            expect(fullDs).not.to.be.deep.equal(partialDs2);
+            expect(partialDs1).not.to.be.deep.equal(partialDs2);
+            done();
+          });
+        });
+      });
+    });
   });
 
+  //Deprecated tests
   describe('getDatastore() function', function() {
     it('should be defined and be a function', function() {
       expect($wakanda.getDatastore).to.be.defined;

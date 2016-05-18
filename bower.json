@@ -1,6 +1,6 @@
 {
   "name": "sources-angular-wakanda",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Source repository of Angular-Wakanda connector",
   "main": "src/angular-wakanda.js",
   "authors": [
@@ -16,10 +16,8 @@
     "test",
     "tests"
   ],
-  "dependencies": {
-  },
   "devDependencies": {
-    "wakanda-client": "^0.3.1",
+    "wakanda-client": "^0.3.2",
     "angular": "1.3.*",
     "angular-mocks": "~1.3.0"
   }

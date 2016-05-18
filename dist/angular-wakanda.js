@@ -1,4 +1,4 @@
-//angular-wakanda.js - v1.1.0 - 2016-05-11
+//angular-wakanda.js - v1.1.1 - 2016-05-18
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	__webpack_require__(81);
 	var wakanda_client_1 = __webpack_require__(86);
 	exports.WakandaClient = wakanda_client_1.default;
-	var browser_http_client_1 = __webpack_require__(115);
+	var browser_http_client_1 = __webpack_require__(116);
 	var catalog_base_service_1 = __webpack_require__(91);
 	exports.CatalogBaseService = catalog_base_service_1.CatalogBaseService;
 	var collection_base_service_1 = __webpack_require__(105);
@@ -2109,6 +2109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var directory_business_1 = __webpack_require__(112);
 	var entity_1 = __webpack_require__(99);
 	var collection_1 = __webpack_require__(110);
+	var packageOptions = __webpack_require__(115);
 	var WakandaClient = (function () {
 	    function WakandaClient(host) {
 	        this._httpClient = new WakandaClient.HttpClient({
@@ -2147,7 +2148,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return catalogBusiness.get(dataClasses);
 	    };
 	    WakandaClient.prototype.version = function () {
-	        return '0.2.0';
+	        return packageOptions.version;
 	    };
 	    return WakandaClient;
 	}());
@@ -2524,12 +2525,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    DataClassBusiness.prototype._addUserDefinedMethods = function () {
 	        var _this = this;
-	        var _this_ = this;
+	        var self = this;
 	        this.methods.dataClass.forEach(function (method) {
 	            //Voluntary don't use fat arrow notation to use arguments object without a bug
 	            _this.dataClass[method] = function () {
 	                var params = Array.from(arguments);
-	                return _this_.callMethod(method, params);
+	                return self.callMethod(method, params);
 	            };
 	        });
 	    };
@@ -2659,7 +2660,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            for (var _i = 0, _b = this.dataClass.attributes; _i < _b.length; _i++) {
 	                var attr = _b[_i];
 	                var dboAttribute = dbo[attr.name];
-	                if (dboAttribute) {
+	                if (dboAttribute !== null && dboAttribute !== undefined) {
 	                    if (attr instanceof dataclass_1.AttributeRelated) {
 	                        //Kind of recursive call with a potententialy different instance of
 	                        //DataClassBusiness
@@ -2675,7 +2676,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        });
 	                    }
 	                    else if (attr.type === 'image' || attr.type === 'blob') {
-	                        var uri;
+	                        var uri = void 0;
 	                        if (dboAttribute && dboAttribute.__deferred && dboAttribute.__deferred.uri) {
 	                            uri = dboAttribute.__deferred.uri;
 	                        }
@@ -2690,7 +2691,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        });
 	                    }
 	                    else {
-	                        entity[attr.name] = dboAttribute || null;
+	                        entity[attr.name] = dboAttribute;
 	                    }
 	                }
 	                else {
@@ -2787,12 +2788,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    EntityBusiness.prototype._addUserDefinedMethods = function () {
 	        var _this = this;
-	        var _this_ = this;
+	        var self = this;
 	        this.dataClassBusiness.methods.entity.forEach(function (method) {
 	            //Voluntary don't use fat arrow notation to use arguments object without a bug
 	            _this.entity[method] = function () {
 	                var params = Array.from(arguments);
-	                return _this_.callMethod(method, params);
+	                return self.callMethod(method, params);
 	            };
 	        });
 	    };
@@ -2866,7 +2867,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        for (var _i = 0, _a = this.dataClass.attributes; _i < _a.length; _i++) {
 	            var attr = _a[_i];
-	            var objAttr = this.entity[attr.name] || null;
+	            var objAttr = this.entity[attr.name];
+	            if (objAttr === undefined) {
+	                objAttr = null;
+	            }
 	            if (attr instanceof dataclass_1.AttributeRelated) {
 	                data[attr.name] = objAttr ? objAttr._key : null;
 	            }
@@ -3012,7 +3016,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    EntityBaseService.delete = function (_a) {
 	        var httpClient = _a.httpClient, dataClassName = _a.dataClassName, entityKey = _a.entityKey;
-	        return httpClient.get({
+	        return httpClient.post({
 	            uri: '/' + dataClassName + '(' + entityKey + ')?$method=delete'
 	        }).then(function (res) {
 	            var obj = JSON.parse(res.body);
@@ -3121,8 +3125,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	var Entity = (function () {
 	    function Entity(_a) {
-	        var key = _a.key, deferred = _a.deferred, dataClass = _a.dataClass;
-	        this._key = key;
+	        var entityKey = _a.key, deferred = _a.deferred, dataClass = _a.dataClass;
+	        this._key = entityKey;
 	        this._deferred = deferred === true;
 	        Object.defineProperty(this, '_dataClass', {
 	            enumerable: false,
@@ -3248,6 +3252,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    DataClassBaseService.query = function (_a) {
 	        var httpClient = _a.httpClient, options = _a.options, dataClassName = _a.dataClassName;
 	        options.method = 'entityset';
+	        if (Array.isArray(options.params)) {
+	            options.params = this._sanitizeOptionParams(options.params);
+	        }
 	        var optString = util_1.default.handleOptions(options);
 	        return httpClient.get({
 	            uri: '/' + dataClassName + optString
@@ -3269,6 +3276,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }).then(function (res) {
 	            var obj = JSON.parse(res.body);
 	            return obj.result || obj || null;
+	        });
+	    };
+	    DataClassBaseService._sanitizeOptionParams = function (params) {
+	        return params.map(function (element) {
+	            if (element instanceof Date) {
+	                return element.toISOString();
+	            }
+	            else {
+	                return element;
+	            }
 	        });
 	    };
 	    return DataClassBaseService;
@@ -3327,9 +3344,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.initialSelect = opt.select;
 	        }
 	        this.pageSize = opt.pageSize;
-	        return this.service.fetch(opt).then(function (collectionDbo) {
+	        return this.service.fetch(opt).then(function (collectionDBO) {
 	            var fresherCollection = _this.dataClassBusiness._presentationCollectionFromDbo({
-	                dbo: collectionDbo,
+	                dbo: collectionDBO,
 	                pageSize: _this.pageSize
 	            });
 	            _this._refreshCollection({ fresherCollection: fresherCollection });
@@ -3388,12 +3405,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    CollectionBusiness.prototype._addUserDefinedMethods = function () {
 	        var _this = this;
-	        var _this_ = this;
+	        var self = this;
 	        this.dataClassBusiness.methods.collection.forEach(function (method) {
 	            //Voluntary don't use fat arrow notation to use arguments object without a bug
 	            _this.collection[method] = function () {
 	                var params = Array.from(arguments);
-	                return _this_.callMethod(method, params);
+	                return self.callMethod(method, params);
 	            };
 	        });
 	    };
@@ -3930,6 +3947,83 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 115 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"name": "wakanda-client",
+		"main": "dist/wakanda-client.node.js",
+		"version": "0.3.2",
+		"description": "Wakanda Client allows you to easily interact with Wakanda Server on a JavaScript (browser or node) environment",
+		"typings": "dist/wakanda-client.d.ts",
+		"browser": "dist/wakanda-client.min.js",
+		"repository": "wakanda/wakanda-javascript-client",
+		"scripts": {
+			"webpack-watch": "node ./node_modules/webpack/bin/webpack.js --progress --colors --watch",
+			"webpack-build": "node ./node_modules/webpack/bin/webpack.js --progress --colors",
+			"webpack-build:ci": "node ./node_modules/webpack/bin/webpack.js --progress --colors --config webpack.ci.js",
+			"webpack-build:prod": "node ./node_modules/webpack/bin/webpack.js --progress --colors --config webpack.prod.js",
+			"test:karma:single": "node ./node_modules/karma/bin/karma start",
+			"test:karma:full": "npm run webpack-build && npm run test:karma:single",
+			"test:node:single": "http_proxy=\"\" node ./node_modules/mocha/bin/mocha test/bootstrap.js test/spec/**/*.spec.js",
+			"test:node:full": "npm run webpack-build && npm run test:node:single",
+			"test-single": "./test.sh single",
+			"test": "./test.sh",
+			"test-server:start": "node test/connect/server.js & echo $! > testserver.pid && sleep 1",
+			"test-server:stop": "kill `cat testserver.pid` && rm testserver.pid",
+			"test-server:record": "node test/connect/server.js record & echo $! > testserver.pid",
+			"test-server:init": "rm -rf test/connect/mocks && npm run test-server:record && npm run webpack-build && npm run test:node:single && npm run test:karma:single && npm run test-server:stop",
+			"codecov": "cat coverage/*/lcov.info | codecov",
+			"tsc": "node ./node_modules/typescript/bin/tsc",
+			"serve": "node ./node_modules/.bin/concurrently -r \"npm run webpack-watch\" \"node ./node_modules/.bin/gulp serve\""
+		},
+		"author": "Wakanda SAS",
+		"license": "MIT",
+		"devDependencies": {
+			"babel-core": "^6.3.17",
+			"babel-loader": "^6.2.0",
+			"babel-polyfill": "^6.3.14",
+			"babel-preset-es2015": "^6.3.13",
+			"body-parser": "^1.14.2",
+			"chai": "^3.4.1",
+			"chalk": "^1.1.1",
+			"codecov.io": "^0.1.6",
+			"concurrently": "^2.0.0",
+			"connect": "^3.4.0",
+			"connect-prism": "mrblackus/connect-prism",
+			"eslint": "^1.10.3",
+			"eslint-loader": "^1.2.0",
+			"express": "^4.13.3",
+			"grunt": "^0.4.5",
+			"gulp": "^3.9.0",
+			"gulp-connect": "^2.2.0",
+			"http-proxy-middleware": "^0.9.0",
+			"isparta": "^4.0.0",
+			"isparta-loader": "^2.0.0",
+			"json-loader": "^0.5.4",
+			"karma": "^0.13.15",
+			"karma-chai": "^0.1.0",
+			"karma-coverage": "^0.5.3",
+			"karma-mocha": "^0.2.1",
+			"karma-phantomjs-launcher": "^0.2.1",
+			"karma-verbose-reporter": "0.0.3",
+			"mocha": "^2.3.4",
+			"path": "^0.12.7",
+			"phantomjs": "^1.9.19",
+			"serve-static": "^1.10.2",
+			"ts-loader": "^0.8.1",
+			"tslint": "^3.9.0",
+			"tslint-loader": "^2.1.4",
+			"typescript": "^1.8.10",
+			"webpack": "^1.12.15"
+		},
+		"dependencies": {
+			"core-js": "^2.1.2",
+			"request": "^2.67.0"
+		}
+	};
+
+/***/ },
+/* 116 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3938,9 +4032,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var http_client_1 = __webpack_require__(116);
-	var http_response_1 = __webpack_require__(117);
-	var AureliaHttpClient = __webpack_require__(118).HttpClient;
+	var http_client_1 = __webpack_require__(117);
+	var http_response_1 = __webpack_require__(118);
+	var AureliaHttpClient = __webpack_require__(119).HttpClient;
 	var BrowserHttpClient = (function (_super) {
 	    __extends(BrowserHttpClient, _super);
 	    function BrowserHttpClient(_a) {
@@ -4004,7 +4098,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 116 */
+/* 117 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4132,7 +4226,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 117 */
+/* 118 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4150,7 +4244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 118 */
+/* 119 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4159,7 +4253,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	
-	var _httpClient = __webpack_require__(119);
+	var _httpClient = __webpack_require__(120);
 	
 	Object.defineProperty(exports, 'HttpClient', {
 	  enumerable: true,
@@ -4168,7 +4262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 	
-	var _httpRequestMessage = __webpack_require__(123);
+	var _httpRequestMessage = __webpack_require__(124);
 	
 	Object.defineProperty(exports, 'HttpRequestMessage', {
 	  enumerable: true,
@@ -4177,7 +4271,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 	
-	var _httpResponseMessage = __webpack_require__(125);
+	var _httpResponseMessage = __webpack_require__(126);
 	
 	Object.defineProperty(exports, 'HttpResponseMessage', {
 	  enumerable: true,
@@ -4186,7 +4280,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 	
-	var _jsonpRequestMessage = __webpack_require__(127);
+	var _jsonpRequestMessage = __webpack_require__(128);
 	
 	Object.defineProperty(exports, 'JSONPRequestMessage', {
 	  enumerable: true,
@@ -4195,7 +4289,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 	
-	var _headers = __webpack_require__(120);
+	var _headers = __webpack_require__(121);
 	
 	Object.defineProperty(exports, 'Headers', {
 	  enumerable: true,
@@ -4204,7 +4298,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 	
-	var _requestBuilder = __webpack_require__(121);
+	var _requestBuilder = __webpack_require__(122);
 	
 	Object.defineProperty(exports, 'RequestBuilder', {
 	  enumerable: true,
@@ -4214,7 +4308,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 /***/ },
-/* 119 */
+/* 120 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4226,13 +4320,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.HttpClient = undefined;
 	
-	var _headers = __webpack_require__(120);
+	var _headers = __webpack_require__(121);
 	
-	var _requestBuilder = __webpack_require__(121);
+	var _requestBuilder = __webpack_require__(122);
 	
-	var _httpRequestMessage = __webpack_require__(123);
+	var _httpRequestMessage = __webpack_require__(124);
 	
-	var _jsonpRequestMessage = __webpack_require__(127);
+	var _jsonpRequestMessage = __webpack_require__(128);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -4481,7 +4575,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 /***/ },
-/* 120 */
+/* 121 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4565,7 +4659,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 /***/ },
-/* 121 */
+/* 122 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4577,11 +4671,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.RequestBuilder = undefined;
 	
-	var _aureliaPath = __webpack_require__(122);
+	var _aureliaPath = __webpack_require__(123);
 	
-	var _httpRequestMessage = __webpack_require__(123);
+	var _httpRequestMessage = __webpack_require__(124);
 	
-	var _jsonpRequestMessage = __webpack_require__(127);
+	var _jsonpRequestMessage = __webpack_require__(128);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -4758,7 +4852,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 /***/ },
-/* 122 */
+/* 123 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4918,7 +5012,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 123 */
+/* 124 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4929,11 +5023,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.HttpRequestMessage = undefined;
 	exports.createHttpRequestMessageProcessor = createHttpRequestMessageProcessor;
 	
-	var _headers = __webpack_require__(120);
+	var _headers = __webpack_require__(121);
 	
-	var _requestMessageProcessor = __webpack_require__(124);
+	var _requestMessageProcessor = __webpack_require__(125);
 	
-	var _transformers = __webpack_require__(126);
+	var _transformers = __webpack_require__(127);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -4952,7 +5046,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 124 */
+/* 125 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4964,9 +5058,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.RequestMessageProcessor = undefined;
 	
-	var _httpResponseMessage = __webpack_require__(125);
+	var _httpResponseMessage = __webpack_require__(126);
 	
-	var _aureliaPath = __webpack_require__(122);
+	var _aureliaPath = __webpack_require__(123);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -5058,7 +5152,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 /***/ },
-/* 125 */
+/* 126 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5070,7 +5164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.HttpResponseMessage = undefined;
 	
-	var _headers = __webpack_require__(120);
+	var _headers = __webpack_require__(121);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -5128,7 +5222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 /***/ },
-/* 126 */
+/* 127 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -5210,7 +5304,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 127 */
+/* 128 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5223,11 +5317,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.JSONPRequestMessage = undefined;
 	exports.createJSONPRequestMessageProcessor = createJSONPRequestMessageProcessor;
 	
-	var _headers = __webpack_require__(120);
+	var _headers = __webpack_require__(121);
 	
-	var _requestMessageProcessor = __webpack_require__(124);
+	var _requestMessageProcessor = __webpack_require__(125);
 	
-	var _transformers = __webpack_require__(126);
+	var _transformers = __webpack_require__(127);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -5362,8 +5456,8 @@ wakanda.provider('$wakandaConfig', ['wakandaClient', function(wakandaClient) {
 
 var wakanda = angular.module('wakanda');
 
-wakanda.factory('collectionFactory', ['$injector', '$q', 'dsStorage', 'rootScopeSafeApply', 'wakandaClient',
-  function ($injector, $q, dsStorage, rootScopeSafeApply, wakandaClient) {
+wakanda.factory('collectionFactory', ['$injector', '$q', 'rootScopeSafeApply', 'wakandaClient',
+  function ($injector, $q, rootScopeSafeApply, wakandaClient) {
     var collectionFactory = {};
 
     function _decorate(ngCollection, ngDataClass) {
@@ -5546,7 +5640,7 @@ wakanda.factory('collectionFactory', ['$injector', '$q', 'dsStorage', 'rootScope
                 var result = res;
 
                 if (wakandaClient.helper.isEntity(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
+                  var ngDataClass = ngCollection.$_dataClass.$_catalog[res._dataClass.name];
                   if (ngDataClass) {
                     var entityFactory = $injector.get('entityFactory');
                     result = entityFactory.createNgEntity(ngDataClass);
@@ -5554,7 +5648,7 @@ wakanda.factory('collectionFactory', ['$injector', '$q', 'dsStorage', 'rootScope
                   }
                 }
                 else if (wakandaClient.helper.isCollection(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
+                  var ngDataClass = ngCollection.$_dataClass.$_catalog[res._dataClass.name];
                   if (ngDataClass) {
                     result = collectionFactory.createNgCollection(ngDataClass)
                     result.$_collection = res;
@@ -5626,16 +5720,23 @@ wakanda.factory('collectionFactory', ['$injector', '$q', 'dsStorage', 'rootScope
 
 var wakanda = angular.module('wakanda');
 
-wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory', 'dsStorage', 'rootScopeSafeApply', 'wakandaClient',
-  function ($q, entityFactory, collectionFactory, dsStorage, rootScopeSafeApply, wakandaClient) {
+wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory', 'rootScopeSafeApply', 'wakandaClient',
+  function ($q, entityFactory, collectionFactory, rootScopeSafeApply, wakandaClient) {
     var dcFactory = {};
 
-    function NgDataClass(dataClass) {
+    function NgDataClass(dataClass, catalog) {
       Object.defineProperty(this, '$_dataClass', {
         enumerable: false,
         configurable: false,
         writable: false,
         value: dataClass
+      });
+
+      Object.defineProperty(this, '$_catalog', {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: catalog
       });
 
       this.$name            = dataClass.name;
@@ -5755,16 +5856,16 @@ wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory',
                 var result = res;
 
                 if (wakandaClient.helper.isEntity(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
-                  if (ngDataClass) {
-                    result = entityFactory.createNgEntity(ngDataClass);
+                  var targetDataClass = ngDataClass.$_catalog[res._dataClass.name];
+                  if (targetDataClass) {
+                    result = entityFactory.createNgEntity(targetDataClass);
                     result.$_entity = res;
                   }
                 }
                 else if (wakandaClient.helper.isCollection(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
-                  if (ngDataClass) {
-                    result = collectionFactory.createNgCollection(ngDataClass);
+                  var targetDataClass = ngDataClass.$_catalog[res._dataClass.name];
+                  if (targetDataClass) {
+                    result = collectionFactory.createNgCollection(targetDataClass);
                     result.$_collection = res;
                     collectionFactory.addEntities(result, res.entities);
                   }
@@ -5822,8 +5923,8 @@ wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory',
       return ngDataClass.$_dataClass.methods[type];
     }
 
-    dcFactory.createNgDataClass = function (dataClass) {
-      return new NgDataClass(dataClass);
+    dcFactory.createNgDataClass = function (dataClass, catalog) {
+      return new NgDataClass(dataClass, catalog);
     }
 
     return dcFactory;
@@ -5831,54 +5932,49 @@ wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory',
 
 var wakanda = angular.module('wakanda');
 
-wakanda.provider('dsStorage', function () {
-  var ds;
-
-  this.$get = function () {
-    return {
-      setDataStore: function (_ds) {
-        ds = _ds;
-      },
-      getNgDataClass: function (dcName) {
-        return ds ? ds[dcName] : null;
-      }
-    };
-  };
-});
-
-wakanda.factory('datastoreFactory', ['$q', 'dataclassFactory', 'dsStorage', 'wakandaClient',
-  function ($q, dataclassFactory, dsStorage, wakandaClient) {
+wakanda.factory('datastoreFactory', ['$q', 'dataclassFactory', 'wakandaClient',
+  function ($q, dataclassFactory, wakandaClient) {
     var dsFactory = {};
-    var ds;
+    var ds = null;
+
+    var _dsMap = {};
 
     dsFactory.init = function(catalogStr) {
       var catalog;
       var promise;
 
-      if (!ds) {
-        if (typeof catalogStr !== "string" || catalogStr === '*' || catalogStr === '') {
-          catalog = undefined;
-        } else {
-          catalog = catalogStr.split(',');
-        }
 
+      if (typeof catalogStr !== "string" || catalogStr === '*' || catalogStr === '') {
+        catalog = undefined;
+      } else {
+        catalog = catalogStr.split(',');
+      }
+
+      var cachedCatalog = _dsMap[hashCatalogName(catalog)];
+
+      if (!cachedCatalog) {
         promise = wakandaClient.getCatalog(catalog).then(function(_ds) {
           var dataClasses = {};
 
           for (var dcName in _ds) {
             if (_ds.hasOwnProperty(dcName)) {
-              dataClasses[dcName] = dataclassFactory.createNgDataClass(_ds[dcName]);
+              dataClasses[dcName] = dataclassFactory.createNgDataClass(_ds[dcName], dataClasses);
             }
           }
 
-          ds = dataClasses;
-          dsStorage.setDataStore(dataClasses);
+          //Will be deleted at the same time that $wakanda.$ds and $wakanda.getDataStore
+          if (!ds) {
+            ds = dataClasses;
+          }
+
+          _dsMap[hashCatalogName(catalog)] = dataClasses;
+
           return dataClasses;
         });
       }
       else {
         deferred = $q.defer();
-        deferred.resolve(ds);
+        deferred.resolve(cachedCatalog);
         promise = deferred.promise;
       }
       promise.$promise = promise;
@@ -5887,10 +5983,15 @@ wakanda.factory('datastoreFactory', ['$q', 'dataclassFactory', 'dsStorage', 'wak
   };
 
   dsFactory.getDataStore = function() {
+    console.warn('$wakanda.getDataStore() and $wakanda.$ds are deprecated. Use $wakanda.init() instead.');
     if (!ds) {
       throw new Error('The Datastore isn\'t initialized please execute $wakanda.init(catalog) before you run your app.');
     }
     return ds;
+  }
+
+  function hashCatalogName(catalog) {
+    return JSON.stringify(catalog || '*');
   }
 
   return dsFactory;
@@ -5999,8 +6100,8 @@ wakanda.factory('directoryFactory', ['$q', 'rootScopeSafeApply', 'wakandaClient'
 
 var wakanda = angular.module('wakanda');
 
-wakanda.factory('entityFactory', ['$injector', '$q', 'dsStorage', 'mediaFactory', 'rootScopeSafeApply', 'wakandaClient',
-  function ($injector, $q, dsStorage, mediaFactory, rootScopeSafeApply, wakandaClient) {
+wakanda.factory('entityFactory', ['$injector', '$q', 'mediaFactory', 'rootScopeSafeApply', 'wakandaClient',
+  function ($injector, $q, mediaFactory, rootScopeSafeApply, wakandaClient) {
     var entityFactory = {};
 
     //Entity class for Angular-Wakanda connector
@@ -6019,6 +6120,13 @@ wakanda.factory('entityFactory', ['$injector', '$q', 'dsStorage', 'mediaFactory'
         configurable: false,
         writable: true,
         value: {}
+      });
+
+      Object.defineProperty(this, '$_dataClass', {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: ngDataClass
       });
 
       //Creating property accessors for the entity
@@ -6194,17 +6302,17 @@ wakanda.factory('entityFactory', ['$injector', '$q', 'dsStorage', 'mediaFactory'
                 var result = res;
 
                 if (wakandaClient.helper.isEntity(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
-                  if (ngDataClass) {
-                    result = entityFactory.createNgEntity(ngDataClass);
+                  var targetDataClass = ngDataClass.$_catalog[res._dataClass.name];
+                  if (targetDataClass) {
+                    result = entityFactory.createNgEntity(targetDataClass);
                     result.$_entity = res;
                   }
                 }
                 else if (wakandaClient.helper.isCollection(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
-                  if (ngDataClass) {
+                  var targetDataClass = ngDataClass.$_catalog[res._dataClass.name];
+                  if (targetDataClass) {
                     var collectionFactory = $injector.get('collectionFactory');
-                    result = collectionFactory.createNgCollection(ngDataClass);
+                    result = collectionFactory.createNgCollection(targetDataClass);
                     result.$_collection = res;
                     collectionFactory.addEntities(result, res.entities);
                   }
@@ -6237,7 +6345,7 @@ wakanda.factory('entityFactory', ['$injector', '$q', 'dsStorage', 'mediaFactory'
 
           if (this.$_entity[attr.name]) {
             if (!ngEntity.$_relatedAttributes[attr.name]) {
-              var ngDataClass = dsStorage.getNgDataClass(attr.type);
+              var ngDataClass = ngEntity.$_dataClass.$_catalog[attr.type];
               var relatedNgEntity = new NgEntity(ngDataClass);
 
               relatedNgEntity.$_entity = ngEntity.$_entity[attr.name];
@@ -6278,7 +6386,7 @@ wakanda.factory('entityFactory', ['$injector', '$q', 'dsStorage', 'mediaFactory'
 
           if (this.$_entity[attr.name]) {
             if (!ngEntity.$_relatedAttributes[attr.name]) {
-              var ngDataClass = dsStorage.getNgDataClass(attr.entityType);
+              var ngDataClass = ngEntity.$_dataClass.$_catalog[attr.entityType];
               var collectionFactory = $injector.get('collectionFactory');
               var ngCollection = collectionFactory.createNgCollection(ngDataClass);
 

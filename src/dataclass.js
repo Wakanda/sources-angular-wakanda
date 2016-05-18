@@ -1,15 +1,22 @@
 var wakanda = angular.module('wakanda');
 
-wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory', 'dsStorage', 'rootScopeSafeApply', 'wakandaClient',
-  function ($q, entityFactory, collectionFactory, dsStorage, rootScopeSafeApply, wakandaClient) {
+wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory', 'rootScopeSafeApply', 'wakandaClient',
+  function ($q, entityFactory, collectionFactory, rootScopeSafeApply, wakandaClient) {
     var dcFactory = {};
 
-    function NgDataClass(dataClass) {
+    function NgDataClass(dataClass, catalog) {
       Object.defineProperty(this, '$_dataClass', {
         enumerable: false,
         configurable: false,
         writable: false,
         value: dataClass
+      });
+
+      Object.defineProperty(this, '$_catalog', {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: catalog
       });
 
       this.$name            = dataClass.name;
@@ -129,16 +136,16 @@ wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory',
                 var result = res;
 
                 if (wakandaClient.helper.isEntity(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
-                  if (ngDataClass) {
-                    result = entityFactory.createNgEntity(ngDataClass);
+                  var targetDataClass = ngDataClass.$_catalog[res._dataClass.name];
+                  if (targetDataClass) {
+                    result = entityFactory.createNgEntity(targetDataClass);
                     result.$_entity = res;
                   }
                 }
                 else if (wakandaClient.helper.isCollection(res)) {
-                  var ngDataClass = dsStorage.getNgDataClass(res._dataClass.name);
-                  if (ngDataClass) {
-                    result = collectionFactory.createNgCollection(ngDataClass);
+                  var targetDataClass = ngDataClass.$_catalog[res._dataClass.name];
+                  if (targetDataClass) {
+                    result = collectionFactory.createNgCollection(targetDataClass);
                     result.$_collection = res;
                     collectionFactory.addEntities(result, res.entities);
                   }
@@ -196,8 +203,8 @@ wakanda.factory('dataclassFactory', ['$q', 'entityFactory', 'collectionFactory',
       return ngDataClass.$_dataClass.methods[type];
     }
 
-    dcFactory.createNgDataClass = function (dataClass) {
-      return new NgDataClass(dataClass);
+    dcFactory.createNgDataClass = function (dataClass, catalog) {
+      return new NgDataClass(dataClass, catalog);
     }
 
     return dcFactory;
