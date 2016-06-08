@@ -1,6 +1,10 @@
 angular-wakanda.js - release notes
 ===================================================
 
+## v1.1.2
+
+* [Bugfix] Fix an issue with `$login` method that could fail when `setHostname()` was used and CORS enabled on Wakanda Server
+
 ## v1.1.1
 
 * Correct `$wakanda.init()` issue when calling it multiple times with different parameters, resulting on always returning the first fetched catalog

@@ -1,4 +1,4 @@
-//angular-wakanda.js - v1.1.1 - 2016-05-18
+//angular-wakanda.js - v1.1.2 - 2016-06-8
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -3952,7 +3952,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = {
 		"name": "wakanda-client",
 		"main": "dist/wakanda-client.node.js",
-		"version": "0.3.2",
+		"version": "0.3.3",
 		"description": "Wakanda Client allows you to easily interact with Wakanda Server on a JavaScript (browser or node) environment",
 		"typings": "dist/wakanda-client.d.ts",
 		"browser": "dist/wakanda-client.min.js",
@@ -4060,6 +4060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var uri = _a.uri;
 	        var request = this.client.createRequest(this.prefix + uri)
 	            .asGet()
+	            .withCredentials(true)
 	            .send();
 	        return this._httpResponseAdaptor({ request: request });
 	    };
@@ -4077,6 +4078,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var request = this.client.createRequest(this.prefix + uri)
 	            .asPost()
 	            .withContent(data)
+	            .withCredentials(true)
 	            .send();
 	        var result = this._httpResponseAdaptor({ request: request });
 	        return _super.prototype.responsePost.call(this, uri, result);
