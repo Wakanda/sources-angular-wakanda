@@ -17,10 +17,10 @@ Please file your issues on this repo : [Wakanda/wakanda-issues](https://github.c
 
 ## Setup
 
-Install development dependencies through npm.
+Install development dependencies through npm and bower.
 
 ```bash
-npm install
+npm install && bower install
 ```
 
 ### Run
