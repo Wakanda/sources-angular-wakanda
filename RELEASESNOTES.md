@@ -1,6 +1,10 @@
 angular-wakanda.js - release notes
 ===================================================
 
+## v1.1.3
+
+* [Bugfix] Update WakandaClient dependency to fix IE9 CustomEvent issue in AngularWakanda
+
 ## v1.1.2
 
 * [Bugfix] Fix an issue with `$login` method that could fail when `setHostname()` was used and CORS enabled on Wakanda Server
