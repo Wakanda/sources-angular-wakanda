@@ -1,6 +1,10 @@
 angular-wakanda.js - release notes
 ===================================================
 
+## v1.1.4
+
+* [Bugfix] Fix issue while calling `$wakanda.init()` with an empty data model
+
 ## v1.1.3
 
 * [Bugfix] Update WakandaClient dependency to fix IE9 CustomEvent issue in AngularWakanda
