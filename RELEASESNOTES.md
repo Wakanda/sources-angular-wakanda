@@ -1,6 +1,10 @@
 angular-wakanda.js - release notes
 ===================================================
 
+## v1.1.5
+
+* [Bugfix] Fix bug getting DataClass name for related entities attribute
+
 ## v1.1.4
 
 * [Bugfix] Fix issue while calling `$wakanda.init()` with an empty data model
