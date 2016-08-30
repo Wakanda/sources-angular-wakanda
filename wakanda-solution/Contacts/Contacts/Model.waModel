@@ -83,7 +83,7 @@
 					"name": "staff",
 					"kind": "relatedEntities",
 					"scope": "public",
-					"type": "EmployeeCollection",
+					"type": "Employees",
 					"reversePath": true,
 					"path": "employer"
 				}
@@ -136,7 +136,7 @@
 		{
 			"name": "Employee",
 			"className": "Employee",
-			"collectionName": "EmployeeCollection",
+			"collectionName": "Employees",
 			"scope": "public",
 			"attributes": [
 				{
