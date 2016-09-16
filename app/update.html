@@ -1,0 +1,23 @@
+<form novalidate >
+  <label>First Name</label>
+  <input type="text" ng-model="employee.firstName"><br/>
+
+  <label style="width=100px;">Last Name</label>
+  <input type="text" ng-model="employee.lastName"><br/>
+
+  <label style="width=100px;">Salary</label>
+  <input type="text" ng-model="employee.salary"><br/>
+
+  <input type="submit" ng-click="save()" value="Save">
+</form>
+
+<style>
+  label {
+    width: 80px;
+    display: inline-block;
+  }
+
+  form {
+    padding: 50px 0 0 0;
+  }
+</style>
