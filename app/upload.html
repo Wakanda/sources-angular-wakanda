@@ -1,0 +1,10 @@
+<h2>{{employee.firstName}} {{employee.lastName}}</h2>
+
+<div>
+  <input type="file" id="fileInput">
+  <input type="submit" value="Upload" ng-click="upload()">
+</div>
+
+<figure>
+    <img ng-show="employee.photo.uri"  ng-src="{{employee.photo.uri}}" alt="employee photo"/>
+</figure>

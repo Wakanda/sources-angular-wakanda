@@ -46,7 +46,7 @@ wakanda.factory('entityFactory', ['$injector', '$q', 'mediaFactory', 'rootScopeS
       }.bind(this));
 
       addUserDefinedMethods(this, ngDataClass);
-    };
+    }
 
     NgEntity.prototype.$save        = save;
     NgEntity.prototype.$remove      = remove;

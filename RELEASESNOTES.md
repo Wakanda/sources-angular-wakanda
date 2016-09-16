@@ -1,6 +1,17 @@
 angular-wakanda.js - release notes
 ===================================================
 
+## v1.2.0
+
+* [Bugfix] Update WakandaClient dependency
+* [Bugfix] Update WakandaClient dependency to fix :
+	* Handling `date` and `simple date` attributes
+	* Fix upload/remove files
+	* Update only changed attributes of an entity
+	* Fix on expanding implicitly related entity after an update
+	
+* [Bugfix] apply the changes after uploading/removing a file
+
 ## v1.1.5
 
 * [Bugfix] Fix bug getting DataClass name for related entities attribute
