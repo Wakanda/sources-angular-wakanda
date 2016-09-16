@@ -304,7 +304,19 @@ describe('Connector/Entity:', function() {
             done();
           });
         });
-      })
+      });
+    });
+
+    it('should update only changed attributes', function (done) {
+      ds.Employee.$all().$promise.then(function (e) {
+        var employee = e.result[0];
+        var oldStamp = employee.$_entity._stamp;
+      
+        return employee.$save().$promise.then(function () {
+          expect(employee.$_entity._stamp).to.be.equal(oldStamp);
+          done();
+        });
+      });
     });
   });
 
