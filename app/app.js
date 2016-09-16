@@ -36,6 +36,28 @@ app.config(function ($stateProvider, $urlRouterProvider) {
           return $wakandaManager.getDataStore();
         }
       }
+    })
+    .state('upload', {
+      url: '/upload',
+      controller: 'uploadController',
+      templateUrl: 'upload.html',
+      resolve: {
+         ds: function ($wakandaManager) {
+          //WakandaManager will call $wakanda.init() for us and return its result
+          return $wakandaManager.getDataStore();
+        }
+      }
+    })
+    .state('update', {
+      url: '/update',
+      controller: 'updateController',
+      templateUrl: 'update.html',
+      resolve: {
+         ds: function ($wakandaManager) {
+          //WakandaManager will call $wakanda.init() for us and return its result
+          return $wakandaManager.getDataStore();
+        }
+      }
     });
 });
 
@@ -70,4 +92,30 @@ app.controller('profileController', function ($scope, user, ds) {
 
     console.log(em.$toJSON());
   })
+});
+
+app.controller('uploadController', function($scope, ds) {
+  ds.Employee.$query().$promise.then(function(e) {
+    employee = $scope.employee = e.result[0];
+  });
+
+  $scope.upload = function() {
+    var file = document.getElementById('fileInput').files[0];
+    $scope.employee.photo.$upload(file).$promise.then(function (e) {
+      //Photo is uploaded and accessible on the entity
+      var photoUri = $scope.employee.photo.uri;
+      console.log('> photouri ', photoUri);
+    });
+  };
+});
+
+app.controller('updateController', function($scope, ds) {
+  _ds = ds;
+  ds.Employee.$query().$promise.then(function (e) {
+    employee = $scope.employee = e.result[0];
+  });
+
+  $scope.save = function() {
+    $scope.employee.$save();
+  };
 });
