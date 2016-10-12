@@ -34,7 +34,12 @@ describe('Connector/Entity:', function() {
   beforeEach(function(done) {
     employees = ds.Employee.$query();
     employees.$promise.then(function() {
-      employee = employees[0];
+      employees.some(function(_employee) {
+        if(_employee.employer) {
+          employee = _employee;
+          return true;
+        }
+      });
       done();
     });
   });
@@ -233,7 +238,7 @@ describe('Connector/Entity:', function() {
       });
     });
     it('should return an error if not found', function (done) {
-      var employeeToRemove = employees['0'];
+      var employeeToRemove = employees[0];
       employeeToRemove.$_entity = null;
       try {
         employeeToRemove.$remove();
