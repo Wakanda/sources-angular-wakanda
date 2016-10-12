@@ -390,7 +390,7 @@ describe('Connector/Entity:', function() {
    });
 
    it('should return a promise on $promise property', function (done) {
-     var request = employees[1].employer.$fetch();
+     var request = employee.employer.$fetch();
 
      var promise = request.$promise;
      expect(request).to.have.property('$promise');
