@@ -404,12 +404,10 @@ describe('Connector/Entity:', function() {
 
   describe('setter on related entity', function() {
     it('should update the related entity before and after $save', function(done) {
-      employee = employees[2];
-      var companies = ds.Company.$query();
-      companies.$promise.then(function() {
-        var company = companies[0];
-
-        employee.employer.$fetch().then(function() {
+      employee.employer.$fetch().then(function() {
+        var companies = ds.Company.$query({ filter: 'ID != :1', params: [ employee.employer.ID ] });
+        companies.$promise.then(function() {
+          var company = companies[0];
           expect(employee.employer.ID).to.not.equal(company.ID);
 
           employee.employer = company;
