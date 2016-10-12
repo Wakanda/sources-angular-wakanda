@@ -1,3 +1,5 @@
+
+
 model.Product.events.init = function(event) {
 	this.myBoolean = true;
 };
