@@ -11,7 +11,9 @@ describe('Connector/Trasnform :', function() {
 
   beforeEach(function() {
     if (!$wakanda) {
-      module('wakanda');
+      module('wakanda', function ($wakandaConfigProvider) {
+        $wakandaConfigProvider.setCatalogName();
+      });
       inject(function(_$rootScope_, _$wakanda_, _$q_) {
         $q = _$q_;
         $rootScope = _$rootScope_;
