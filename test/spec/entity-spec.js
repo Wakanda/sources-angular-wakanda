@@ -227,12 +227,12 @@ describe('Connector/Entity:', function() {
     });
 
     it('should remove an entity', function (done) {
-      var employeeToRemove = employees[0];
-      employees[0].$remove().should.be.fulfilled.then(function(removeResult){
+      var employeeToRemove = employees[4];
+      employees[4].$remove().should.be.fulfilled.then(function(removeResult){
         expect(removeResult).to.be.an('object');
         employees = ds.Employee.$query();
         employees.$promise.then(function() {
-          expect(employees[0]).to.be.not.equal(employeeToRemove);
+          expect(employees[4]).to.be.not.equal(employeeToRemove);
           done();
         });
       });
