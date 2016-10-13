@@ -9,8 +9,8 @@
 					"isOpen": "true",
 					"pathVisible": true,
 					"position": {
-						"X": 51,
-						"Y": 331
+						"X": 31,
+						"Y": 52
 					}
 				}
 			},
@@ -20,8 +20,8 @@
 					"isOpen": "true",
 					"pathVisible": true,
 					"position": {
-						"X": 387,
-						"Y": 55
+						"X": 519,
+						"Y": 93
 					}
 				}
 			},
@@ -31,8 +31,8 @@
 					"isOpen": "true",
 					"pathVisible": true,
 					"position": {
-						"X": 747,
-						"Y": 35
+						"X": 863,
+						"Y": 55
 					}
 				}
 			}
@@ -40,7 +40,7 @@
 		"model": {
 			"scriptMode": "manual",
 			"workspaceLeft": 0,
-			"workspaceTop": 9,
+			"workspaceTop": 16,
 			"lastScriptLocation": {
 				"Product": {
 					"method": "Product/Product-methods.js",
@@ -48,7 +48,8 @@
 				},
 				"Employee": {
 					"method": "Employee/Employee-methods.js",
-					"computed": "Employee/Employee-events.js"
+					"computed": "Employee/Employee-events.js",
+					"events": "Employee/Employee-events.js"
 				},
 				"Company": {
 					"method": "Company/Company-methods.js"
@@ -199,6 +200,21 @@
 					"kind": "storage",
 					"scope": "public",
 					"type": "image"
+				},
+				{
+					"name": "birthDate",
+					"kind": "storage",
+					"matchColumn": "born",
+					"scope": "public",
+					"type": "date",
+					"simpleDate": false
+				},
+				{
+					"name": "hiringDate",
+					"kind": "storage",
+					"scope": "public",
+					"type": "date",
+					"simpleDate": true
 				}
 			],
 			"methods": [
@@ -313,12 +329,23 @@
 					"kind": "storage",
 					"scope": "public",
 					"type": "image"
+				},
+				{
+					"name": "myNumber",
+					"kind": "storage",
+					"scope": "public",
+					"type": "number"
 				}
 			],
 			"events": [
 				{
 					"kind": "init",
 					"from": "$mainModel.Product.events.init",
+					"userDefined": true
+				},
+				{
+					"kind": "clientrefresh",
+					"from": "$mainModel.Product.events.clientrefresh",
 					"userDefined": true
 				}
 			],

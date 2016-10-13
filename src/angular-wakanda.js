@@ -33,16 +33,24 @@ wakanda.factory('$wakanda', ['datastoreFactory', 'directoryFactory', 'transformF
 ]);
 
 wakanda.provider('$wakandaConfig', ['wakandaClient', function(wakandaClient) {
-  var hostname = '';
+  var hostname = '',
+    catalogName;
   this.$get = function() {
     return {
       getHostname: function() {
         return hostname;
+      },
+      getCatalogName: function() {
+        return catalogName;
       }
     };
   };
   this.setHostname = function(_hostname) {
     wakandaClient._httpClient.prefix = _hostname + '/rest';
     hostname = _hostname;
+  };
+  this.setCatalogName = function(_catalogName) {
+    wakandaClient.catalog = _catalogName; 
+    catalogName = _catalogName;
   };
 }]);
