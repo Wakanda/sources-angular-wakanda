@@ -1,6 +1,11 @@
 angular-wakanda.js - release notes
 ===================================================
 
+## v1.3.0
+
+* [Feature] Update WakandaClient dependency to get the feature which support the multimodel 
+* [Feature] Add `setCatalogName()` to wakanda provider to use another catalog than the main one 
+
 ## v1.2.0
 
 * [Bugfix] Update WakandaClient dependency

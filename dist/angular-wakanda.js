@@ -1,4 +1,4 @@
-//angular-wakanda.js - v1.2.0 - 2016-10-12
+//angular-wakanda.js - v1.3.0 - 2016-10-13
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
