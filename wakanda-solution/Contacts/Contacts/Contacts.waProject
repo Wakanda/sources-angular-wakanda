@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-	<folder path="./WebFolder/">
-		<tag name="webFolder"/>
-	</folder>
-	<file path="./Model.waModel">
+	<file path="./models/main/model.waModel">
 		<tag name="catalog"/>
 	</file>
-	<file path="./Settings.waSettings">
+	<folder path="./database/data/">
+		<tag name="dataFolder"/>
+	</folder>
+	<folder path="./database/backups/">
+		<tag name="Backups"/>
+	</folder>
+	<folder path="./Widgets/">
+		<tag name="widgets"/>
+	</folder>
+	<folder path="./Themes/">
+		<tag name="themes"/>
+	</folder>
+	<folder path="./web/"><tag name="webFolder"/></folder>
+	<folder path="./mobile/"><tag name="mobileFolder"/></folder>
+	<file path="./backend/settings.waSettings">
 		<tag name="settings"/>
 	</file>
-	<file path="./Permissions.waPerm">
+	<file path="./backend/permissions.waPerm">
 		<tag name="permissions"/>
 	</file>
-	<file path="./Bootstrap.js">
-		<tag name="bootStrap"/>
-	</file>
+   <file path="./backend/bootstrap.js">
+      <tag name="bootStrap"/>
+  </file>
 </project>

@@ -34,7 +34,12 @@ describe('Connector/Entity:', function() {
   beforeEach(function(done) {
     employees = ds.Employee.$query();
     employees.$promise.then(function() {
-      employee = employees[0];
+      employees.some(function(_employee) {
+        if(_employee.employer) {
+          employee = _employee;
+          return true;
+        }
+      });
       done();
     });
   });
@@ -222,18 +227,18 @@ describe('Connector/Entity:', function() {
     });
 
     it('should remove an entity', function (done) {
-      var employeeToRemove = employees[0];
-      employees[0].$remove().should.be.fulfilled.then(function(removeResult){
+      var employeeToRemove = employees[4];
+      employees[4].$remove().should.be.fulfilled.then(function(removeResult){
         expect(removeResult).to.be.an('object');
         employees = ds.Employee.$query();
         employees.$promise.then(function() {
-          expect(employees[0]).to.be.not.equal(employeeToRemove);
+          expect(employees[4]).to.be.not.equal(employeeToRemove);
           done();
         });
       });
     });
     it('should return an error if not found', function (done) {
-      var employeeToRemove = employees['0'];
+      var employeeToRemove = employees[0];
       employeeToRemove.$_entity = null;
       try {
         employeeToRemove.$remove();
@@ -385,7 +390,7 @@ describe('Connector/Entity:', function() {
    });
 
    it('should return a promise on $promise property', function (done) {
-     var request = employees[1].employer.$fetch();
+     var request = employee.employer.$fetch();
 
      var promise = request.$promise;
      expect(request).to.have.property('$promise');
@@ -399,12 +404,10 @@ describe('Connector/Entity:', function() {
 
   describe('setter on related entity', function() {
     it('should update the related entity before and after $save', function(done) {
-      employee = employees[2];
-      var companies = ds.Company.$query();
-      companies.$promise.then(function() {
-        var company = companies[0];
-
-        employee.employer.$fetch().then(function() {
+      employee.employer.$fetch().then(function() {
+        var companies = ds.Company.$query({ filter: 'ID != :1', params: [ employee.employer.ID ] });
+        companies.$promise.then(function() {
+          var company = companies[0];
           expect(employee.employer.ID).to.not.equal(company.ID);
 
           employee.employer = company;
