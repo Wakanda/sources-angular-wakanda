@@ -12,6 +12,7 @@
   },
   "author": "Wakanda SAS",
   "license": "MIT",
+  "repository": "Wakanda/source-angular-wakanda",
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
