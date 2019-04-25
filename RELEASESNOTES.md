@@ -1,6 +1,26 @@
 angular-wakanda.js - release notes
 ===================================================
 
+## v1.3.0
+
+* [Feature] Update WakandaClient dependency to get the feature which support the multimodel 
+* [Feature] Add `setCatalogName()` to wakanda provider to use another catalog than the main one 
+
+## v1.2.0
+
+* [Bugfix] Update WakandaClient dependency
+* [Bugfix] Update WakandaClient dependency to fix :
+	* Handling `date` and `simple date` attributes
+	* Fix upload/remove files
+	* Update only changed attributes of an entity
+	* Fix on expanding implicitly related entity after an update
+	
+* [Bugfix] apply the changes after uploading/removing a file
+
+## v1.1.5
+
+* [Bugfix] Fix bug getting DataClass name for related entities attribute
+
 ## v1.1.4
 
 * [Bugfix] Fix issue while calling `$wakanda.init()` with an empty data model

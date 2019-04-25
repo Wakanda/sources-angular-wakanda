@@ -1,7 +1,7 @@
 var wakanda = angular.module('wakanda');
 
-wakanda.factory('mediaFactory', [
-  function () {
+wakanda.factory('mediaFactory', ['rootScopeSafeApply', '$q',
+  function (rootScopeSafeApply, $q) {
     var mediaFactory = {};
 
     function NgMedia(media) {
@@ -29,9 +29,12 @@ wakanda.factory('mediaFactory', [
 
     function upload(file) {
       var promise = this.$_media.upload(file, file.type).then(function (res) {
-        return {
-          result: res
-        };
+        var deferred = $q.defer();
+        rootScopeSafeApply(function () {
+          deferred.resolve({
+            result: res
+          });
+        });
       });
 
       promise.$promise = promise;
@@ -40,9 +43,12 @@ wakanda.factory('mediaFactory', [
 
     function remove() {
       var promise = this.$_media.delete().then(function (res) {
-        return {
-          result: res
-        };
+        var deferred = $q.defer();
+        rootScopeSafeApply(function () {
+          deferred.resolve({
+            result: res
+          });
+        });
       });
 
       promise.$promise = promise;

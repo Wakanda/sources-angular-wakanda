@@ -156,7 +156,7 @@ describe('Connector/Dataclass:', function() {
     it('should return the name defined for the collection of the datastore class in the Model', function(done) {
       var collectionName = ds.Employee.$collectionName;
       expect(collectionName).to.be.a('string');
-      expect(collectionName).to.be.equal('EmployeeCollection');
+      expect(collectionName).to.be.equal('Employees');
       done();
     });
   });

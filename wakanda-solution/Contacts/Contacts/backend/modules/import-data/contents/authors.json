@@ -1,0 +1,56 @@
+{
+	"1": {
+		"ID": 1,
+		"firstName": "Victor",
+		"lastName": "Hugo",
+		"birthDate": "1802-02-26T00:00:00.000Z"
+	},
+	"2": {
+		"ID": 2,
+		"firstName": "Albert",
+		"lastName": "Camus",
+		"birthDate": "1913-11-07T00:00:00.000Z"
+	},
+	"3": {
+		"ID": 3,
+		"firstName": "Honoré",
+		"lastName": "Balzac",
+		"birthDate": "1799-05-20T00:00:00.000Z"
+	},
+	"4": {
+		"ID": 4,
+		"firstName": "Gustave",
+		"lastName": "Flaubert",
+		"birthDate": "1821-12-12T00:00:00.000Z"
+	},
+	"5": {
+		"ID": 5,
+		"firstName": "Emile",
+		"lastName": "Zola",
+		"birthDate": "1840-04-02T00:00:00.000Z"
+	},
+	"6": {
+		"ID": 6,
+		"firstName": "Charles",
+		"lastName": "Baudelaires",
+		"birthDate": "1821-04-09T00:00:00.000Z"
+	},
+	"7": {
+		"ID": 7,
+		"firstName": "Christine",
+		"lastName": "Margerrison",
+		"birthDate": ""
+	},
+	"8": {
+		"ID": 8,
+		"firstName": "Véronique",
+		"lastName": "Anglard",
+		"birthDate": ""
+	},
+	"9": {
+		"ID": 9,
+		"firstName": "José",
+		"lastName": "José",
+		"birthDate": ""
+	}
+}
